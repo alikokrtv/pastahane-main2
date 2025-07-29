@@ -29,6 +29,13 @@ DEBUG = os.environ.get('DEBUG', 'True').lower() == 'true'
 
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'siparis.tatopastabaklava.com,localhost,127.0.0.1').split(',')
 
+# CSRF trusted origins for secure forms
+CSRF_TRUSTED_ORIGINS = [
+    'https://siparis.tatopastabaklava.com',
+    'http://localhost:8000',
+    'http://127.0.0.1:8000',
+]
+
 
 # Application definition
 
