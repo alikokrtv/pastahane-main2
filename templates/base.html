@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="tr" class="h-full bg-gray-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Pastane Yönetim Sistemi{% endblock %}</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- HTMX -->
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    
+    <!-- Alpine.js -->
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <style>
+        .htmx-indicator {
+            opacity: 0;
+            transition: opacity 500ms ease-in;
+        }
+        .htmx-request .htmx-indicator {
+            opacity: 1;
+        }
+        .htmx-request.htmx-indicator {
+            opacity: 1;
+        }
+        
+        /* Custom scrollbar */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 3px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+        
+        /* Animations */
+        .fade-in {
+            animation: fadeIn 0.3s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .slide-down {
+            animation: slideDown 0.3s ease-out;
+        }
+        
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="h-full" x-data="{ sidebarOpen: false, userMenuOpen: false }" @keydown.escape="sidebarOpen = false; userMenuOpen = false">
+    <!-- Loading indicator -->
+    <div id="loading-indicator" class="htmx-indicator fixed top-4 right-4 z-50">
+        <div class="bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg flex items-center">
+            <i class="fas fa-spinner fa-spin mr-2"></i>
+            Yükleniyor...
+        </div>
+    </div>
+    
+    <!-- Mobile sidebar backdrop -->
+    <div x-show="sidebarOpen" 
+         x-transition:enter="transition-opacity ease-linear duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition-opacity ease-linear duration-300"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         class="fixed inset-0 flex z-40 md:hidden" 
+         @click="sidebarOpen = false">
+        <div class="fixed inset-0 bg-gray-600 bg-opacity-75"></div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="fixed inset-y-0 left-0 flex w-64 flex-col" 
+         :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'"
+         x-transition:enter="transition ease-in-out duration-300 transform"
+         x-transition:enter-start="-translate-x-full"
+         x-transition:enter-end="translate-x-0"
+         x-transition:leave="transition ease-in-out duration-300 transform"
+         x-transition:leave-start="translate-x-0"
+         x-transition:leave-end="-translate-x-full">
+        
+        <div class="flex flex-col flex-grow pt-5 bg-gradient-to-b from-indigo-800 to-indigo-900 overflow-y-auto custom-scrollbar">
+            <!-- Logo -->
+            <div class="flex items-center flex-shrink-0 px-4">
+                <div class="flex items-center">
+                    <i class="fas fa-bread-slice text-white text-2xl mr-3"></i>
+                    <h1 class="text-white text-xl font-bold">Pastane Yönetimi</h1>
+                </div>
+            </div>
+            
+            <!-- Navigation -->
+            <nav class="mt-8 flex-1 px-2 space-y-1">
+                <!-- Dashboard -->
+                <a href="{% url 'dashboard' %}" 
+                   class="group flex items-center px-2 py-2 text-sm font-medium rounded-md text-indigo-100 hover:text-white hover:bg-indigo-700 transition-colors duration-200">
+                    <i class="fas fa-tachometer-alt mr-3 text-indigo-300 group-hover:text-white"></i>
+                    Dashboard
+                </a>
+                
+                <!-- Orders -->
+                <div x-data="{ open: false }">
+                    <button @click="open = !open" 
+                            class="group w-full flex items-center px-2 py-2 text-sm font-medium rounded-md text-indigo-100 hover:text-white hover:bg-indigo-700 transition-colors duration-200">
+                        <i class="fas fa-shopping-cart mr-3 text-indigo-300 group-hover:text-white"></i>
+                        Siparişler
+                        <i class="fas fa-chevron-right ml-auto transform transition-transform duration-200" :class="{ 'rotate-90': open }"></i>
+                    </button>
+                    <div x-show="open" x-transition class="mt-1 space-y-1">
+                        <a href="{% url 'orders:order-list' %}" class="group flex items-center pl-8 pr-2 py-2 text-sm font-medium rounded-md text-indigo-200 hover:text-white hover:bg-indigo-700">
+                            <i class="fas fa-list mr-3 text-indigo-400"></i>
+                            Sipariş Listesi
+                        </a>
+                        <a href="{% url 'orders:order-create' %}" class="group flex items-center pl-8 pr-2 py-2 text-sm font-medium rounded-md text-indigo-200 hover:text-white hover:bg-indigo-700">
+                            <i class="fas fa-plus mr-3 text-indigo-400"></i>
+                            Yeni Sipariş
+                        </a>
+                        <a href="{% url 'orders:template-list' %}" class="group flex items-center pl-8 pr-2 py-2 text-sm font-medium rounded-md text-indigo-200 hover:text-white hover:bg-indigo-700">
+                            <i class="fas fa-template mr-3 text-indigo-400"></i>
+                            Şablonlar
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Inventory -->
+                <div x-data="{ open: false }">
+                    <button @click="open = !open" 
+                            class="group w-full flex items-center px-2 py-2 text-sm font-medium rounded-md text-indigo-100 hover:text-white hover:bg-indigo-700 transition-colors duration-200">
+                        <i class="fas fa-boxes mr-3 text-indigo-300 group-hover:text-white"></i>
+                        Stok Yönetimi
+                        <i class="fas fa-chevron-right ml-auto transform transition-transform duration-200" :class="{ 'rotate-90': open }"></i>
+                    </button>
+                    <div x-show="open" x-transition class="mt-1 space-y-1">
+                        <a href="{% url 'inventory:inventory-list' %}" class="group flex items-center pl-8 pr-2 py-2 text-sm font-medium rounded-md text-indigo-200 hover:text-white hover:bg-indigo-700">
+                            <i class="fas fa-warehouse mr-3 text-indigo-400"></i>
+                            Stok Durumu
+                        </a>
+                        <a href="{% url 'inventory:product-list' %}" class="group flex items-center pl-8 pr-2 py-2 text-sm font-medium rounded-md text-indigo-200 hover:text-white hover:bg-indigo-700">
+                            <i class="fas fa-birthday-cake mr-3 text-indigo-400"></i>
+                            Ürünler
+                        </a>
+                        <a href="{% url 'inventory:recipe-list' %}" class="group flex items-center pl-8 pr-2 py-2 text-sm font-medium rounded-md text-indigo-200 hover:text-white hover:bg-indigo-700">
+                            <i class="fas fa-book mr-3 text-indigo-400"></i>
+                            Reçeteler
+                        </a>
+                        <a href="{% url 'inventory:stock-movement-list' %}" class="group flex items-center pl-8 pr-2 py-2 text-sm font-medium rounded-md text-indigo-200 hover:text-white hover:bg-indigo-700">
+                            <i class="fas fa-exchange-alt mr-3 text-indigo-400"></i>
+                            Stok Hareketleri
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Production -->
+                <div x-data="{ open: false }">
+                    <button @click="open = !open" 
+                            class="group w-full flex items-center px-2 py-2 text-sm font-medium rounded-md text-indigo-100 hover:text-white hover:bg-indigo-700 transition-colors duration-200">
+                        <i class="fas fa-industry mr-3 text-indigo-300 group-hover:text-white"></i>
+                        Üretim
+                        <i class="fas fa-chevron-right ml-auto transform transition-transform duration-200" :class="{ 'rotate-90': open }"></i>
+                    </button>
+                    <div x-show="open" x-transition class="mt-1 space-y-1">
+                        <a href="{% url 'production:plan-list' %}" class="group flex items-center pl-8 pr-2 py-2 text-sm font-medium rounded-md text-indigo-200 hover:text-white hover:bg-indigo-700">
+                            <i class="fas fa-calendar-alt mr-3 text-indigo-400"></i>
+                            Üretim Planları
+                        </a>
+                        <a href="{% url 'production:batch-list' %}" class="group flex items-center pl-8 pr-2 py-2 text-sm font-medium rounded-md text-indigo-200 hover:text-white hover:bg-indigo-700">
+                            <i class="fas fa-layer-group mr-3 text-indigo-400"></i>
+                            Üretim Partileri
+                        </a>
+                        <a href="{% url 'production:quality-list' %}" class="group flex items-center pl-8 pr-2 py-2 text-sm font-medium rounded-md text-indigo-200 hover:text-white hover:bg-indigo-700">
+                            <i class="fas fa-check-circle mr-3 text-indigo-400"></i>
+                            Kalite Kontrol
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Sales -->
+                <a href="{% url 'sales:sales-list' %}" 
+                   class="group flex items-center px-2 py-2 text-sm font-medium rounded-md text-indigo-100 hover:text-white hover:bg-indigo-700 transition-colors duration-200">
+                    <i class="fas fa-chart-line mr-3 text-indigo-300 group-hover:text-white"></i>
+                    Satış
+                </a>
+                
+                <!-- Reports -->
+                <a href="{% url 'reports:report-list' %}" 
+                   class="group flex items-center px-2 py-2 text-sm font-medium rounded-md text-indigo-100 hover:text-white hover:bg-indigo-700 transition-colors duration-200">
+                    <i class="fas fa-chart-bar mr-3 text-indigo-300 group-hover:text-white"></i>
+                    Raporlar
+                </a>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Main content -->
+    <div class="md:pl-64 flex flex-col flex-1">
+        <!-- Top bar -->
+        <div class="sticky top-0 z-10 flex-shrink-0 flex h-16 bg-white shadow-sm border-b border-gray-200">
+            <!-- Mobile menu button -->
+            <button @click="sidebarOpen = true" 
+                    class="px-4 border-r border-gray-200 text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500 md:hidden">
+                <span class="sr-only">Menüyü aç</span>
+                <i class="fas fa-bars"></i>
+            </button>
+            
+            <div class="flex-1 px-4 flex justify-between items-center">
+                <!-- Page title -->
+                <div class="flex-1">
+                    <h1 class="text-2xl font-semibold text-gray-900">
+                        {% block page_title %}Dashboard{% endblock %}
+                    </h1>
+                </div>
+                
+                <!-- User menu -->
+                <div class="ml-4 flex items-center md:ml-6" x-data="{ open: false }">
+                    <!-- Notifications -->
+                    <button class="bg-white p-1 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 mr-3">
+                        <span class="sr-only">Bildirimler</span>
+                        <i class="fas fa-bell text-lg"></i>
+                    </button>
+                    
+                    <!-- Profile dropdown -->
+                    <div class="relative">
+                        <button @click="open = !open" 
+                                class="max-w-xs bg-white flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            <span class="sr-only">Kullanıcı menüsü</span>
+                            <div class="h-8 w-8 rounded-full bg-indigo-500 flex items-center justify-center">
+                                <i class="fas fa-user text-white text-sm"></i>
+                            </div>
+                            <span class="ml-2 text-gray-700 font-medium">Kullanıcı</span>
+                            <i class="fas fa-chevron-down ml-2 text-gray-400"></i>
+                        </button>
+                        
+                        <div x-show="open" 
+                             x-transition:enter="transition ease-out duration-100"
+                             x-transition:enter-start="transform opacity-0 scale-95"
+                             x-transition:enter-end="transform opacity-100 scale-100"
+                             x-transition:leave="transition ease-in duration-75"
+                             x-transition:leave-start="transform opacity-100 scale-100"
+                             x-transition:leave-end="transform opacity-0 scale-95"
+                             @click.away="open = false"
+                             class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-50">
+                            <a href="{% url 'users:profile' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <i class="fas fa-user-cog mr-2"></i>
+                                Profil
+                            </a>
+                            <a href="/admin/" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <i class="fas fa-cogs mr-2"></i>
+                                Yönetim Paneli
+                            </a>
+                            <a href="{% url 'users:logout' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <i class="fas fa-sign-out-alt mr-2"></i>
+                                Çıkış
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Page content -->
+        <main class="flex-1">
+            <div class="py-6">
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+    </div>
+
+    <!-- Toast notifications -->
+    <div id="toast-container" class="fixed top-20 right-4 z-50 space-y-2">
+        <!-- Toasts will be dynamically added here -->
+    </div>
+
+    <script>
+        // HTMX configuration
+        document.addEventListener('DOMContentLoaded', function() {
+            // Configure HTMX
+            htmx.config.globalViewTransitions = true;
+            htmx.config.includeIndicatorStyles = false;
+            
+            // Global error handler
+            document.body.addEventListener('htmx:responseError', function(event) {
+                showToast('Bir hata oluştu. Lütfen tekrar deneyin.', 'error');
+            });
+            
+            // Loading indicator
+            document.body.addEventListener('htmx:beforeRequest', function(event) {
+                document.getElementById('loading-indicator').style.display = 'block';
+            });
+            
+            document.body.addEventListener('htmx:afterRequest', function(event) {
+                document.getElementById('loading-indicator').style.display = 'none';
+            });
+        });
+        
+        // Toast notification function
+        function showToast(message, type = 'info', duration = 5000) {
+            const toastContainer = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            const bgColor = type === 'error' ? 'bg-red-500' : 
+                           type === 'success' ? 'bg-green-500' : 
+                           type === 'warning' ? 'bg-yellow-500' : 'bg-blue-500';
+            
+            const icon = type === 'error' ? 'fas fa-exclamation-circle' : 
+                        type === 'success' ? 'fas fa-check-circle' : 
+                        type === 'warning' ? 'fas fa-exclamation-triangle' : 'fas fa-info-circle';
+            
+            toast.className = `${bgColor} text-white px-6 py-4 rounded-lg shadow-lg flex items-center fade-in`;
+            toast.innerHTML = `
+                <i class="${icon} mr-3"></i>
+                <span>${message}</span>
+                <button onclick="this.parentElement.remove()" class="ml-4 text-white hover:text-gray-200">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            
+            toastContainer.appendChild(toast);
+            
+            setTimeout(() => {
+                if (toast.parentElement) {
+                    toast.style.opacity = '0';
+                    toast.style.transform = 'translateX(100%)';
+                    setTimeout(() => toast.remove(), 300);
+                }
+            }, duration);
+        }
+        
+        // Global utility functions
+        window.showToast = showToast;
+        
+        // Auto-refresh for real-time data
+        function setupAutoRefresh(selector, interval = 30000) {
+            setInterval(() => {
+                const element = document.querySelector(selector);
+                if (element) {
+                    htmx.trigger(element, 'refresh');
+                }
+            }, interval);
+        }
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html> 

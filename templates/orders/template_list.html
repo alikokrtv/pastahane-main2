@@ -1,0 +1,187 @@
+{% extends 'base.html' %}
+
+{% block title %}Sipariş Şablonları - Pastane Yönetim Sistemi{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Page Header -->
+    <div class="bg-white shadow-sm rounded-lg p-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900 mb-2">
+                    <i class="fas fa-file-alt text-indigo-600 mr-3"></i>
+                    Sipariş Şablonları
+                </h1>
+                <p class="text-gray-600">Sık kullanılan sipariş şablonlarını yönetin</p>
+            </div>
+            <div class="flex space-x-3">
+                <a href="{% url 'orders:order-list' %}" 
+                   class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition flex items-center">
+                    <i class="fas fa-arrow-left mr-2"></i>
+                    Sipariş Listesi
+                </a>
+                <button class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition flex items-center">
+                    <i class="fas fa-plus mr-2"></i>
+                    Yeni Şablon
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Templates Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Template Card 1 -->
+        <div class="bg-white shadow-sm rounded-lg p-6 hover:shadow-md transition">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-medium text-gray-900">Doğum Günü Paketi</h3>
+                <div class="flex space-x-2">
+                    <button class="text-indigo-600 hover:text-indigo-800">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="text-red-600 hover:text-red-800">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="space-y-2 mb-4">
+                <div class="flex justify-between text-sm">
+                    <span class="text-gray-600">Doğum Günü Pastası (1 adet)</span>
+                    <span class="font-medium">₺250.00</span>
+                </div>
+                <div class="flex justify-between text-sm">
+                    <span class="text-gray-600">Cupcake Set (12 adet)</span>
+                    <span class="font-medium">₺120.00</span>
+                </div>
+                <div class="flex justify-between text-sm">
+                    <span class="text-gray-600">Mum Seti</span>
+                    <span class="font-medium">₺15.00</span>
+                </div>
+            </div>
+            
+            <div class="border-t pt-4">
+                <div class="flex justify-between items-center mb-4">
+                    <span class="text-lg font-medium">Toplam: ₺385.00</span>
+                </div>
+                <button class="w-full bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">
+                    <i class="fas fa-plus mr-2"></i>
+                    Şablonu Kullan
+                </button>
+            </div>
+        </div>
+
+        <!-- Template Card 2 -->
+        <div class="bg-white shadow-sm rounded-lg p-6 hover:shadow-md transition">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-medium text-gray-900">Düğün Paketi</h3>
+                <div class="flex space-x-2">
+                    <button class="text-indigo-600 hover:text-indigo-800">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="text-red-600 hover:text-red-800">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="space-y-2 mb-4">
+                <div class="flex justify-between text-sm">
+                    <span class="text-gray-600">3 Katlı Düğün Pastası</span>
+                    <span class="font-medium">₺850.00</span>
+                </div>
+                <div class="flex justify-between text-sm">
+                    <span class="text-gray-600">Mini Tatlı Set (50 adet)</span>
+                    <span class="font-medium">₺300.00</span>
+                </div>
+                <div class="flex justify-between text-sm">
+                    <span class="text-gray-600">Süsleme</span>
+                    <span class="font-medium">₺100.00</span>
+                </div>
+            </div>
+            
+            <div class="border-t pt-4">
+                <div class="flex justify-between items-center mb-4">
+                    <span class="text-lg font-medium">Toplam: ₺1,250.00</span>
+                </div>
+                <button class="w-full bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">
+                    <i class="fas fa-plus mr-2"></i>
+                    Şablonu Kullan
+                </button>
+            </div>
+        </div>
+
+        <!-- Template Card 3 -->
+        <div class="bg-white shadow-sm rounded-lg p-6 hover:shadow-md transition">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-medium text-gray-900">Kurumsal Paket</h3>
+                <div class="flex space-x-2">
+                    <button class="text-indigo-600 hover:text-indigo-800">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="text-red-600 hover:text-red-800">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="space-y-2 mb-4">
+                <div class="flex justify-between text-sm">
+                    <span class="text-gray-600">Büro Keki</span>
+                    <span class="font-medium">₺180.00</span>
+                </div>
+                <div class="flex justify-between text-sm">
+                    <span class="text-gray-600">Kurabiye Set (30 adet)</span>
+                    <span class="font-medium">₺90.00</span>
+                </div>
+                <div class="flex justify-between text-sm">
+                    <span class="text-gray-600">Kahve Eşliği</span>
+                    <span class="font-medium">₺45.00</span>
+                </div>
+            </div>
+            
+            <div class="border-t pt-4">
+                <div class="flex justify-between items-center mb-4">
+                    <span class="text-lg font-medium">Toplam: ₺315.00</span>
+                </div>
+                <button class="w-full bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">
+                    <i class="fas fa-plus mr-2"></i>
+                    Şablonu Kullan
+                </button>
+            </div>
+        </div>
+
+        <!-- Add New Template Card -->
+        <div class="bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg p-6 flex flex-col items-center justify-center hover:border-indigo-400 hover:bg-indigo-50 transition">
+            <i class="fas fa-plus text-4xl text-gray-400 mb-4"></i>
+            <h3 class="text-lg font-medium text-gray-900 mb-2">Yeni Şablon Oluştur</h3>
+            <p class="text-gray-600 text-center mb-4">Sık kullandığınız sipariş kombinasyonlarını şablon olarak kaydedin</p>
+            <button class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">
+                Şablon Oluştur
+            </button>
+        </div>
+    </div>
+
+    <!-- Usage Statistics -->
+    <div class="bg-white shadow-sm rounded-lg p-6">
+        <h3 class="text-lg font-medium text-gray-900 mb-4">
+            <i class="fas fa-chart-bar text-indigo-600 mr-2"></i>
+            Şablon Kullanım İstatistikleri
+        </h3>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="text-center">
+                <div class="text-3xl font-bold text-indigo-600 mb-2">23</div>
+                <div class="text-sm text-gray-600">Bu Ay Kullanılan</div>
+            </div>
+            <div class="text-center">
+                <div class="text-3xl font-bold text-green-600 mb-2">5</div>
+                <div class="text-sm text-gray-600">Aktif Şablon</div>
+            </div>
+            <div class="text-center">
+                <div class="text-3xl font-bold text-yellow-600 mb-2">₺8,450</div>
+                <div class="text-sm text-gray-600">Şablonlardan Gelir</div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}Reçeteler - Pastane Yönetim Sistemi{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="bg-white shadow-sm rounded-lg p-6">
+        <h1 class="text-2xl font-bold text-gray-900 mb-2">
+            <i class="fas fa-book text-indigo-600 mr-3"></i>
+            Reçeteler
+        </h1>
+        <p class="text-gray-600">Ürün reçetelerini görüntüleyin ve yönetin</p>
+    </div>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="bg-white shadow-sm rounded-lg p-6">
+            <h3 class="text-lg font-medium mb-4">Çikolatalı Pasta</h3>
+            <div class="space-y-2 text-sm">
+                <div>• 200g Un</div>
+                <div>• 150g Çikolata</div>
+                <div>• 100g Tereyağı</div>
+                <div>• 3 adet Yumurta</div>
+            </div>
+            <div class="mt-4 pt-4 border-t">
+                <span class="text-sm text-gray-600">Hazırlama: 45 dk</span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}Kalite Kontrol - Pastane Yönetim Sistemi{% endblock %}
+{% block content %}
+<div class="space-y-6">
+    <div class="bg-white shadow-sm rounded-lg p-6">
+        <h1 class="text-2xl font-bold text-gray-900 mb-2">
+            <i class="fas fa-check-circle text-indigo-600 mr-3"></i>
+            Kalite Kontrol
+        </h1>
+        <p class="text-gray-600">Ürün kalite kontrollerini yönetin</p>
+    </div>
+    <div class="bg-white shadow-sm rounded-lg p-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="border rounded-lg p-4">
+                <h3 class="font-medium mb-2">Çikolatalı Pasta</h3>
+                <p class="text-sm">Kalite Skoru: <span class="text-green-600 font-medium">9.2/10</span></p>
+                <p class="text-sm text-gray-600">Test Tarihi: 25.06.2024</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,292 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Pastane Yönetim Sistemi{% endblock %}
+
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Welcome message -->
+    <div class="mb-8">
+        <div class="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg shadow-lg p-6 text-white">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="text-2xl font-bold mb-2">Hoş Geldiniz! 👋</h2>
+                    <p class="text-indigo-100">Pastane yönetim sisteminize genel bakış</p>
+                </div>
+                <div class="text-right">
+                    <p class="text-sm text-indigo-200">Bugünün Tarihi</p>
+                    <p class="text-lg font-semibold" id="current-date"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8" 
+         hx-get="/api/reports/dashboard/" 
+         hx-trigger="load, refresh from:body every 30s"
+         hx-target="this"
+         hx-swap="innerHTML">
+        
+        <!-- Orders Card -->
+        <div class="bg-white overflow-hidden shadow-lg rounded-lg border border-gray-200 hover:shadow-xl transition-shadow duration-300">
+            <div class="p-6">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-shopping-cart text-blue-600"></i>
+                        </div>
+                    </div>
+                    <div class="ml-4 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 truncate">Bugünkü Siparişler</dt>
+                            <dd class="text-2xl font-semibold text-gray-900">-</dd>
+                        </dl>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <div class="flex items-center text-sm">
+                        <span class="text-gray-500">Bekleyen: </span>
+                        <span class="ml-1 font-medium text-yellow-600">-</span>
+                        <span class="ml-4 text-gray-500">Tamamlanan: </span>
+                        <span class="ml-1 font-medium text-green-600">-</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Production Card -->
+        <div class="bg-white overflow-hidden shadow-lg rounded-lg border border-gray-200 hover:shadow-xl transition-shadow duration-300">
+            <div class="p-6">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-industry text-green-600"></i>
+                        </div>
+                    </div>
+                    <div class="ml-4 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 truncate">Aktif Üretim</dt>
+                            <dd class="text-2xl font-semibold text-gray-900">-</dd>
+                        </dl>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <div class="flex items-center text-sm">
+                        <span class="text-gray-500">Tamamlanma: </span>
+                        <span class="ml-1 font-medium text-blue-600">-%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Inventory Card -->
+        <div class="bg-white overflow-hidden shadow-lg rounded-lg border border-gray-200 hover:shadow-xl transition-shadow duration-300">
+            <div class="p-6">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-boxes text-yellow-600"></i>
+                        </div>
+                    </div>
+                    <div class="ml-4 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 truncate">Düşük Stok</dt>
+                            <dd class="text-2xl font-semibold text-gray-900">-</dd>
+                        </dl>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <div class="flex items-center text-sm">
+                        <span class="text-gray-500">Toplam Ürün: </span>
+                        <span class="ml-1 font-medium text-indigo-600">-</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sales Card -->
+        <div class="bg-white overflow-hidden shadow-lg rounded-lg border border-gray-200 hover:shadow-xl transition-shadow duration-300">
+            <div class="p-6">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-chart-line text-purple-600"></i>
+                        </div>
+                    </div>
+                    <div class="ml-4 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 truncate">Bugünkü Satış</dt>
+                            <dd class="text-2xl font-semibold text-gray-900">- ₺</dd>
+                        </dl>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <div class="flex items-center text-sm">
+                        <span class="text-gray-500">Hedef: </span>
+                        <span class="ml-1 font-medium text-green-600">- ₺</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Recent Orders -->
+        <div class="lg:col-span-2">
+            <div class="bg-white shadow-lg rounded-lg border border-gray-200">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-lg font-semibold text-gray-900">Son Siparişler</h3>
+                        <a href="{% url 'orders:order-list' %}" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">
+                            Tümünü Gör <i class="fas fa-arrow-right ml-1"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="overflow-hidden">
+                    <div hx-get="/api/orders/?limit=5" 
+                         hx-trigger="load, every 60s"
+                         hx-target="this"
+                         class="p-6">
+                        <div class="text-center py-8">
+                            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mx-auto"></div>
+                            <p class="mt-2 text-gray-500">Siparişler yükleniyor...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions & Alerts -->
+        <div class="space-y-6">
+            <!-- Quick Actions -->
+            <div class="bg-white shadow-lg rounded-lg border border-gray-200">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-semibold text-gray-900">Hızlı İşlemler</h3>
+                </div>
+                <div class="p-6 space-y-3">
+                    <a href="{% url 'orders:order-create' %}" 
+                       class="w-full flex items-center px-4 py-3 border border-transparent rounded-md shadow-sm bg-indigo-600 text-white hover:bg-indigo-700 transition-colors duration-200">
+                        <i class="fas fa-plus mr-3"></i>
+                        Yeni Sipariş
+                    </a>
+                    <a href="{% url 'production:plan-create' %}" 
+                       class="w-full flex items-center px-4 py-3 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50 transition-colors duration-200">
+                        <i class="fas fa-calendar-plus mr-3"></i>
+                        Üretim Planı
+                    </a>
+                    <a href="{% url 'inventory:product-create' %}" 
+                       class="w-full flex items-center px-4 py-3 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50 transition-colors duration-200">
+                        <i class="fas fa-birthday-cake mr-3"></i>
+                        Yeni Ürün
+                    </a>
+                    <a href="{% url 'reports:dashboard-report' %}" 
+                       class="w-full flex items-center px-4 py-3 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50 transition-colors duration-200">
+                        <i class="fas fa-chart-bar mr-3"></i>
+                        Raporlar
+                    </a>
+                </div>
+            </div>
+
+            <!-- Alerts & Notifications -->
+            <div class="bg-white shadow-lg rounded-lg border border-gray-200">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-semibold text-gray-900">Uyarılar</h3>
+                </div>
+                <div class="p-6" 
+                     hx-get="/api/inventory/?low_stock=true&limit=5" 
+                     hx-trigger="load, every 120s"
+                     hx-target="this">
+                    <div class="text-center py-4">
+                        <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-600 mx-auto"></div>
+                        <p class="mt-2 text-sm text-gray-500">Uyarılar yükleniyor...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Weather Widget -->
+            <div class="bg-white shadow-lg rounded-lg border border-gray-200">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-semibold text-gray-900">Hava Durumu</h3>
+                </div>
+                <div class="p-6 text-center">
+                    <div class="text-4xl mb-2">☀️</div>
+                    <p class="text-lg font-medium text-gray-900">25°C</p>
+                    <p class="text-sm text-gray-500">Güneşli</p>
+                    <p class="text-xs text-gray-400 mt-2">İstanbul</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="mt-8">
+        <div class="bg-white shadow-lg rounded-lg border border-gray-200">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-semibold text-gray-900">Son Aktiviteler</h3>
+            </div>
+            <div class="p-6" 
+                 hx-get="/api/reports/activities/?limit=10" 
+                 hx-trigger="load, every 90s"
+                 hx-target="this">
+                <div class="text-center py-8">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mx-auto"></div>
+                    <p class="mt-2 text-gray-500">Aktiviteler yükleniyor...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Update current date
+    function updateCurrentDate() {
+        const now = new Date();
+        const options = { 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric',
+            weekday: 'long'
+        };
+        document.getElementById('current-date').textContent = 
+            now.toLocaleDateString('tr-TR', options);
+    }
+    
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+        updateCurrentDate();
+        
+        // Update time every minute
+        setInterval(updateCurrentDate, 60000);
+        
+        // Show welcome toast
+        setTimeout(() => {
+            showToast('Dashboard yüklendi! Hoş geldiniz.', 'success');
+        }, 1000);
+    });
+    
+    // Keyboard shortcuts
+    document.addEventListener('keydown', function(e) {
+        if (e.ctrlKey || e.metaKey) {
+            switch(e.key) {
+                case 'n':
+                    e.preventDefault();
+                    window.location.href = '{% url "orders:order-create" %}';
+                    break;
+                case 'p':
+                    e.preventDefault();
+                    window.location.href = '{% url "production:plan-create" %}';
+                    break;
+                case 'r':
+                    e.preventDefault();
+                    window.location.href = '{% url "reports:dashboard-report" %}';
+                    break;
+            }
+        }
+    });
+</script>
+{% endblock %} 

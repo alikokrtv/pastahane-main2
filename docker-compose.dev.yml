@@ -1,0 +1,74 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database for Development
+  db:
+    image: postgres:15-alpine
+    container_name: bakery_db_dev
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: bakery_dev
+      POSTGRES_USER: bakery_user
+      POSTGRES_PASSWORD: bakery_password
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - bakery_dev_network
+
+  # Redis Cache for Development
+  redis:
+    image: redis:7-alpine
+    container_name: bakery_redis_dev
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_dev_data:/data
+    ports:
+      - "6379:6379"
+    networks:
+      - bakery_dev_network
+
+  # Django Web Application for Development
+  web:
+    build: 
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: bakery_web_dev
+    restart: unless-stopped
+    environment:
+      - DEBUG=True
+      - SECRET_KEY=dev-secret-key-not-for-production
+      - DATABASE_URL=postgresql://bakery_user:bakery_password@db:5432/bakery_dev
+      - REDIS_URL=redis://redis:6379/0
+      - ALLOWED_HOSTS=localhost,127.0.0.1,0.0.0.0
+    volumes:
+      - .:/app
+      - static_dev_volume:/app/staticfiles
+      - media_dev_volume:/app/media
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - redis
+    networks:
+      - bakery_dev_network
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py collectstatic --noinput &&
+             python manage.py runserver 0.0.0.0:8000"
+
+volumes:
+  postgres_dev_data:
+    driver: local
+  redis_dev_data:
+    driver: local
+  static_dev_volume:
+    driver: local
+  media_dev_volume:
+    driver: local
+
+networks:
+  bakery_dev_network:
+ 

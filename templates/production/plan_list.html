@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}Üretim Planları - Pastane Yönetim Sistemi{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="bg-white shadow-sm rounded-lg p-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900 mb-2">
+                    <i class="fas fa-calendar-alt text-indigo-600 mr-3"></i>
+                    Üretim Planları
+                </h1>
+                <p class="text-gray-600">Üretim planlarını görüntüleyin ve yönetin</p>
+            </div>
+            <button class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">
+                <i class="fas fa-plus mr-2"></i>
+                Yeni Plan
+            </button>
+        </div>
+    </div>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="bg-white shadow-sm rounded-lg p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-medium">Günlük Plan - 26.06.2024</h3>
+                <span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs">Planlandı</span>
+            </div>
+            <div class="space-y-2 mb-4">
+                <div class="flex justify-between text-sm">
+                    <span>Çikolatalı Pasta:</span>
+                    <span>10 adet</span>
+                </div>
+                <div class="flex justify-between text-sm">
+                    <span>Vanilyalı Kek:</span>
+                    <span>15 adet</span>
+                </div>
+                <div class="flex justify-between text-sm">
+                    <span>Kurabiye:</span>
+                    <span>50 adet</span>
+                </div>
+            </div>
+            <div class="flex space-x-2">
+                <button class="flex-1 bg-green-600 text-white px-3 py-2 rounded text-sm">Başlat</button>
+                <button class="px-3 py-2 border border-gray-300 rounded text-sm">Düzenle</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

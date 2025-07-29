@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block title %}Raporlar - Pastane Yönetim Sistemi{% endblock %}
+{% block content %}
+<div class="space-y-6">
+    <div class="bg-white shadow-sm rounded-lg p-6">
+        <h1 class="text-2xl font-bold text-gray-900 mb-2">
+            <i class="fas fa-chart-bar text-indigo-600 mr-3"></i>
+            Raporlar
+        </h1>
+        <p class="text-gray-600">Detaylı raporları görüntüleyin</p>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="bg-white shadow-sm rounded-lg p-6 hover:shadow-md transition cursor-pointer">
+            <div class="flex items-center mb-4">
+                <i class="fas fa-chart-line text-indigo-600 text-2xl mr-3"></i>
+                <h3 class="text-lg font-medium">Satış Raporu</h3>
+            </div>
+            <p class="text-gray-600 text-sm">Detaylı satış analizi ve grafikleri</p>
+        </div>
+        <div class="bg-white shadow-sm rounded-lg p-6 hover:shadow-md transition cursor-pointer">
+            <div class="flex items-center mb-4">
+                <i class="fas fa-boxes text-green-600 text-2xl mr-3"></i>
+                <h3 class="text-lg font-medium">Stok Raporu</h3>
+            </div>
+            <p class="text-gray-600 text-sm">Stok durumu ve hareket analizi</p>
+        </div>
+        <div class="bg-white shadow-sm rounded-lg p-6 hover:shadow-md transition cursor-pointer">
+            <div class="flex items-center mb-4">
+                <i class="fas fa-industry text-blue-600 text-2xl mr-3"></i>
+                <h3 class="text-lg font-medium">Üretim Raporu</h3>
+            </div>
+            <p class="text-gray-600 text-sm">Üretim performansı ve verimlilik</p>
+        </div>
+    </div>
+</div>
+{% endblock %} 

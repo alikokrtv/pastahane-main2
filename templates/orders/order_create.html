@@ -1,0 +1,296 @@
+{% extends 'base.html' %}
+
+{% block title %}Yeni Sipariş - Pastane Yönetim Sistemi{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Page Header -->
+    <div class="bg-white shadow-sm rounded-lg p-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900 mb-2">
+                    <i class="fas fa-plus-circle text-indigo-600 mr-3"></i>
+                    Yeni Sipariş Oluştur
+                </h1>
+                <p class="text-gray-600">Yeni bir sipariş oluşturun ve ürün ekleyin</p>
+            </div>
+            <div>
+                <a href="{% url 'orders:order-list' %}" 
+                   class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition flex items-center">
+                    <i class="fas fa-arrow-left mr-2"></i>
+                    Sipariş Listesi
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <form id="order-form" class="space-y-6">
+        {% csrf_token %}
+        
+        <!-- Customer Information -->
+        <div class="bg-white shadow-sm rounded-lg p-6">
+            <h3 class="text-lg font-medium text-gray-900 mb-4">
+                <i class="fas fa-user text-indigo-600 mr-2"></i>
+                Müşteri Bilgileri
+            </h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Müşteri Adı *</label>
+                    <input type="text" name="customer_name" required
+                           class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500"
+                           placeholder="Müşteri adını girin">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Müşteri Telefonu *</label>
+                    <input type="tel" name="customer_phone" required
+                           class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500"
+                           placeholder="0555 123 45 67">
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Teslimat Adresi</label>
+                    <textarea name="delivery_address" rows="3"
+                              class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500"
+                              placeholder="Teslimat adresi (opsiyonel)"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Order Details -->
+        <div class="bg-white shadow-sm rounded-lg p-6">
+            <h3 class="text-lg font-medium text-gray-900 mb-4">
+                <i class="fas fa-calendar text-indigo-600 mr-2"></i>
+                Sipariş Detayları
+            </h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Teslimat Tarihi *</label>
+                    <input type="datetime-local" name="delivery_date" required
+                           class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Öncelik</label>
+                    <select name="priority" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500">
+                        <option value="normal">Normal</option>
+                        <option value="high">Yüksek</option>
+                        <option value="urgent">Acil</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Teslimat Şekli</label>
+                    <select name="delivery_type" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500">
+                        <option value="pickup">Mağazadan Teslim</option>
+                        <option value="delivery">Kurye ile Teslimat</option>
+                    </select>
+                </div>
+                <div class="md:col-span-3">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Sipariş Notları</label>
+                    <textarea name="notes" rows="3"
+                              class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500"
+                              placeholder="Özel istekler, not vb. (opsiyonel)"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Order Items -->
+        <div class="bg-white shadow-sm rounded-lg p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-medium text-gray-900">
+                    <i class="fas fa-birthday-cake text-indigo-600 mr-2"></i>
+                    Sipariş Ürünleri
+                </h3>
+                <button type="button" id="add-product-btn"
+                        class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">
+                    <i class="fas fa-plus mr-2"></i>
+                    Ürün Ekle
+                </button>
+            </div>
+
+            <div id="order-items">
+                <!-- Sample product row -->
+                <div class="product-row border border-gray-200 rounded-lg p-4 mb-4" data-row="1">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Ürün</label>
+                            <select name="product_1" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500">
+                                <option value="">Ürün seçin</option>
+                                <option value="1">Doğum Günü Pastası</option>
+                                <option value="2">Çikolatalı Kek</option>
+                                <option value="3">Vanilyalı Cupcake</option>
+                                <option value="4">Meyveli Tart</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Miktar</label>
+                            <input type="number" name="quantity_1" min="1" value="1"
+                                   class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Birim Fiyat</label>
+                            <input type="number" name="unit_price_1" step="0.01" min="0"
+                                   class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500"
+                                   placeholder="₺0.00">
+                        </div>
+                        <div>
+                            <button type="button" class="remove-product-btn w-full bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Özel İstekler</label>
+                        <textarea name="special_requests_1" rows="2"
+                                  class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500"
+                                  placeholder="Bu ürün için özel istekler (opsiyonel)"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order Summary -->
+            <div class="border-t pt-4 mt-6">
+                <div class="flex justify-between items-center text-lg font-medium">
+                    <span>Toplam Tutar:</span>
+                    <span id="order-total" class="text-2xl text-indigo-600">₺0.00</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment Information -->
+        <div class="bg-white shadow-sm rounded-lg p-6">
+            <h3 class="text-lg font-medium text-gray-900 mb-4">
+                <i class="fas fa-credit-card text-indigo-600 mr-2"></i>
+                Ödeme Bilgileri
+            </h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Ödeme Yöntemi</label>
+                    <select name="payment_method" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500">
+                        <option value="cash">Nakit</option>
+                        <option value="card">Kredi Kartı</option>
+                        <option value="transfer">Havale/EFT</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Ödeme Durumu</label>
+                    <select name="payment_status" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500">
+                        <option value="pending">Beklemede</option>
+                        <option value="partial">Kısmi Ödendi</option>
+                        <option value="paid">Ödendi</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Peşinat Tutarı</label>
+                    <input type="number" name="advance_payment" step="0.01" min="0"
+                           class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500"
+                           placeholder="₺0.00">
+                </div>
+            </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="bg-white shadow-sm rounded-lg p-6">
+            <div class="flex flex-col sm:flex-row gap-4 justify-end">
+                <button type="button" class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition">
+                    Taslak Kaydet
+                </button>
+                <button type="button" class="px-6 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition">
+                    Önizleme
+                </button>
+                <button type="submit" class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
+                    <i class="fas fa-save mr-2"></i>
+                    Siparişi Kaydet
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+let productRowCounter = 1;
+
+// Add new product row
+document.getElementById('add-product-btn').addEventListener('click', function() {
+    productRowCounter++;
+    const productRow = document.querySelector('.product-row').cloneNode(true);
+    productRow.dataset.row = productRowCounter;
+    
+    // Update names and clear values
+    productRow.querySelectorAll('input, select, textarea').forEach(element => {
+        if (element.name) {
+            element.name = element.name.replace(/_\d+$/, '_' + productRowCounter);
+        }
+        if (element.type !== 'number' || element.classList.contains('total-price')) {
+            element.value = '';
+        }
+        if (element.type === 'number' && !element.classList.contains('total-price')) {
+            element.value = element.name.includes('quantity') ? '1' : '';
+        }
+    });
+    
+    document.getElementById('order-items').appendChild(productRow);
+    updateOrderTotal();
+});
+
+// Remove product row
+document.addEventListener('click', function(e) {
+    if (e.target.closest('.remove-product-btn')) {
+        const productRows = document.querySelectorAll('.product-row');
+        if (productRows.length > 1) {
+            e.target.closest('.product-row').remove();
+            updateOrderTotal();
+        }
+    }
+});
+
+// Update totals when quantity or price changes
+document.addEventListener('input', function(e) {
+    if (e.target.name && (e.target.name.includes('quantity_') || e.target.name.includes('unit_price_'))) {
+        updateRowTotal(e.target.closest('.product-row'));
+        updateOrderTotal();
+    }
+});
+
+function updateRowTotal(row) {
+    const quantity = parseFloat(row.querySelector('[name*="quantity_"]').value) || 0;
+    const unitPrice = parseFloat(row.querySelector('[name*="unit_price_"]').value) || 0;
+    const total = quantity * unitPrice;
+    
+    row.querySelector('.total-price').value = '₺' + total.toFixed(2);
+}
+
+function updateOrderTotal() {
+    let total = 0;
+    document.querySelectorAll('.product-row').forEach(row => {
+        const quantity = parseFloat(row.querySelector('[name*="quantity_"]').value) || 0;
+        const unitPrice = parseFloat(row.querySelector('[name*="unit_price_"]').value) || 0;
+        total += quantity * unitPrice;
+    });
+    
+    document.getElementById('order-total').textContent = '₺' + total.toFixed(2);
+}
+
+// Form submission
+document.getElementById('order-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    // Show loading state
+    const submitBtn = this.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Kaydediliyor...';
+    submitBtn.disabled = true;
+    
+    // Simulate form submission (replace with actual HTMX or fetch)
+    setTimeout(() => {
+        alert('Sipariş başarıyla kaydedildi!');
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+        // window.location.href = '/orders/';
+    }, 2000);
+});
+
+// Initialize
+updateOrderTotal();
+</script>
+{% endblock %} 
