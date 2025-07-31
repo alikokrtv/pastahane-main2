@@ -30,7 +30,7 @@ admin.site.index_title = "Yönetim Paneli"
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('django.contrib.auth.urls')),  # Login/logout URLs
-    path('', RedirectView.as_view(url='/accounts/login/', permanent=False)),
+    path('', RedirectView.as_view(url='/dashboard/', permanent=False)),
     path('dashboard/', login_required(TemplateView.as_view(template_name='dashboard.html')), name='dashboard'),
     
     # API endpoints
