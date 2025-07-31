@@ -8,6 +8,13 @@ import django
 from pathlib import Path
 import time
 
+# PyMySQL configuration for MySQL support
+try:
+    import pymysql
+    pymysql.install_as_MySQLdb()
+except ImportError:
+    pass
+
 # Django ayarlarını yükle
 BASE_DIR = Path(__file__).resolve().parent
 sys.path.append(str(BASE_DIR))

@@ -6,6 +6,13 @@ import os
 import sys
 import django
 
+# PyMySQL configuration for MySQL support
+try:
+    import pymysql
+    pymysql.install_as_MySQLdb()
+except ImportError:
+    pass
+
 # Django ayarlarını yükle
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'bakery_management.settings')
 django.setup()
