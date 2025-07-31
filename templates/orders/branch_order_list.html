@@ -35,8 +35,8 @@
     <div class="filter-section">
         <form method="GET" class="row">
             <div class="col-md-3">
-                <label for="status">Durum</label>
-                <select name="status" id="status" class="form-control">
+                <label for="status" class="form-label">Durum</label>
+                <select name="status" id="status" class="form-select">
                     <option value="">Tüm Durumlar</option>
                     {% for value, display in status_choices %}
                     <option value="{{ value }}" {% if selected_status == value %}selected{% endif %}>
@@ -46,11 +46,11 @@
                 </select>
             </div>
             <div class="col-md-3">
-                <label for="date">Teslimat Tarihi</label>
+                <label for="date" class="form-label">Teslimat Tarihi</label>
                 <input type="date" name="date" id="date" class="form-control" value="{{ selected_date }}">
             </div>
             <div class="col-md-3 d-flex align-items-end">
-                <button type="submit" class="btn btn-outline-primary mr-2">
+                <button type="submit" class="btn btn-outline-primary me-2">
                     <i class="fas fa-filter"></i>
                     Filtrele
                 </button>
@@ -67,8 +67,8 @@
     <div class="row">
         {% for order in orders %}
         <div class="col-md-6 col-lg-4">
-            <div class="order-card">
-                <div class="order-header">
+            <div class="card order-card mb-3">
+                <div class="card-header order-header">
                     <div class="d-flex justify-content-between align-items-start">
                         <div>
                             <h6 class="mb-1">{{ order.order_number }}</h6>
@@ -78,19 +78,19 @@
                             </small>
                         </div>
                         <span class="badge status-badge 
-                            {% if order.status == 'pending' %}badge-warning
-                            {% elif order.status == 'confirmed' %}badge-info
-                            {% elif order.status == 'in_production' %}badge-primary
-                            {% elif order.status == 'ready' %}badge-success
-                            {% elif order.status == 'delivered' %}badge-success
-                            {% elif order.status == 'cancelled' %}badge-danger
-                            {% else %}badge-secondary{% endif %}">
+                            {% if order.status == 'pending' %}bg-warning text-dark
+                            {% elif order.status == 'confirmed' %}bg-info text-white
+                            {% elif order.status == 'in_production' %}bg-primary text-white
+                            {% elif order.status == 'ready' %}bg-success text-white
+                            {% elif order.status == 'delivered' %}bg-success text-white
+                            {% elif order.status == 'cancelled' %}bg-danger text-white
+                            {% else %}bg-secondary text-white{% endif %}">
                             {{ order.get_status_display }}
                         </span>
                     </div>
                 </div>
                 
-                <div class="order-body">
+                <div class="card-body order-body">
                     <div class="mb-2">
                         <strong>Teslimat Tarihi:</strong>
                         <span class="{% if order.requested_delivery_date < today %}text-danger{% endif %}">
@@ -185,33 +185,31 @@
 </div>
 
 <!-- Status Update Modal -->
-<div class="modal fade" id="statusModal" tabindex="-1" role="dialog">
-    <div class="modal-dialog" role="document">
+<div class="modal fade" id="statusModal" tabindex="-1">
+    <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Sipariş Durumu Güncelle</h5>
-                <button type="button" class="close" data-dismiss="modal">
-                    <span>&times;</span>
-                </button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <form id="statusForm">
-                    <div class="form-group">
-                        <label for="statusSelect">Yeni Durum</label>
-                        <select class="form-control" id="statusSelect">
+                    <div class="mb-3">
+                        <label for="statusSelect" class="form-label">Yeni Durum</label>
+                        <select class="form-select" id="statusSelect">
                             {% for value, display in status_choices %}
                             <option value="{{ value }}">{{ display }}</option>
                             {% endfor %}
                         </select>
                     </div>
-                    <div class="form-group">
-                        <label for="statusNotes">Notlar</label>
+                    <div class="mb-3">
+                        <label for="statusNotes" class="form-label">Notlar</label>
                         <textarea class="form-control" id="statusNotes" rows="3" placeholder="Durum değişikliği ile ilgili notlar..."></textarea>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
                 <button type="button" class="btn btn-primary" onclick="confirmStatusUpdate()">Güncelle</button>
             </div>
         </div>
@@ -223,10 +221,15 @@
 <script>
 let currentOrderId = null;
 
+let statusModal;
+
 function updateOrderStatus(orderId, status) {
     currentOrderId = orderId;
     $('#statusSelect').val(status);
-    $('#statusModal').modal('show');
+    if (!statusModal) {
+        statusModal = new bootstrap.Modal(document.getElementById('statusModal'));
+    }
+    statusModal.show();
 }
 
 function confirmStatusUpdate() {
@@ -246,7 +249,7 @@ function confirmStatusUpdate() {
         },
         success: function(response) {
             if (response.success) {
-                $('#statusModal').modal('hide');
+                statusModal.hide();
                 location.reload();
             } else {
                 alert('Hata: ' + response.error);

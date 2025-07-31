@@ -65,7 +65,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         
         # Bu haftaki siparişler
         weekly_orders = Order.objects.filter(
-            customer_branch=branch,
+            branch=branch,
             created_at__date__gte=week_ago
         )
         
@@ -134,7 +134,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         
         # Bugünkü siparişler
         today_orders = Order.objects.filter(
-            customer_branch=branch,
+            branch=branch,
             created_at__date=today
         )
         
@@ -144,7 +144,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
                 total=Sum('total_amount')
             )['total'] or 0,
             'ready_for_delivery': Order.objects.filter(
-                customer_branch=branch,
+                branch=branch,
                 status='ready'
             ).count(),
         })

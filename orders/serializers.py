@@ -35,7 +35,7 @@ class OrderStatusHistorySerializer(serializers.ModelSerializer):
 
 class OrderSerializer(serializers.ModelSerializer):
     """Sipariş serializer'ı"""
-    customer_branch_name = serializers.CharField(source='customer_branch.name', read_only=True)
+    customer_branch_name = serializers.CharField(source='branch.name', read_only=True)
     delivery_branch_name = serializers.CharField(source='delivery_branch.name', read_only=True)
     created_by_name = serializers.CharField(source='created_by.get_full_name', read_only=True)
     items = OrderItemSerializer(many=True, read_only=True, source='orderitem_set')
@@ -45,7 +45,7 @@ class OrderSerializer(serializers.ModelSerializer):
         model = Order
         fields = [
             'id', 'order_number', 'customer_name', 'customer_phone', 
-            'customer_email', 'customer_branch', 'customer_branch_name',
+            'customer_email', 'branch', 'customer_branch_name',
             'delivery_branch', 'delivery_branch_name', 'delivery_address',
             'delivery_date', 'status', 'priority', 'subtotal', 'tax_amount',
             'discount_amount', 'total_amount', 'special_instructions',
