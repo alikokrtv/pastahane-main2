@@ -97,22 +97,21 @@ WSGI_APPLICATION = 'bakery_management.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-# Database configuration - ViaPos databases only
+# Database configuration - Coolify MySQL + ViaPos databases
 if os.environ.get('DATABASE_URL'):  # Coolify production
-    # Production: Use ViaPos remote database as default
+    # Production: Use Coolify MySQL database as default
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
-            'NAME': 'viapospr2_site',
-            'USER': 'viapospr2_site',
-            'PASSWORD': 'uCSPYXXNS3DuJrwWmf3e',
-            'HOST': 'viapospro.tr',
-            'PORT': '2222',
+            'NAME': 'default',
+            'USER': 'mysql',
+            'PASSWORD': 'Xu9hX5D9FKe2eQQsdfiS3rnGqTcO4EmrmexiEH0F8NlhiZkPwSxuaISGrKNwAsXj',
+            'HOST': 'h80w4kwwsocg0g004k8wo8gg',
+            'PORT': '3306',
             'OPTIONS': {
                 'charset': 'utf8mb4',
                 'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
                 'connect_timeout': 20,
-                'sql_mode': 'STRICT_TRANS_TABLES',
             },
         },
         'viapos': {
