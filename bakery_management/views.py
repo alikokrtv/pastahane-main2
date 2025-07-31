@@ -159,9 +159,14 @@ def dashboard(request):
 
 
 def home(request):
-    """Ana sayfa - tüm kullanıcıları login sayfasına yönlendir"""
+    """Ana sayfa - giriş kontrolü"""
     if request.user.is_authenticated:
-        # Giriş yapmış kullanıcıları da logout yap ve login'e yönlendir
-        from django.contrib.auth import logout
-        logout(request)
-    return redirect('users:login') 
+        # Giriş yapmış kullanıcıları uygun sayfaya yönlendir
+        if hasattr(request.user, 'role') and request.user.role == 'branch_manager':
+            return redirect('orders:branch_order_create')
+        elif request.user.branch and not request.user.is_staff:
+            return redirect('orders:branch_order_create')
+        else:
+            return redirect('dashboard')
+    else:
+        return redirect('users:login') 

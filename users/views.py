@@ -76,6 +76,8 @@ class LoginView(View):
             else:
                 # Admin ve diğer roller dashboard'a gitsin
                 return redirect('dashboard')
+        
+        # Giriş yapmamış kullanıcılar için login formunu göster
         return render(request, self.template_name)
     
     def post(self, request):
