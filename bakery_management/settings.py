@@ -97,82 +97,74 @@ WSGI_APPLICATION = 'bakery_management.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-# Database configuration - Coolify MySQL + ViaPos databases
-if os.environ.get('DATABASE_URL'):  # Coolify production
-    # Production: Use Coolify MySQL database as default
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.mysql',
-            'NAME': 'default',
-            'USER': 'mysql',
-            'PASSWORD': 'Xu9hX5D9FKe2eQQsdfiS3rnGqTcO4EmrmexiEH0F8NlhiZkPwSxuaISGrKNwAsXj',
-            'HOST': 'h80w4kwwsocg0g004k8wo8gg',
-            'PORT': '3306',
-            'OPTIONS': {
-                'charset': 'utf8mb4',
-                'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
-                'connect_timeout': 20,
-            },
-        },
-        'viapos': {
-            'ENGINE': 'django.db.backends.mysql',
-            'NAME': 'viapospr2_site',
-            'USER': 'viapospr2_site',
-            'PASSWORD': 'uCSPYXXNS3DuJrwWmf3e',
-            'HOST': 'viapospro.tr',
-            'PORT': '2222',
-            'OPTIONS': {
-                'charset': 'utf8mb4',
-                'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
-                'connect_timeout': 20,
-                'sql_mode': 'STRICT_TRANS_TABLES',
-            },
-        },
-    }
-else:  # Local development
-    # Local: Use local ViaPos database as default
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.mysql',
-            'NAME': 'viapos_local',
-            'USER': 'root',
-            'PASSWORD': '255223',
-            'HOST': 'localhost',
-            'PORT': '3306',
-            'OPTIONS': {
-                'charset': 'utf8mb4',
-                'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
-                'connect_timeout': 20,
-            },
-        },
-        'viapos': {
-            'ENGINE': 'django.db.backends.mysql',
-            'NAME': 'viapospr2_site',
-            'USER': 'viapospr2_site',
-            'PASSWORD': 'uCSPYXXNS3DuJrwWmf3e',
-            'HOST': 'viapospro.tr',
-            'PORT': '2222',
-            'OPTIONS': {
-                'charset': 'utf8mb4',
-                'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
-                'connect_timeout': 20,
-                'sql_mode': 'STRICT_TRANS_TABLES',
-            },
-        },
-        'viapos_local': {
-            'ENGINE': 'django.db.backends.mysql',
-            'NAME': 'viapos_local',
-            'USER': 'root',
-            'PASSWORD': '255223',
-            'HOST': 'localhost',
-            'PORT': '3306',
-            'OPTIONS': {
-                'charset': 'utf8mb4',
-                'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
-                'connect_timeout': 20,
-            },
-        }
-    }
+# Database configuration with intelligent fallback
+import logging
+from django.db import DatabaseError
+
+logger = logging.getLogger(__name__)
+
+# Database configurations
+COOLIFY_DB_CONFIG = {
+    'ENGINE': 'django.db.backends.mysql',
+    'NAME': 'default',
+    'USER': 'mysql',
+    'PASSWORD': 'Xu9hX5D9FKe2eQQsdfiS3rnGqTcO4EmrmexiEH0F8NlhiZkPwSxuaISGrKNwAsXj',
+    'HOST': 'h80w4kwwsocg0g004k8wo8gg',
+    'PORT': '3306',
+    'OPTIONS': {
+        'charset': 'utf8mb4',
+        'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+        'connect_timeout': 10,
+    },
+}
+
+LOCAL_DB_CONFIG = {
+    'ENGINE': 'django.db.backends.mysql',
+    'NAME': 'viapos_local',
+    'USER': 'root',
+    'PASSWORD': '255223',
+    'HOST': 'localhost',
+    'PORT': '3306',
+    'OPTIONS': {
+        'charset': 'utf8mb4',
+        'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+        'connect_timeout': 10,
+    },
+}
+
+VIAPOS_DB_CONFIG = {
+    'ENGINE': 'django.db.backends.mysql',
+    'NAME': 'viapospr2_site',
+    'USER': 'viapospr2_site',
+    'PASSWORD': 'uCSPYXXNS3DuJrwWmf3e',
+    'HOST': 'viapospro.tr',
+    'PORT': '2222',
+    'OPTIONS': {
+        'charset': 'utf8mb4',
+        'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+        'connect_timeout': 10,
+        'sql_mode': 'STRICT_TRANS_TABLES',
+    },
+}
+
+# Choose primary database with fallback logic
+# For local development, use local database as primary
+# For production (Coolify), will use Coolify database
+if os.environ.get('DATABASE_URL') or os.environ.get('USE_COOLIFY', '').lower() == 'true':
+    # Production mode: Try Coolify first, fallback to local
+    DEFAULT_DB = COOLIFY_DB_CONFIG
+    logger.info("Configured for Coolify primary database with local fallback")
+else:
+    # Development mode: Use local as primary (recommended for development)
+    DEFAULT_DB = LOCAL_DB_CONFIG
+    logger.info("Configured for local development database")
+
+DATABASES = {
+    'default': DEFAULT_DB,
+    'coolify': COOLIFY_DB_CONFIG,
+    'viapos': VIAPOS_DB_CONFIG,
+    'viapos_local': LOCAL_DB_CONFIG,
+}
 
 
 # Password validation

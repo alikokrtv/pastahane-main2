@@ -1,6 +1,7 @@
 """
 Şube müdürleri için özel sipariş oluşturma view'ları
 """
+import json
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -13,7 +14,6 @@ from datetime import datetime, timedelta
 from decimal import Decimal
 from inventory.models import Product, ProductCategory
 from .models import Order, OrderItem, OrderStatusHistory
-from inventory.models import Product, ProductCategory
 from users.models import Branch
 
 

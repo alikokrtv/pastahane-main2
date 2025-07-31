@@ -108,7 +108,6 @@
                         <div class="product-card" data-product-id="{{ product.id }}">
                             <div class="d-flex justify-content-between align-items-start mb-2">
                                 <h6 class="product-name mb-1">{{ product.name }}</h6>
-                                <span class="badge badge-primary">{{ product.price_per_unit }} TL</span>
                             </div>
                             
                             <div class="text-muted small mb-3">
@@ -124,7 +123,8 @@
                                     </button>
                                     <input type="number" class="form-control form-control-sm quantity-input mx-2" 
                                            id="quantity-{{ product.id }}" value="0" min="0" max="999"
-                                           onchange="updateQuantity({{ product.id }}, this.value)">
+                                           onchange="updateQuantity({{ product.id }}, this.value)"
+                                           onkeyup="updateQuantity({{ product.id }}, this.value)">
                                     <button type="button" class="btn btn-sm btn-outline-secondary btn-quantity" onclick="increaseQuantity({{ product.id }})">
                                         <i class="fas fa-plus"></i>
                                     </button>
@@ -175,13 +175,9 @@
                 </div>
                 
                 <div class="border-top pt-3 mt-3">
-                    <div class="d-flex justify-content-between mb-2">
-                        <span>Toplam Ürün:</span>
-                        <span id="total-items">0</span>
-                    </div>
                     <div class="d-flex justify-content-between mb-3">
-                        <strong>Toplam Tutar:</strong>
-                        <strong id="total-amount">0.00 TL</strong>
+                        <strong>Toplam Ürün:</strong>
+                        <strong id="total-items">0</strong>
                     </div>
                     
                     <button type="button" class="btn btn-success btn-block" id="create-order-btn" disabled>
@@ -215,6 +211,7 @@
 {% endblock %}
 
 {% block extra_js %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
 let selectedItems = {};
 let products = {
@@ -222,14 +219,16 @@ let products = {
         {% for product in products %}
         {{ product.id }}: {
             'name': '{{ product.name|escapejs }}',
-            'price': {{ product.price_per_unit }},
             'unit': '{{ product.get_unit_display|escapejs }}'
         },
         {% endfor %}
     {% endfor %}
 };
 
+console.log('Products loaded:', products);
+
 function updateQuantity(productId, quantity) {
+    console.log('updateQuantity called:', productId, quantity);
     quantity = parseInt(quantity) || 0;
     
     if (quantity > 0) {
@@ -246,11 +245,13 @@ function updateQuantity(productId, quantity) {
 }
 
 function increaseQuantity(productId) {
+    console.log('increaseQuantity called:', productId);
     const currentQuantity = parseInt($(`#quantity-${productId}`).val()) || 0;
     updateQuantity(productId, currentQuantity + 1);
 }
 
 function decreaseQuantity(productId) {
+    console.log('decreaseQuantity called:', productId);
     const currentQuantity = parseInt($(`#quantity-${productId}`).val()) || 0;
     if (currentQuantity > 0) {
         updateQuantity(productId, currentQuantity - 1);
@@ -265,7 +266,6 @@ function quickAdd(productId, quantity) {
 function updateOrderSummary() {
     const itemsContainer = $('#selected-items');
     let totalItems = 0;
-    let totalAmount = 0;
     
     if (Object.keys(selectedItems).length === 0) {
         itemsContainer.html(`
@@ -281,19 +281,16 @@ function updateOrderSummary() {
         Object.keys(selectedItems).forEach(productId => {
             const quantity = selectedItems[productId];
             const product = products[productId];
-            const itemTotal = quantity * product.price;
             
             totalItems += quantity;
-            totalAmount += itemTotal;
             
             itemsHtml += `
                 <div class="selected-item">
                     <div>
                         <strong>${product.name}</strong><br>
-                        <small class="text-muted">${quantity} ${product.unit} × ${product.price} TL</small>
+                        <small class="text-muted">${quantity} ${product.unit}</small>
                     </div>
                     <div class="text-right">
-                        <strong>${itemTotal.toFixed(2)} TL</strong><br>
                         <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeItem(${productId})">
                             <i class="fas fa-times"></i>
                         </button>
@@ -307,7 +304,6 @@ function updateOrderSummary() {
     }
     
     $('#total-items').text(totalItems);
-    $('#total-amount').text(totalAmount.toFixed(2) + ' TL');
 }
 
 function removeItem(productId) {
@@ -374,6 +370,8 @@ function createOrder() {
 }
 
 $(document).ready(function() {
+    console.log('Document ready');
+    
     $('#create-order-btn').click(createOrder);
     
     // Quantity input değişikliklerini dinle
@@ -382,6 +380,17 @@ $(document).ready(function() {
         const quantity = parseInt(this.value) || 0;
         updateQuantity(productId, quantity);
     });
+    
+    // Test butonları
+    $('button[onclick*="increaseQuantity"]').each(function() {
+        console.log('Found increase button:', this);
+    });
+    
+    $('button[onclick*="decreaseQuantity"]').each(function() {
+        console.log('Found decrease button:', this);
+    });
+    
+    console.log('All initialization complete');
 });
 </script>
 {% endblock %}

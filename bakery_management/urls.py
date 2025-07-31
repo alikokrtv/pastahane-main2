@@ -21,6 +21,7 @@ from django.conf.urls.static import static
 from django.views.generic import TemplateView
 from django.contrib.auth.decorators import login_required
 from django.views.generic import RedirectView
+from . import views
 
 # Admin site başlık ve başlık ayarları
 admin.site.site_header = "Pastane Yönetim Sistemi"
@@ -30,8 +31,8 @@ admin.site.index_title = "Yönetim Paneli"
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('django.contrib.auth.urls')),  # Login/logout URLs
-    path('', RedirectView.as_view(url='/dashboard/', permanent=False)),
-    path('dashboard/', login_required(TemplateView.as_view(template_name='dashboard.html')), name='dashboard'),
+    path('', views.home, name='home'),
+    path('dashboard/', views.DashboardView.as_view(), name='dashboard'),
     
     # API endpoints
     path('api/users/', include(('users.urls', 'users-api'), namespace='users-api')),

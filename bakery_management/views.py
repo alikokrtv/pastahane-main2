@@ -159,8 +159,9 @@ def dashboard(request):
 
 
 def home(request):
-    """Ana sayfa - giriş yapmış kullanıcıları dashboard'a yönlendir"""
+    """Ana sayfa - tüm kullanıcıları login sayfasına yönlendir"""
     if request.user.is_authenticated:
-        return redirect('dashboard')
-    else:
-        return redirect('users:login') 
+        # Giriş yapmış kullanıcıları da logout yap ve login'e yönlendir
+        from django.contrib.auth import logout
+        logout(request)
+    return redirect('users:login') 
