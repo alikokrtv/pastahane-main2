@@ -38,24 +38,23 @@ function initializeOrderPage() {
     });
     
     // Add event listeners to all buttons
-    const minusButtons = document.querySelectorAll('button[data-product-id]');
+    const allButtons = document.querySelectorAll('button[data-product-id]');
     
-    minusButtons.forEach(button => {
+    allButtons.forEach(button => {
         const productId = button.getAttribute('data-product-id');
+        const action = button.getAttribute('data-action');
         
-        if (button.innerHTML.includes('fa-minus')) {
-            button.addEventListener('click', function(e) {
-                e.preventDefault();
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            if (action === 'decrease' || button.innerHTML.includes('fa-minus')) {
                 console.log('Minus button clicked for product:', productId);
                 changeQuantity(productId, -1);
-            });
-        } else if (button.innerHTML.includes('fa-plus')) {
-            button.addEventListener('click', function(e) {
-                e.preventDefault();
+            } else if (button.innerHTML.includes('fa-plus')) {
                 console.log('Plus button clicked for product:', productId);
                 changeQuantity(productId, 1);
-            });
-        }
+            }
+        });
     });
     
     console.log('Order page initialized successfully');
