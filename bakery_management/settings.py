@@ -97,11 +97,24 @@ WSGI_APPLICATION = 'bakery_management.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-# Database configuration with environment-based selection
+# Database configuration - ViaPos databases only
 if os.environ.get('DATABASE_URL'):  # Coolify production
-    import dj_database_url
+    # Production: Use ViaPos remote database as default
     DATABASES = {
-        'default': dj_database_url.parse(os.environ.get('DATABASE_URL')),
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': 'viapospr2_site',
+            'USER': 'viapospr2_site',
+            'PASSWORD': 'uCSPYXXNS3DuJrwWmf3e',
+            'HOST': 'viapospro.tr',
+            'PORT': '2222',
+            'OPTIONS': {
+                'charset': 'utf8mb4',
+                'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+                'connect_timeout': 20,
+                'sql_mode': 'STRICT_TRANS_TABLES',
+            },
+        },
         'viapos': {
             'ENGINE': 'django.db.backends.mysql',
             'NAME': 'viapospr2_site',
@@ -116,7 +129,11 @@ if os.environ.get('DATABASE_URL'):  # Coolify production
                 'sql_mode': 'STRICT_TRANS_TABLES',
             },
         },
-        'viapos_local': {
+    }
+else:  # Local development
+    # Local: Use local ViaPos database as default
+    DATABASES = {
+        'default': {
             'ENGINE': 'django.db.backends.mysql',
             'NAME': 'viapos_local',
             'USER': 'root',
@@ -128,13 +145,6 @@ if os.environ.get('DATABASE_URL'):  # Coolify production
                 'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
                 'connect_timeout': 20,
             },
-        }
-    }
-else:  # Local development
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
         },
         'viapos': {
             'ENGINE': 'django.db.backends.mysql',
