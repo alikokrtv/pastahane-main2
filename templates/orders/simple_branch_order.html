@@ -1,0 +1,196 @@
+{% extends 'branch_base.html' %}
+{% load static %}
+
+{% block title %}Günlük Sipariş - Şube Paneli{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-6">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Header -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-900">Günlük Sipariş Oluştur</h1>
+                        <p class="text-sm text-gray-600 mt-1">{{ user.branch.name }} - {{ today|date:"d F Y" }}</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-sm text-gray-500">Hoş geldiniz</p>
+                        <p class="font-medium text-gray-900">{{ user.get_full_name|default:user.username }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Order Form -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h2 class="text-lg font-semibold text-gray-900">Ürün Seçimi</h2>
+                <p class="text-sm text-gray-600">Yarın için ihtiyacınız olan ürünleri ve miktarlarını seçin</p>
+            </div>
+
+            <form id="order-form" class="p-6">
+                {% csrf_token %}
+                
+                <!-- Delivery Date -->
+                <div class="mb-6">
+                    <label for="delivery_date" class="block text-sm font-medium text-gray-700 mb-2">
+                        Teslimat Tarihi
+                    </label>
+                    <input type="date" 
+                           id="delivery_date" 
+                           name="delivery_date" 
+                           value="{{ tomorrow|date:'Y-m-d' }}"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
+
+                <!-- Products Grid -->
+                <div class="space-y-6">
+                    {% for category, products in products_by_category.items %}
+                    <div class="border border-gray-200 rounded-lg p-4">
+                        <h3 class="text-lg font-medium text-gray-900 mb-4 flex items-center">
+                            <i class="fas fa-layer-group text-indigo-600 mr-2"></i>
+                            {{ category }}
+                        </h3>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {% for product in products %}
+                            <div class="border border-gray-100 rounded-lg p-4 hover:border-indigo-300 transition-colors">
+                                <div class="flex items-center justify-between mb-2">
+                                    <h4 class="font-medium text-gray-900 text-sm">{{ product.name }}</h4>
+                                    <span class="text-sm text-gray-500">{{ product.unit }}</span>
+                                </div>
+                                
+                                <div class="flex items-center justify-between">
+                                    <span class="text-lg font-bold text-indigo-600">
+                                        ₺{{ product.price_per_unit }}
+                                    </span>
+                                    
+                                    <div class="flex items-center space-x-2">
+                                        <button type="button" 
+                                                class="w-8 h-8 rounded-full bg-red-100 text-red-600 hover:bg-red-200 flex items-center justify-center"
+                                                data-product-id="{{ product.id }}" data-action="decrease">
+                                            <i class="fas fa-minus text-xs"></i>
+                                        </button>
+                                        
+                                        <input type="text" 
+                                               id="quantity_{{ product.id }}" 
+                                               name="quantity_{{ product.id }}"
+                                               value="0" 
+                                               readonly
+                                               class="w-16 text-center border border-gray-300 rounded px-2 py-1 text-sm bg-gray-50"
+                                               style="-webkit-appearance: none; -moz-appearance: textfield;">
+                                        
+                                        <button type="button" 
+                                                class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 hover:bg-indigo-200 flex items-center justify-center"
+                                                data-product-id="{{ product.id }}">
+                                            <i class="fas fa-plus text-xs"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Order Summary -->
+                <div class="mt-8 bg-gray-50 rounded-lg p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Sipariş Özeti</h3>
+                    
+                    <div id="order-summary" class="space-y-2 mb-4">
+                        <p class="text-gray-600">Henüz ürün seçilmedi</p>
+                    </div>
+                    
+                    <div class="border-t border-gray-200 pt-4">
+                        <div class="flex justify-between items-center text-lg font-bold">
+                            <span>Toplam:</span>
+                            <span id="total-amount" class="text-indigo-600">₺0.00</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notes -->
+                <div class="mt-6">
+                    <label for="notes" class="block text-sm font-medium text-gray-700 mb-2">
+                        Notlar (İsteğe bağlı)
+                    </label>
+                    <textarea id="notes" 
+                              name="notes" 
+                              rows="3" 
+                              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                              placeholder="Özel taleplerinizi buraya yazabilirsiniz..."></textarea>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="mt-8 flex justify-end space-x-4">
+                    <button type="button" 
+                            onclick="clearForm()"
+                            class="px-6 py-3 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 font-medium">
+                        Temizle
+                    </button>
+                    
+                    <button type="submit" 
+                            id="submit-btn"
+                            class="px-8 py-3 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 font-medium disabled:opacity-50 disabled:cursor-not-allowed">
+                        <i class="fas fa-paper-plane mr-2"></i>
+                        Siparişi Gönder
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="mt-6 bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+            <h3 class="text-sm font-medium text-gray-900 mb-3">Hızlı İşlemler</h3>
+            <div class="flex space-x-4">
+                <a href="{% url 'orders:branch_order_list' %}" 
+                   class="text-sm text-indigo-600 hover:text-indigo-800 flex items-center">
+                    <i class="fas fa-list mr-1"></i>
+                    Siparişlerimi Görüntüle
+                </a>
+                <a href="{% url 'users:logout' %}" 
+                   class="text-sm text-red-600 hover:text-red-800 flex items-center">
+                    <i class="fas fa-sign-out-alt mr-1"></i>
+                    Çıkış Yap
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Loading Modal -->
+<div id="loading-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden items-center justify-center z-50">
+    <div class="bg-white rounded-lg p-6 max-w-sm mx-4">
+        <div class="flex items-center">
+            <i class="fas fa-spinner fa-spin text-indigo-600 mr-3"></i>
+            <span class="text-gray-900">Sipariş gönderiliyor...</span>
+        </div>
+    </div>
+</div>
+
+<!-- Load external JavaScript -->
+<script>
+// Product data for calculations (still needed for backend data)
+const products = {
+    {% for category, products in products_by_category.items %}
+        {% for product in products %}
+        '{{ product.id }}': {
+            name: "{{ product.name|escapejs }}",
+            price: {{ product.price_per_unit }},
+            unit: "{{ product.unit|escapejs }}"
+        }{% if not forloop.last %},{% endif %}
+        {% endfor %}{% if not forloop.parentloop.last %},{% endif %}
+    {% endfor %}
+};
+
+// Make products data globally available
+window.productsData = products;
+console.log('Products data set:', window.productsData);
+</script>
+
+<!-- Load branch order JavaScript -->
+<script src="{% static 'js/branch_order.js' %}"></script>
+
+{% endblock %}

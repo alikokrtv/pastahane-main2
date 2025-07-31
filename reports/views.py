@@ -53,55 +53,87 @@ class DashboardReportView(LoginRequiredMixin, TemplateView):
 
 
 # API Views  
-class ReportListAPIView(generics.ListAPIView):
+class ReportListAPIView(generics.GenericAPIView):
     """API Rapor listesi"""
     permission_classes = [IsAuthenticated]
     
-    def get_queryset(self):
-        from django.db import models
-        return models.QuerySet(model=None)
+    def get(self, request):
+        # Rapor listesi
+        data = {
+            'reports': [],
+            'count': 0,
+            'status': 'success'
+        }
+        return Response(data)
 
 
-class DashboardDataAPIView(generics.ListAPIView):
+class DashboardDataAPIView(generics.GenericAPIView):
     """API Dashboard data"""
     permission_classes = [IsAuthenticated]
     
-    def get_queryset(self):
-        from django.db import models
-        return models.QuerySet(model=None)
+    def get(self, request):
+        # Dashboard için temel veriler
+        data = {
+            'total_orders': 0,
+            'low_stock_count': 0,
+            'active_users': 1,
+            'daily_activities': 0,
+            'status': 'success'
+        }
+        return Response(data)
 
 
-class InventoryReportAPIView(generics.ListAPIView):
+class InventoryReportAPIView(generics.GenericAPIView):
     """API Envanter rapor"""
     permission_classes = [IsAuthenticated]
     
-    def get_queryset(self):
-        from django.db import models
-        return models.QuerySet(model=None)
+    def get(self, request):
+        # Envanter raporu
+        data = {
+            'inventory': [],
+            'count': 0,
+            'status': 'success'
+        }
+        return Response(data)
 
 
-class ProductionReportAPIView(generics.ListAPIView):
+class ProductionReportAPIView(generics.GenericAPIView):
     """API Üretim rapor"""
     permission_classes = [IsAuthenticated]
     
-    def get_queryset(self):
-        from django.db import models
-        return models.QuerySet(model=None)
+    def get(self, request):
+        # Üretim raporu
+        data = {
+            'production': [],
+            'count': 0,
+            'status': 'success'
+        }
+        return Response(data)
 
 
-class ActivityReportAPIView(generics.ListAPIView):
+class ActivityReportAPIView(generics.GenericAPIView):
     """API Aktivite rapor"""
     permission_classes = [IsAuthenticated]
     
-    def get_queryset(self):
-        from django.db import models
-        return models.QuerySet(model=None)
+    def get(self, request):
+        # Aktivite verileri (şimdilik boş)
+        data = {
+            'activities': [],
+            'count': 0,
+            'status': 'success'
+        }
+        return Response(data)
 
 
-class SalesReportAPIView(generics.ListAPIView):
+class SalesReportAPIView(generics.GenericAPIView):
     """API Satış rapor"""
     permission_classes = [IsAuthenticated]
     
-    def get_queryset(self):
-        from django.db import models
-        return models.QuerySet(model=None)
+    def get(self, request):
+        # Satış raporu
+        data = {
+            'sales': [],
+            'count': 0,
+            'status': 'success'
+        }
+        return Response(data)

@@ -150,7 +150,7 @@ class InventoryListView(LoginRequiredMixin, ListView):
         # Düşük stok uyarısı filtresi
         low_stock = self.request.GET.get('low_stock')
         if low_stock:
-            queryset = queryset.filter(current_stock__lte=F('min_stock_level'))
+            queryset = queryset.filter(quantity__lte=F('minimum_stock'))
         
         # Arama filtresi
         search = self.request.GET.get('search')
@@ -335,15 +335,15 @@ def low_stock_alert_api(request):
     
     low_stock_items = Inventory.objects.select_related('product').filter(
         branch=branch,
-        current_stock__lte=F('min_stock_level')
+        quantity__lte=F('minimum_stock')
     )
     
     data = []
     for item in low_stock_items:
         data.append({
             'product_name': item.product.name,
-            'current_stock': item.current_stock,
-            'min_stock_level': item.min_stock_level,
+            'current_stock': item.quantity,
+            'min_stock_level': item.minimum_stock,
             'unit': item.product.unit,
         })
     

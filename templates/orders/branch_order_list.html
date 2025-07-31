@@ -1,0 +1,268 @@
+{% extends 'branch_base.html' %}
+{% load static %}
+
+{% block title %}Siparişlerim - {{ user.branch.name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .order-card {
+        transition: all 0.3s ease;
+    }
+    
+    .order-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>
+            <i class="fas fa-list-alt"></i>
+            Şube Siparişleri
+        </h2>
+        <div>
+            <a href="{% url 'orders:branch_order_create' %}" class="btn btn-primary">
+                <i class="fas fa-plus"></i>
+                Yeni Sipariş
+            </a>
+        </div>
+    </div>
+
+    <!-- Filtreler -->
+    <div class="filter-section">
+        <form method="GET" class="row">
+            <div class="col-md-3">
+                <label for="status">Durum</label>
+                <select name="status" id="status" class="form-control">
+                    <option value="">Tüm Durumlar</option>
+                    {% for value, display in status_choices %}
+                    <option value="{{ value }}" {% if selected_status == value %}selected{% endif %}>
+                        {{ display }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="date">Teslimat Tarihi</label>
+                <input type="date" name="date" id="date" class="form-control" value="{{ selected_date }}">
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+                <button type="submit" class="btn btn-outline-primary mr-2">
+                    <i class="fas fa-filter"></i>
+                    Filtrele
+                </button>
+                <a href="{% url 'orders:branch_order_list' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-times"></i>
+                    Temizle
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Sipariş Listesi -->
+    {% if orders %}
+    <div class="row">
+        {% for order in orders %}
+        <div class="col-md-6 col-lg-4">
+            <div class="order-card">
+                <div class="order-header">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="mb-1">{{ order.order_number }}</h6>
+                            <small class="text-muted">
+                                <i class="fas fa-calendar"></i>
+                                {{ order.created_at|date:"d.m.Y H:i" }}
+                            </small>
+                        </div>
+                        <span class="badge status-badge 
+                            {% if order.status == 'pending' %}badge-warning
+                            {% elif order.status == 'confirmed' %}badge-info
+                            {% elif order.status == 'in_production' %}badge-primary
+                            {% elif order.status == 'ready' %}badge-success
+                            {% elif order.status == 'delivered' %}badge-success
+                            {% elif order.status == 'cancelled' %}badge-danger
+                            {% else %}badge-secondary{% endif %}">
+                            {{ order.get_status_display }}
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="order-body">
+                    <div class="mb-2">
+                        <strong>Teslimat Tarihi:</strong>
+                        <span class="{% if order.requested_delivery_date < today %}text-danger{% endif %}">
+                            {{ order.requested_delivery_date|date:"d.m.Y" }}
+                        </span>
+                    </div>
+                    
+                    <div class="mb-2">
+                        <strong>Ürün Sayısı:</strong>
+                        {{ order.get_item_count }}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <strong>Toplam Tutar:</strong>
+                        <span class="text-success">{{ order.total_amount }} TL</span>
+                    </div>
+                    
+                    {% if order.notes %}
+                    <div class="mb-3">
+                        <small class="text-muted">
+                            <i class="fas fa-sticky-note"></i>
+                            {{ order.notes|truncatechars:50 }}
+                        </small>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'orders:branch_order_detail' order.id %}" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-eye"></i>
+                            Detay
+                        </a>
+                        
+                        {% if order.status in 'pending,confirmed' %}
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-sm btn-outline-success" onclick="updateOrderStatus({{ order.id }}, 'confirmed')">
+                                <i class="fas fa-check"></i>
+                                Onayla
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-danger" onclick="updateOrderStatus({{ order.id }}, 'cancelled')">
+                                <i class="fas fa-times"></i>
+                                İptal
+                            </button>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Pagination -->
+    {% if is_paginated %}
+    <nav aria-label="Sipariş sayfaları">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page=1{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.date %}&date={{ request.GET.date }}{% endif %}">İlk</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.date %}&date={{ request.GET.date }}{% endif %}">Önceki</a>
+            </li>
+            {% endif %}
+            
+            <li class="page-item active">
+                <span class="page-link">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+            </li>
+            
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.date %}&date={{ request.GET.date }}{% endif %}">Sonraki</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.date %}&date={{ request.GET.date }}{% endif %}">Son</a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+    
+    {% else %}
+    <div class="text-center py-5">
+        <i class="fas fa-shopping-cart fa-3x text-muted mb-3"></i>
+        <h4 class="text-muted">Henüz sipariş bulunmuyor</h4>
+        <p class="text-muted">İlk siparişinizi oluşturmak için aşağıdaki butona tıklayın.</p>
+        <a href="{% url 'orders:branch_order_create' %}" class="btn btn-primary">
+            <i class="fas fa-plus"></i>
+            Yeni Sipariş Oluştur
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Status Update Modal -->
+<div class="modal fade" id="statusModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Sipariş Durumu Güncelle</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="statusForm">
+                    <div class="form-group">
+                        <label for="statusSelect">Yeni Durum</label>
+                        <select class="form-control" id="statusSelect">
+                            {% for value, display in status_choices %}
+                            <option value="{{ value }}">{{ display }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="statusNotes">Notlar</label>
+                        <textarea class="form-control" id="statusNotes" rows="3" placeholder="Durum değişikliği ile ilgili notlar..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" onclick="confirmStatusUpdate()">Güncelle</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let currentOrderId = null;
+
+function updateOrderStatus(orderId, status) {
+    currentOrderId = orderId;
+    $('#statusSelect').val(status);
+    $('#statusModal').modal('show');
+}
+
+function confirmStatusUpdate() {
+    const status = $('#statusSelect').val();
+    const notes = $('#statusNotes').val();
+    
+    $.ajax({
+        url: `/orders/branch/${currentOrderId}/update-status/`,
+        method: 'POST',
+        data: JSON.stringify({
+            status: status,
+            notes: notes
+        }),
+        contentType: 'application/json',
+        headers: {
+            'X-CSRFToken': $('[name=csrfmiddlewaretoken]').val()
+        },
+        success: function(response) {
+            if (response.success) {
+                $('#statusModal').modal('hide');
+                location.reload();
+            } else {
+                alert('Hata: ' + response.error);
+            }
+        },
+        error: function() {
+            alert('Durum güncellenirken bir hata oluştu.');
+        }
+    });
+}
+
+$(document).ready(function() {
+    // CSRF token'ı sayfaya ekle
+    if (!$('[name=csrfmiddlewaretoken]').length) {
+        $('body').append('<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">');
+    }
+});
+</script>
+{% endblock %}

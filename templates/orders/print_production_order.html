@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Üretim Siparişi - {{ order.order_number }}</title>
+    <style>
+        @media print {
+            body { margin: 0; }
+            .no-print { display: none; }
+            .page-break { page-break-after: always; }
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            line-height: 1.4;
+            margin: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #000;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .company-name {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .document-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        
+        .order-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            background-color: #f9f9f9;
+        }
+        
+        .info-section {
+            flex: 1;
+        }
+        
+        .info-label {
+            font-weight: bold;
+            display: inline-block;
+            width: 120px;
+        }
+        
+        .category-section {
+            margin-bottom: 25px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        
+        .category-header {
+            background-color: #f0f0f0;
+            padding: 8px 12px;
+            border-bottom: 1px solid #ddd;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .items-table th,
+        .items-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        
+        .items-table th {
+            background-color: #f5f5f5;
+            font-weight: bold;
+        }
+        
+        .quantity-cell {
+            text-align: center;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        .notes-section {
+            margin-top: 20px;
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+        
+        .signature-section {
+            margin-top: 30px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .signature-box {
+            border: 1px solid #ccc;
+            width: 200px;
+            height: 60px;
+            text-align: center;
+            padding-top: 40px;
+        }
+        
+        .print-controls {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: white;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .priority-urgent {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        
+        .priority-high {
+            color: #fd7e14;
+            font-weight: bold;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+        
+        .status-confirmed {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .status-in-production {
+            background-color: #cce5ff;
+            color: #004085;
+        }
+    </style>
+</head>
+<body>
+    <!-- Print Controls -->
+    <div class="print-controls no-print">
+        <button onclick="window.print()" style="margin-right: 10px; padding: 5px 10px;">
+            🖨️ Yazdır
+        </button>
+        <button onclick="window.close()" style="padding: 5px 10px;">
+            ❌ Kapat
+        </button>
+    </div>
+
+    <!-- Header -->
+    <div class="header">
+        <div class="company-name">{{ user.branch.name|default:"PASTANE YÖNETİM SİSTEMİ" }}</div>
+        <div class="document-title">ÜRETİM SİPARİŞİ</div>
+    </div>
+
+    <!-- Order Information -->
+    <div class="order-info">
+        <div class="info-section">
+            <div><span class="info-label">Sipariş No:</span> {{ order.order_number }}</div>
+            <div><span class="info-label">Şube:</span> {{ order.branch.name }}</div>
+            <div><span class="info-label">Sipariş Tarihi:</span> {{ order.created_at|date:"d.m.Y H:i" }}</div>
+            <div><span class="info-label">Teslimat Tarihi:</span> {{ order.requested_delivery_date|date:"d.m.Y" }}</div>
+        </div>
+        <div class="info-section">
+            <div>
+                <span class="info-label">Öncelik:</span> 
+                <span class="{% if order.priority == 'urgent' %}priority-urgent{% elif order.priority == 'high' %}priority-high{% endif %}">
+                    {{ order.get_priority_display }}
+                </span>
+            </div>
+            <div>
+                <span class="info-label">Durum:</span> 
+                <span class="status-badge status-{{ order.status }}">{{ order.get_status_display }}</span>
+            </div>
+            <div><span class="info-label">Yazdırma:</span> {{ print_date|date:"d.m.Y H:i" }}</div>
+            <div><span class="info-label">Toplam Çeşit:</span> {{ items_by_category|length }} kategori</div>
+        </div>
+    </div>
+
+    <!-- Items by Category -->
+    {% for category, items in items_by_category.items %}
+    <div class="category-section">
+        <div class="category-header">
+            🍰 {{ category.name }} ({{ items|length }} çeşit)
+        </div>
+        
+        <table class="items-table">
+            <thead>
+                <tr>
+                    <th style="width: 50%;">Ürün Adı</th>
+                    <th style="width: 15%;">Miktar</th>
+                    <th style="width: 15%;">Birim</th>
+                    <th style="width: 20%;">Notlar</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td>
+                        <strong>{{ item.product.name }}</strong>
+                        {% if item.product.sku %}
+                        <br><small style="color: #666;">{{ item.product.sku }}</small>
+                        {% endif %}
+                    </td>
+                    <td class="quantity-cell">{{ item.quantity }}</td>
+                    <td>{{ item.product.get_unit_display }}</td>
+                    <td>
+                        {% if item.notes %}
+                            {{ item.notes }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endfor %}
+
+    <!-- Order Notes -->
+    {% if order.notes or order.internal_notes %}
+    <div class="notes-section">
+        <strong>📝 Sipariş Notları:</strong>
+        <div style="margin-top: 5px;">
+            {% if order.notes %}
+                <div><strong>Genel Notlar:</strong> {{ order.notes }}</div>
+            {% endif %}
+            {% if order.internal_notes %}
+                <div><strong>İç Notlar:</strong> {{ order.internal_notes }}</div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Production Checklist -->
+    <div style="margin-top: 20px; border: 1px solid #ccc; padding: 15px;">
+        <strong>✅ ÜRETİM KONTROL LİSTESİ</strong>
+        <div style="margin-top: 10px;">
+            <div style="margin: 5px 0;">
+                ☐ Malzemeler kontrol edildi
+            </div>
+            <div style="margin: 5px 0;">
+                ☐ Üretim başlatıldı
+            </div>
+            <div style="margin: 5px 0;">
+                ☐ Kalite kontrol yapıldı
+            </div>
+            <div style="margin: 5px 0;">
+                ☐ Paketleme tamamlandı
+            </div>
+            <div style="margin: 5px 0;">
+                ☐ Teslimat için hazır
+            </div>
+        </div>
+    </div>
+
+    <!-- Signatures -->
+    <div class="signature-section">
+        <div>
+            <div style="margin-bottom: 10px;"><strong>Üretim Sorumlusu</strong></div>
+            <div class="signature-box">İmza & Tarih</div>
+        </div>
+        <div>
+            <div style="margin-bottom: 10px;"><strong>Kalite Kontrol</strong></div>
+            <div class="signature-box">İmza & Tarih</div>
+        </div>
+        <div>
+            <div style="margin-bottom: 10px;"><strong>Teslim Eden</strong></div>
+            <div class="signature-box">İmza & Tarih</div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div style="margin-top: 30px; text-align: center; font-size: 10px; color: #666; border-top: 1px solid #ccc; padding-top: 10px;">
+        Bu belge {{ print_date|date:"d.m.Y H:i" }} tarihinde sistem tarafından otomatik olarak oluşturulmuştur.
+        <br>
+        Sipariş ID: {{ order.id }} | Yazdıran: {{ user.get_full_name|default:user.username }}
+    </div>
+
+    <script>
+        // Sayfa yüklendiğinde otomatik yazdırma dialogunu aç
+        window.onload = function() {
+            // 1 saniye bekle, sonra yazdırma dialogunu aç
+            setTimeout(function() {
+                window.print();
+            }, 1000);
+        };
+        
+        // Yazdırma tamamlandıktan sonra pencereyi kapat
+        window.onafterprint = function() {
+            setTimeout(function() {
+                window.close();
+            }, 2000);
+        };
+    </script>
+</body>
+</html>

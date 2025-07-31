@@ -67,7 +67,15 @@ class LoginView(View):
     
     def get(self, request):
         if request.user.is_authenticated:
-            return redirect('dashboard')
+            # Şube müdürü ise direkt sipariş oluşturma sayfasına yönlendir
+            if hasattr(request.user, 'role') and request.user.role == 'branch_manager':
+                return redirect('orders:branch_order_create')
+            elif request.user.branch and not request.user.is_staff:
+                # Normal şube kullanıcısı da sipariş sayfasına gitsin
+                return redirect('orders:branch_order_create')
+            else:
+                # Admin ve diğer roller dashboard'a gitsin
+                return redirect('dashboard')
         return render(request, self.template_name)
     
     def post(self, request):
@@ -82,7 +90,17 @@ class LoginView(View):
                     messages.success(request, f'Hoş geldiniz, {user.get_full_name() or user.username}!')
                     
                     # Kullanıcının rolüne göre yönlendir
-                    next_url = request.GET.get('next', 'dashboard')
+                    next_url = request.GET.get('next')
+                    if not next_url:
+                        # Şube müdürü ise direkt sipariş oluşturma sayfasına yönlendir
+                        if hasattr(user, 'role') and user.role == 'branch_manager':
+                            next_url = 'orders:branch_order_create'
+                        elif user.branch and not user.is_staff:
+                            # Normal şube kullanıcısı da sipariş sayfasına gitsin
+                            next_url = 'orders:branch_order_create'
+                        else:
+                            # Admin ve diğer roller dashboard'a gitsin
+                            next_url = 'dashboard'
                     return redirect(next_url)
                 else:
                     messages.error(request, 'Hesabınız devre dışı bırakılmış.')

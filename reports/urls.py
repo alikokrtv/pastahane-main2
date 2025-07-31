@@ -12,10 +12,10 @@ urlpatterns = [
     path('sales/', views.SalesReportView.as_view(), name='sales-report'),
     
     # API endpoints
+    path('dashboard/', views.DashboardDataAPIView.as_view(), name='api-dashboard-data'),
+    path('activities/', views.ActivityReportAPIView.as_view(), name='api-activities'),
+    path('inventory/', views.InventoryReportAPIView.as_view(), name='api-inventory-report'),
+    path('production/', views.ProductionReportAPIView.as_view(), name='api-production-report'),
+    path('sales/', views.SalesReportAPIView.as_view(), name='api-sales-report'),
     path('api/', views.ReportListAPIView.as_view(), name='api-report-list'),
-    path('api/dashboard/', views.DashboardDataAPIView.as_view(), name='api-dashboard-data'),
-    path('api/activities/', views.ActivityReportAPIView.as_view(), name='api-activities'),
-    path('api/inventory/', views.InventoryReportAPIView.as_view(), name='api-inventory-report'),
-    path('api/production/', views.ProductionReportAPIView.as_view(), name='api-production-report'),
-    path('api/sales/', views.SalesReportAPIView.as_view(), name='api-sales-report'),
 ] 

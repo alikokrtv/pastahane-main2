@@ -1,0 +1,190 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="tr" class="h-full bg-gray-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Şube Yönetimi - Pastane{% endblock %}</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <style>
+        /* Custom scrollbar */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 3px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+        
+        /* Animations */
+        .fade-in {
+            animation: fadeIn 0.3s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="h-full bg-gray-50">
+    <!-- Simple header for branch manager -->
+    <header class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo and title -->
+                <div class="flex items-center">
+                    <i class="fas fa-bread-slice text-indigo-600 text-2xl mr-3"></i>
+                    <h1 class="text-xl font-bold text-gray-900">Pastane Yönetimi</h1>
+                    <span class="ml-4 text-sm text-gray-500">Şube Paneli</span>
+                </div>
+                
+                <!-- Navigation links -->
+                <nav class="hidden md:flex space-x-8">
+                    <a href="{% url 'orders:branch_order_create' %}" 
+                       class="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">
+                        <i class="fas fa-plus-circle mr-1"></i>
+                        Yeni Sipariş
+                    </a>
+                    <a href="{% url 'orders:branch_order_list' %}" 
+                       class="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">
+                        <i class="fas fa-list mr-1"></i>
+                        Siparişlerim
+                    </a>
+                </nav>
+                
+                <!-- User menu -->
+                <div class="flex items-center space-x-4">
+                    <span class="text-sm text-gray-700">
+                        <i class="fas fa-user mr-1"></i>
+                        {{ user.get_full_name|default:user.username }}
+                    </span>
+                    <a href="{% url 'users:logout' %}" 
+                       class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium">
+                        <i class="fas fa-sign-out-alt mr-1"></i>
+                        Çıkış
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main content -->
+    <main class="flex-1">
+        <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    <!-- Toast notifications -->
+    <div id="toast-container" class="fixed top-20 right-4 z-50 space-y-2">
+        <!-- Toasts will be dynamically added here -->
+    </div>
+
+    <script>
+        // Prevent HTMX errors if loaded from cache
+        if (typeof htmx !== 'undefined') {
+            htmx.config.globalViewTransitions = false;
+            htmx.config.includeIndicatorStyles = false;
+            htmx.config.defaultSwapStyle = 'none';
+            htmx.config.defaultSettleDelay = 0;
+            htmx.config.historyCacheSize = 0;
+            
+            // Remove all HTMX event listeners
+            try {
+                htmx.removeExtension('*');
+                document.body.removeEventListener('htmx:beforeRequest', function() {});
+                document.body.removeEventListener('htmx:afterRequest', function() {});
+                document.body.removeEventListener('htmx:responseError', function() {});
+                document.body.removeEventListener('htmx:sendError', function() {});
+                document.body.removeEventListener('htmx:swapError', function() {});
+                
+                // Override HTMX functions to do nothing
+                htmx.ajax = function() { return Promise.resolve(); };
+                htmx.trigger = function() { return; };
+                htmx.process = function() { return; };
+                htmx.swap = function() { return; };
+            } catch (e) {
+                console.log('HTMX disable attempt:', e);
+            }
+        }
+        
+        // Base JavaScript functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Şube Yönetim Paneli loaded');
+            
+            // Test if our JavaScript functions are available
+            setTimeout(function() {
+                if (typeof window.changeQuantity === 'function') {
+                    console.log('✓ changeQuantity function is available');
+                } else {
+                    console.log('✗ changeQuantity function is NOT available');
+                }
+                
+                if (typeof window.updateOrderSummary === 'function') {
+                    console.log('✓ updateOrderSummary function is available');
+                } else {
+                    console.log('✗ updateOrderSummary function is NOT available');
+                }
+            }, 1000);
+        });
+        
+        // Toast notification function
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            const bgColor = {
+                'success': 'bg-green-500',
+                'error': 'bg-red-500',
+                'warning': 'bg-yellow-500',
+                'info': 'bg-blue-500'
+            }[type] || 'bg-blue-500';
+            
+            toast.className = `${bgColor} text-white px-6 py-3 rounded-lg shadow-lg flex items-center space-x-2 transform transition-all duration-300 translate-x-full`;
+            toast.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check' : type === 'error' ? 'times' : type === 'warning' ? 'exclamation' : 'info'}-circle"></i>
+                <span>${message}</span>
+                <button onclick="this.parentElement.remove()" class="ml-2 text-white hover:text-gray-200">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            
+            container.appendChild(toast);
+            
+            // Animate in
+            setTimeout(() => {
+                toast.classList.remove('translate-x-full');
+            }, 100);
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                toast.classList.add('translate-x-full');
+                setTimeout(() => {
+                    if (toast.parentElement) {
+                        toast.remove();
+                    }
+                }, 300);
+            }, 5000);
+        }
+    </script>
+    
+    <!-- Extra JavaScript block for child templates -->
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,406 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Üretim Siparişleri{% endblock %}
+
+{% block extra_css %}
+<style>
+    .production-card {
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        margin-bottom: 15px;
+        background: white;
+    }
+    
+    .production-header {
+        background: #f8f9fa;
+        padding: 15px;
+        border-bottom: 1px solid #e0e0e0;
+        border-radius: 8px 8px 0 0;
+    }
+    
+    .production-body {
+        padding: 15px;
+    }
+    
+    .tomorrow-section {
+        background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+        border: 2px solid #ffc107;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 30px;
+    }
+    
+    .item-list {
+        background: #f8f9fa;
+        border-radius: 5px;
+        padding: 10px;
+        margin-top: 10px;
+    }
+    
+    .item-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 5px 0;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .item-row:last-child {
+        border-bottom: none;
+    }
+    
+    .priority-high {
+        border-left: 4px solid #dc3545;
+    }
+    
+    .priority-urgent {
+        border-left: 4px solid #e74c3c;
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7); }
+        70% { box-shadow: 0 0 0 10px rgba(231, 76, 60, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); }
+    }
+    
+    .print-btn {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 1000;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>
+            <i class="fas fa-industry"></i>
+            Üretim Siparişleri
+        </h2>
+        <div class="text-muted">
+            <i class="fas fa-clock"></i>
+            {{ "now"|date:"d.m.Y H:i" }}
+        </div>
+    </div>
+
+    <!-- Yarının Siparişleri -->
+    {% if tomorrow_orders %}
+    <div class="tomorrow-section">
+        <h3 class="mb-3">
+            <i class="fas fa-star text-warning"></i>
+            Yarın İçin Siparişler ({{ tomorrow_date|date:"d.m.Y" }})
+        </h3>
+        <div class="row">
+            {% for order in tomorrow_orders %}
+            <div class="col-md-6 col-lg-4">
+                <div class="production-card {% if order.priority == 'high' %}priority-high{% elif order.priority == 'urgent' %}priority-urgent{% endif %}">
+                    <div class="production-header">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6 class="mb-1">{{ order.order_number }}</h6>
+                                <small class="text-muted">
+                                    <i class="fas fa-store"></i>
+                                    {{ order.branch.name }}
+                                </small>
+                            </div>
+                            <div class="text-right">
+                                <span class="badge badge-{% if order.priority == 'urgent' %}danger{% elif order.priority == 'high' %}warning{% else %}info{% endif %}">
+                                    {{ order.get_priority_display }}
+                                </span>
+                                <br>
+                                <span class="badge badge-{% if order.status == 'confirmed' %}success{% else %}primary{% endif %} mt-1">
+                                    {{ order.get_status_display }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="production-body">
+                        <div class="mb-2">
+                            <strong>Sipariş Tarihi:</strong>
+                            {{ order.created_at|date:"d.m.Y H:i" }}
+                        </div>
+                        
+                        <div class="mb-2">
+                            <strong>Ürün Çeşidi:</strong>
+                            {{ order.get_item_count }} çeşit
+                        </div>
+                        
+                        {% if order.notes %}
+                        <div class="mb-3">
+                            <strong>Notlar:</strong>
+                            <small class="text-muted d-block">{{ order.notes }}</small>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Ürün Listesi -->
+                        <div class="item-list">
+                            <strong class="d-block mb-2">Ürünler:</strong>
+                            {% for item in order.items.all %}
+                            <div class="item-row">
+                                <span>{{ item.product.name }}</span>
+                                <span class="badge badge-secondary">{{ item.quantity }} {{ item.product.get_unit_display }}</span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="d-flex justify-content-between mt-3">
+                            <button type="button" class="btn btn-sm btn-outline-primary" onclick="viewOrderDetail({{ order.id }})">
+                                <i class="fas fa-eye"></i>
+                                Detay
+                            </button>
+                            
+                            <div class="btn-group">
+                                {% if order.status == 'confirmed' %}
+                                <button type="button" class="btn btn-sm btn-warning" onclick="updateOrderStatus({{ order.id }}, 'in_production')">
+                                    <i class="fas fa-play"></i>
+                                    Üretime Al
+                                </button>
+                                {% elif order.status == 'in_production' %}
+                                <button type="button" class="btn btn-sm btn-success" onclick="updateOrderStatus({{ order.id }}, 'ready')">
+                                    <i class="fas fa-check"></i>
+                                    Hazır
+                                </button>
+                                {% endif %}
+                                
+                                <a href="{% url 'orders:print_production_order' order.id %}" target="_blank" class="btn btn-sm btn-info">
+                                    <i class="fas fa-print"></i>
+                                    Yazdır
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Diğer Siparişler -->
+    {% if other_orders %}
+    <div class="mb-4">
+        <h3 class="mb-3">
+            <i class="fas fa-list"></i>
+            Diğer Siparişler
+        </h3>
+        <div class="row">
+            {% for order in other_orders %}
+            <div class="col-md-6 col-lg-4">
+                <div class="production-card {% if order.priority == 'high' %}priority-high{% elif order.priority == 'urgent' %}priority-urgent{% endif %}">
+                    <div class="production-header">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6 class="mb-1">{{ order.order_number }}</h6>
+                                <small class="text-muted">
+                                    <i class="fas fa-store"></i>
+                                    {{ order.branch.name }}
+                                </small>
+                            </div>
+                            <div class="text-right">
+                                <span class="badge badge-{% if order.priority == 'urgent' %}danger{% elif order.priority == 'high' %}warning{% else %}info{% endif %}">
+                                    {{ order.get_priority_display }}
+                                </span>
+                                <br>
+                                <span class="badge badge-{% if order.status == 'confirmed' %}success{% else %}primary{% endif %} mt-1">
+                                    {{ order.get_status_display }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="production-body">
+                        <div class="mb-2">
+                            <strong>Teslimat Tarihi:</strong>
+                            <span class="{% if order.requested_delivery_date < today %}text-danger{% endif %}">
+                                {{ order.requested_delivery_date|date:"d.m.Y" }}
+                            </span>
+                        </div>
+                        
+                        <div class="mb-2">
+                            <strong>Sipariş Tarihi:</strong>
+                            {{ order.created_at|date:"d.m.Y H:i" }}
+                        </div>
+                        
+                        <div class="mb-2">
+                            <strong>Ürün Çeşidi:</strong>
+                            {{ order.get_item_count }} çeşit
+                        </div>
+                        
+                        {% if order.notes %}
+                        <div class="mb-3">
+                            <strong>Notlar:</strong>
+                            <small class="text-muted d-block">{{ order.notes }}</small>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Ürün Listesi -->
+                        <div class="item-list">
+                            <strong class="d-block mb-2">Ürünler:</strong>
+                            {% for item in order.items.all %}
+                            <div class="item-row">
+                                <span>{{ item.product.name }}</span>
+                                <span class="badge badge-secondary">{{ item.quantity }} {{ item.product.get_unit_display }}</span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="d-flex justify-content-between mt-3">
+                            <button type="button" class="btn btn-sm btn-outline-primary" onclick="viewOrderDetail({{ order.id }})">
+                                <i class="fas fa-eye"></i>
+                                Detay
+                            </button>
+                            
+                            <div class="btn-group">
+                                {% if order.status == 'confirmed' %}
+                                <button type="button" class="btn btn-sm btn-warning" onclick="updateOrderStatus({{ order.id }}, 'in_production')">
+                                    <i class="fas fa-play"></i>
+                                    Üretime Al
+                                </button>
+                                {% elif order.status == 'in_production' %}
+                                <button type="button" class="btn btn-sm btn-success" onclick="updateOrderStatus({{ order.id }}, 'ready')">
+                                    <i class="fas fa-check"></i>
+                                    Hazır
+                                </button>
+                                {% endif %}
+                                
+                                <a href="{% url 'orders:print_production_order' order.id %}" target="_blank" class="btn btn-sm btn-info">
+                                    <i class="fas fa-print"></i>
+                                    Yazdır
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    {% if not tomorrow_orders and not other_orders %}
+    <div class="text-center py-5">
+        <i class="fas fa-industry fa-3x text-muted mb-3"></i>
+        <h4 class="text-muted">Üretimde sipariş bulunmuyor</h4>
+        <p class="text-muted">Tüm siparişler tamamlanmış veya henüz onaylanmamış.</p>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Toplu Yazdırma Butonu -->
+{% if tomorrow_orders %}
+<div class="print-btn">
+    <button type="button" class="btn btn-success btn-lg rounded-circle" onclick="printAllTomorrowOrders()" title="Yarının Tüm Siparişlerini Yazdır">
+        <i class="fas fa-print fa-lg"></i>
+    </button>
+</div>
+{% endif %}
+
+<!-- Status Update Modal -->
+<div class="modal fade" id="statusModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Sipariş Durumu Güncelle</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p id="statusMessage"></p>
+                <div class="form-group">
+                    <label for="statusNotes">Notlar</label>
+                    <textarea class="form-control" id="statusNotes" rows="3" placeholder="Durum değişikliği ile ilgili notlar..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" onclick="confirmStatusUpdate()">Güncelle</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let currentOrderId = null;
+let currentStatus = null;
+
+function updateOrderStatus(orderId, status) {
+    currentOrderId = orderId;
+    currentStatus = status;
+    
+    let message = '';
+    if (status === 'in_production') {
+        message = 'Bu siparişi üretime almak istediğinizden emin misiniz?';
+    } else if (status === 'ready') {
+        message = 'Bu siparişin üretiminin tamamlandığını onaylıyor musunuz?';
+    }
+    
+    $('#statusMessage').text(message);
+    $('#statusModal').modal('show');
+}
+
+function confirmStatusUpdate() {
+    const notes = $('#statusNotes').val();
+    
+    $.ajax({
+        url: `/orders/branch/${currentOrderId}/update-status/`,
+        method: 'POST',
+        data: JSON.stringify({
+            status: currentStatus,
+            notes: notes
+        }),
+        contentType: 'application/json',
+        headers: {
+            'X-CSRFToken': $('[name=csrfmiddlewaretoken]').val()
+        },
+        success: function(response) {
+            if (response.success) {
+                $('#statusModal').modal('hide');
+                location.reload();
+            } else {
+                alert('Hata: ' + response.error);
+            }
+        },
+        error: function() {
+            alert('Durum güncellenirken bir hata oluştu.');
+        }
+    });
+}
+
+function viewOrderDetail(orderId) {
+    window.open(`/orders/branch/${orderId}/`, '_blank');
+}
+
+function printAllTomorrowOrders() {
+    const tomorrowOrderIds = [
+        {% for order in tomorrow_orders %}{{ order.id }}{% if not forloop.last %},{% endif %}{% endfor %}
+    ];
+    
+    if (tomorrowOrderIds.length > 0) {
+        // Her sipariş için ayrı pencerede yazdırma sayfası aç
+        tomorrowOrderIds.forEach(orderId => {
+            window.open(`/orders/print/${orderId}/`, '_blank');
+        });
+    }
+}
+
+$(document).ready(function() {
+    // CSRF token'ı sayfaya ekle
+    if (!$('[name=csrfmiddlewaretoken]').length) {
+        $('body').append('<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">');
+    }
+    
+    // Sayfa her 5 dakikada bir otomatik yenilensin
+    setInterval(function() {
+        location.reload();
+    }, 300000); // 5 dakika = 300000 ms
+});
+</script>
+{% endblock %}
