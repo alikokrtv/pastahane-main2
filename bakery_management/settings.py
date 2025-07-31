@@ -97,39 +97,73 @@ WSGI_APPLICATION = 'bakery_management.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    },
-    'viapos': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'viapospr2_site',
-        'USER': 'viapospr2_site',
-        'PASSWORD': 'uCSPYXXNS3DuJrwWmf3e',
-        'HOST': 'viapospro.tr',
-        'PORT': '2222',  # Viapos web arayüzü ile aynı port
-        'OPTIONS': {
-            'charset': 'utf8mb4',
-            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
-            'connect_timeout': 20,  # Bağlantı timeout'u artır
-            'sql_mode': 'STRICT_TRANS_TABLES',
+# Database configuration with environment-based selection
+if os.environ.get('DATABASE_URL'):  # Coolify production
+    import dj_database_url
+    DATABASES = {
+        'default': dj_database_url.parse(os.environ.get('DATABASE_URL')),
+        'viapos': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': 'viapospr2_site',
+            'USER': 'viapospr2_site',
+            'PASSWORD': 'uCSPYXXNS3DuJrwWmf3e',
+            'HOST': 'viapospro.tr',
+            'PORT': '2222',
+            'OPTIONS': {
+                'charset': 'utf8mb4',
+                'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+                'connect_timeout': 20,
+                'sql_mode': 'STRICT_TRANS_TABLES',
+            },
         },
-    },
-    'viapos_local': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'viapos_local',
-        'USER': 'root',
-        'PASSWORD': '255223',
-        'HOST': 'localhost',
-        'PORT': '3306',
-        'OPTIONS': {
-            'charset': 'utf8mb4',
-            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
-            'connect_timeout': 20,
-        },
+        'viapos_local': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': 'viapos_local',
+            'USER': 'root',
+            'PASSWORD': '255223',
+            'HOST': 'localhost',
+            'PORT': '3306',
+            'OPTIONS': {
+                'charset': 'utf8mb4',
+                'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+                'connect_timeout': 20,
+            },
+        }
     }
-}
+else:  # Local development
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        },
+        'viapos': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': 'viapospr2_site',
+            'USER': 'viapospr2_site',
+            'PASSWORD': 'uCSPYXXNS3DuJrwWmf3e',
+            'HOST': 'viapospro.tr',
+            'PORT': '2222',
+            'OPTIONS': {
+                'charset': 'utf8mb4',
+                'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+                'connect_timeout': 20,
+                'sql_mode': 'STRICT_TRANS_TABLES',
+            },
+        },
+        'viapos_local': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': 'viapos_local',
+            'USER': 'root',
+            'PASSWORD': '255223',
+            'HOST': 'localhost',
+            'PORT': '3306',
+            'OPTIONS': {
+                'charset': 'utf8mb4',
+                'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+                'connect_timeout': 20,
+            },
+        }
+    }
 
 
 # Password validation

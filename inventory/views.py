@@ -172,9 +172,9 @@ class InventoryListView(LoginRequiredMixin, ListView):
             context.update({
                 'total_products': inventories.count(),
                 'low_stock_count': inventories.filter(
-                    current_stock__lte=F('min_stock_level')
+                    quantity__lte=F('minimum_stock')
                 ).count(),
-                'out_of_stock_count': inventories.filter(current_stock=0).count(),
+                'out_of_stock_count': inventories.filter(quantity=0).count(),
             })
         
         return context

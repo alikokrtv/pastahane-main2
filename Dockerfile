@@ -13,6 +13,7 @@ RUN apt-get update \
         postgresql-client \
         build-essential \
         libpq-dev \
+        pkg-config \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Python dependencies
