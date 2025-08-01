@@ -251,8 +251,8 @@ def update_order_status_api(request, order_id):
         # Durum geçmişi kaydet
         OrderStatusHistory.objects.create(
             order=order,
-            old_status=old_status,
-            new_status=new_status,
+            from_status=old_status,
+            to_status=new_status,
             changed_by=user,
             notes=request.data.get('notes', '')
         )
@@ -354,17 +354,19 @@ def factory_orders_api(request):
     if auth_token != 'factory_printer_2024':
         return Response({'error': 'Unauthorized'}, status=status.HTTP_401_UNAUTHORIZED)
     
-    # Yeni onaylanan siparişleri getir (son 24 saat)
+    # Fabrika için siparişleri getir
     from django.utils import timezone
     from datetime import timedelta
     
-    yesterday = timezone.now() - timedelta(hours=24)
+    # Varsayılan olarak son 7 günün siparişlerini getir (eski siparişleri de görebilmek için)
+    days_back = int(request.GET.get('days', 7))  # URL'de days parametresi ile kontrolü
+    time_limit = timezone.now() - timedelta(days=days_back)
     
-    # Onaylanmış veya üretimde olan siparişleri getir
+    # Onaylanmış, beklemede veya üretimde olan siparişleri getir
     orders = Order.objects.filter(
-        status__in=['confirmed', 'pending'],
-        created_at__gte=yesterday
-    ).select_related('branch', 'created_by').prefetch_related('items__product')
+        status__in=['confirmed', 'pending', 'in_production'],
+        created_at__gte=time_limit
+    ).select_related('branch', 'created_by').prefetch_related('items__product').order_by('-created_at')
     
     # Son kontrol edilen zamanı parametreden al
     last_check = request.GET.get('last_check')

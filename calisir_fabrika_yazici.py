@@ -207,7 +207,7 @@ class CalisanFabrikaYaziciProgram:
         # Konfigürasyon
         self.api_url = "https://siparis.tatopastabaklava.com"
         self.token = "factory_printer_2024"
-        self.check_interval = 30
+        self.check_interval = 5  # 5 saniyede bir kontrol et (çok hızlı)
         
         # Durum değişkenleri
         self.is_running = False
@@ -331,28 +331,28 @@ class CalisanFabrikaYaziciProgram:
         self.refresh_btn.pack(side=tk.LEFT, padx=5)
         
         # Siparişler tablosu
-        orders_frame = ttk.LabelFrame(main_frame, text="📦 Aktif Siparişler")
+        orders_frame = ttk.LabelFrame(main_frame, text="📦 Üretim Siparişleri")
         orders_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=5)
         
         # Tablo
-        columns = ('siparis_no', 'sube', 'tarih', 'urun_sayisi', 'tutar', 'durum')
+        columns = ('siparis_no', 'sube', 'tarih', 'urun_sayisi', 'siparis_veren', 'durum')
         self.orders_tree = ttk.Treeview(orders_frame, columns=columns, show='headings', height=10)
         
         # Sütun başlıkları
         self.orders_tree.heading('siparis_no', text='Sipariş No')
         self.orders_tree.heading('sube', text='Şube')
         self.orders_tree.heading('tarih', text='Teslimat Tarihi')
-        self.orders_tree.heading('urun_sayisi', text='Ürün Sayısı')
-        self.orders_tree.heading('tutar', text='Tutar')
+        self.orders_tree.heading('urun_sayisi', text='Toplam Adet')
+        self.orders_tree.heading('siparis_veren', text='Sipariş Veren')
         self.orders_tree.heading('durum', text='Durum')
         
         # Sütun genişlikleri
         self.orders_tree.column('siparis_no', width=120)
-        self.orders_tree.column('sube', width=100)
+        self.orders_tree.column('sube', width=120)
         self.orders_tree.column('tarih', width=100)
-        self.orders_tree.column('urun_sayisi', width=80)
-        self.orders_tree.column('tutar', width=80)
-        self.orders_tree.column('durum', width=100)
+        self.orders_tree.column('urun_sayisi', width=90)
+        self.orders_tree.column('siparis_veren', width=120)
+        self.orders_tree.column('durum', width=120)
         
         # Scrollbar
         scrollbar = ttk.Scrollbar(orders_frame, orient=tk.VERTICAL, command=self.orders_tree.yview)
@@ -444,7 +444,7 @@ class CalisanFabrikaYaziciProgram:
         
         self.custom_text = tk.Text(custom_frame, height=6, wrap=tk.WORD)
         self.custom_text.pack(fill=tk.X, padx=5, pady=5)
-        self.custom_text.insert('1.0', f"Özel test metni\nTarih: {datetime.now().strftime('%d.%m.%Y %H:%M:%S')}\nTato Pasta & Baklava\nFabrika Test Sistemi")
+        self.custom_text.insert('1.0', f"=======================================\n      TATO PASTA & BAKLAVA\n      ÜRETİM LİSTESİ TEST\n=======================================\n\nTarih: {datetime.now().strftime('%d.%m.%Y %H:%M:%S')}\n\nTest Ürünleri:\nBaklava              10 adet\nPasta                 5 adet\nKurabiye             20 adet\n                  --------\nTOPLAM               35 adet\n\n⚠️ Bu bir test yazdırmasıdır.\n\nÜretim Sistemi Test Modu\n=======================================")
         
         ttk.Button(custom_frame, text="🖨️ ÖZEL METNİ YAZDIR", 
                   command=self.ozel_metin_yazdir).pack(pady=5)
@@ -482,6 +482,10 @@ class CalisanFabrikaYaziciProgram:
         self.interval_entry = ttk.Entry(api_frame, width=20)
         self.interval_entry.insert(0, str(self.check_interval))
         self.interval_entry.grid(row=2, column=1, sticky=tk.W, padx=5, pady=5)
+        
+        # Bilgi etiketi
+        ttk.Label(api_frame, text="(Önerilen: 5-10 saniye arası)", 
+                 font=('Arial', 8), foreground='gray').grid(row=3, column=1, sticky=tk.W, padx=5)
         
         # Kaydet butonu
         ttk.Button(settings_frame, text="💾 AYARLARI KAYDET", 
@@ -593,7 +597,7 @@ class CalisanFabrikaYaziciProgram:
         def test_et():
             try:
                 url = f"{self.api_url}/orders/api/factory/orders/"
-                params = {'token': self.token}
+                params = {'token': self.token, 'days': 7}  # Son 7 günün siparişlerini getir
                 
                 response = requests.get(url, params=params, timeout=10)
                 
@@ -632,13 +636,16 @@ class CalisanFabrikaYaziciProgram:
         
         # Yeni verileri ekle
         for order in orders:
+            # Toplam ürün adedi hesapla
+            total_quantity = sum(item['quantity'] for item in order['items'])
+            
             values = (
                 order['order_number'],
                 order['branch_name'],
                 self.format_date(order['delivery_date']),
-                len(order['items']),
-                f"₺{order['total_amount']:.0f}",
-                "✅ Yazdırıldı" if order['id'] in self.processed_orders else "⏳ Bekliyor"
+                f"{total_quantity:.0f} adet",
+                order['created_by'],
+                "✅ Üretildi" if order['id'] in self.processed_orders else "⏳ Üretim Bekliyor"
             )
             self.orders_tree.insert('', tk.END, values=values)
         
@@ -647,7 +654,7 @@ class CalisanFabrikaYaziciProgram:
         printed = len([o for o in orders if o['id'] in self.processed_orders])
         
         self.total_orders_label.config(text=f"Toplam Sipariş: {total}")
-        self.printed_orders_label.config(text=f"Yazdırılan: {printed}")
+        self.printed_orders_label.config(text=f"Üretildi: {printed}")
     
     def servisi_baslat(self):
         """Ana servisi başlat"""
@@ -662,6 +669,7 @@ class CalisanFabrikaYaziciProgram:
         
         self.log_message("🚀 Fabrika yazıcı sistemi başlatıldı")
         self.log_message(f"🖨️ Aktif yazıcı: {self.printer_manager.selected_printer}")
+        self.log_message(f"⚡ Kontrol hızı: Her {self.check_interval} saniyede bir")
         
         # Arka plan servisi başlat
         self.service_thread = threading.Thread(target=self.service_loop, daemon=True)
@@ -690,7 +698,7 @@ class CalisanFabrikaYaziciProgram:
         """Yeni siparişleri kontrol et ve işle"""
         try:
             url = f"{self.api_url}/orders/api/factory/orders/"
-            params = {'token': self.token}
+            params = {'token': self.token, 'days': 7}  # Son 7 günün siparişlerini getir
             
             if self.last_check_time:
                 params['last_check'] = self.last_check_time.isoformat()
@@ -757,11 +765,11 @@ class CalisanFabrikaYaziciProgram:
             self.log_message(f"❌ Yazdırma hatası: {str(e)}")
     
     def siparis_formatla(self, order):
-        """Siparişi yazdırma formatına dönüştür"""
+        """Siparişi üretim odaklı yazdırma formatına dönüştür"""
         lines = []
         lines.append("=" * 50)
         lines.append("      TATO PASTA & BAKLAVA")
-        lines.append("        FABRİKA SİPARİŞİ")
+        lines.append("        ÜRETİM SİPARİŞİ")
         lines.append("=" * 50)
         lines.append("")
         
@@ -772,33 +780,37 @@ class CalisanFabrikaYaziciProgram:
         lines.append(f"Sipariş Veren : {order['created_by']}")
         
         if order.get('notes'):
-            lines.append(f"Notlar        : {order['notes']}")
+            lines.append(f"Özel Notlar   : {order['notes']}")
         
         lines.append("")
-        lines.append("-" * 50)
-        lines.append("                 ÜRÜNLER")
-        lines.append("-" * 50)
+        lines.append("=" * 50)
+        lines.append("             ÜRETİM LİSTESİ")
+        lines.append("=" * 50)
         
         total_items = 0
         for item in order['items']:
-            product_line = f"{item['product_name']:<30} {item['quantity']:>8} {item['unit']}"
+            # Sadece ürün adı ve miktarı göster
+            product_line = f"{item['product_name']:<35} {item['quantity']:>6.0f} {item['unit']}"
             lines.append(product_line)
             
             if item.get('notes'):
-                lines.append(f"  Not: {item['notes']}")
+                lines.append(f"  → Not: {item['notes']}")
             
             total_items += item['quantity']
         
-        lines.append("-" * 50)
-        lines.append(f"Toplam Ürün   : {total_items} adet")
-        lines.append(f"Toplam Tutar  : ₺{order['total_amount']:.2f}")
+        lines.append("=" * 50)
+        lines.append(f"TOPLAM ÜRÜN ADETİ: {total_items:>6.0f}")
+        lines.append("")
+        lines.append("⚠️  ÜRETİM TALİMATLARI:")
+        lines.append("   • Hijyen kurallarına uyunuz")
+        lines.append("   • Teslimat tarihine dikkat ediniz")
+        lines.append("   • Kalite kontrolü yapınız")
         lines.append("")
         
-        # Yazıcı bilgisi
-        lines.append(f"Yazıcı        : {self.printer_manager.selected_printer}")
-        lines.append("")
-        lines.append("=" * 50)
+        # Yazıcı ve yazdırma bilgisi
+        lines.append("-" * 50)
         lines.append(f"Yazdırma: {datetime.now().strftime('%d.%m.%Y %H:%M:%S')}")
+        lines.append(f"Yazıcı  : {self.printer_manager.selected_printer}")
         lines.append("=" * 50)
         lines.append("")
         
@@ -848,22 +860,34 @@ class CalisanFabrikaYaziciProgram:
         self.test_results.see(tk.END)
         
         test_text = f"""
-METİN TEST YAZDIRMA
-==================
+===============================================
+      TATO PASTA & BAKLAVA
+    ÜRETİM SİSTEMİ TEST ÇIKTISI
+===============================================
+
 Tarih: {datetime.now().strftime('%d.%m.%Y %H:%M:%S')}
 Yazıcı: {self.printer_manager.selected_printer}
 
-Bu bir metin test yazdırmasıdır.
-Türkçe karakterler: ÇĞİÖŞÜ çğıöşü
-Sayılar: 0123456789
-Özel karakterler: ₺!@#$%^&*()
+Bu bir üretim sistemi test yazdırmasıdır.
 
-Test başarılıysa tüm karakterler
-düzgün görünmelidir.
+KARAKTER TESTİ:
+• Türkçe: ÇĞİÖŞÜ çğıöşü
+• Sayılar: 0123456789
+• Özel: →·⚠️✅⏳📦
+
+ÜRETİM TEST LİSTESİ:
+Baklava Çeşitleri        25 adet
+Pasta Çeşitleri          15 adet
+Kurabiye                 50 adet
+                      --------
+TOPLAM                   90 adet
+
+⚠️ Test başarılıysa tüm karakterler
+   düzgün görünmelidir.
 
 TATO PASTA & BAKLAVA
-Fabrika Test Sistemi
-==================
+Üretim Sistemi - Test Modu
+===============================================
 """
         
         def test():
@@ -911,7 +935,7 @@ Fabrika Test Sistemi
             # API testi
             try:
                 url = f"{self.api_url}/orders/api/factory/orders/"
-                params = {'token': self.token}
+                params = {'token': self.token, 'days': 7}
                 response = requests.get(url, params=params, timeout=10)
                 if response.status_code == 200:
                     self.root.after(0, lambda: self.test_results.insert(tk.END, "✅ API bağlantısı: BAŞARILI\n"))

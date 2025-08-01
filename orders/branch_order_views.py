@@ -124,8 +124,8 @@ def create_branch_order_ajax(request):
             # Durum geçmişi oluştur
             OrderStatusHistory.objects.create(
                 order=order,
-                old_status='',
-                new_status='pending',
+                from_status='',
+                to_status='pending',
                 changed_by=request.user,
                 notes='Şube siparişi oluşturuldu'
             )
@@ -226,8 +226,8 @@ def update_order_status_ajax(request, order_id):
         # Durum geçmişi kaydet
         OrderStatusHistory.objects.create(
             order=order,
-            old_status=old_status,
-            new_status=new_status,
+            from_status=old_status,
+            to_status=new_status,
             changed_by=request.user,
             notes=notes
         )
