@@ -1,0 +1,17 @@
+
+🚀 HIZLI BAŞLANGIÇ
+=================
+
+1️⃣ 'Baslatma.bat' dosyasına çift tıklayın
+
+2️⃣ Program açıldığında "🔍 Bağlantı Testi" yapın
+
+3️⃣ "▶️ Başlat" butonuna tıklayın
+
+4️⃣ Artık siparişler otomatik yazdırılıyor! 🎉
+
+❓ Sorun mu var?
+- 'KURULUM_REHBERİ.txt' dosyasını okuyun
+- 'TestYazdirma.bat' ile yazıcıyı test edin
+
+📞 Yardım: Sistem yöneticisiyle iletişime geçin

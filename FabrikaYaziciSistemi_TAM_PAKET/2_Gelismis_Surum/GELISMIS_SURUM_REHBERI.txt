@@ -1,0 +1,29 @@
+
+🏭 GELİŞMİŞ FABRİKA YAZICI SİSTEMİ
+==================================
+
+⭐ ÖZELLIKLER
+- Otomatik yazıcı algılama ve durum kontrolü
+- Sekmeli arayüz (Ana Kontrol/Yazıcı/Ayarlar/Loglar)
+- Test yazdırma özellikleri
+- Detaylı log sistemi
+- Yazıcı yönetimi
+- Gelişmiş ayarlar
+
+🖨️ YAZICI YÖNETİMİ
+- Sistemdeki tüm yazıcıları otomatik bulur
+- Yazıcı durumlarını kontrol eder (Hazır/Çevrimdışı/Hata/etc.)
+- Test yazdırma özelliği
+- Yazıcı seçimi ve ayarları
+
+🚀 KULLANIM
+1. "Gelismis_Baslatma.bat" dosyasına çift tıklayın
+2. "Yazıcı Yönetimi" sekmesinden yazıcıyı seçin
+3. "Ana Kontrol" sekmesinde "Bağlantı Testi" yapın
+4. "Başlat" butonuna tıklayın
+
+🎯 KİMLER İÇİN
+- Detaylı kontrol isteyen fabrikalar
+- Birden fazla yazıcısı olan işletmeler
+- Gelişmiş özellik isteyenler
+- Teknik bilgi sahibi kullanıcılar

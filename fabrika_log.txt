@@ -1,0 +1,3 @@
+[2025-08-01T10:50:15.311438] 🏭 Fabrika Yazıcı Programı başlatıldı
+[2025-08-01T10:50:15.331152] 🔗 API URL: https://siparis.tatopastabaklava.com
+[2025-08-01T11:00:23.376172] 👋 Program kapatılıyor...

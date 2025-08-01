@@ -1,0 +1,118 @@
+
+🔧 SORUN GİDERME REHBERİ
+=======================
+
+🔴 PROGRAM AÇILMIYOR
+-------------------
+Belirtiler: Program başlamıyor, hata veriyor
+
+Çözümler:
+□ Windows Defender'ı geçici olarak kapatın
+□ Dosyaya sağ tık → "Yönetici olarak çalıştır"
+□ Antivirüs programını kontrol edin
+□ .NET Framework güncel mi kontrol edin
+□ Bilgisayarı yeniden başlatın
+
+🔴 YAZICI BULUNAMIYOR
+--------------------
+Belirtiler: "Yazıcı seçilmedi" uyarısı
+
+Çözümler:
+□ Yazıcının açık ve hazır olduğunu kontrol edin
+□ USB kablosunu çıkarıp tekrar takın  
+□ Windows Ayarlar → Yazıcılar'da görünüyor mu kontrol edin
+□ Yazıcı sürücülerini güncelleyin
+□ "Yazıcı Yönetimi" sekmesinde "Yeniden Tara" yapın
+□ "Yazıcı Keşfi" sekmesini kullanın
+
+🔴 BAĞLANTI SORUNU
+-----------------
+Belirtiler: "Bağlantı Yok" durumu
+
+Çözümler:
+□ İnternet bağlantısını test edin (bir web sitesi açın)
+□ Firewall programını kontrol edin
+□ VPN kullanıyorsanız geçici olarak kapatın
+□ Şirket ağındaysanız IT departmanıyla konuşun
+□ "Ayarlar" sekmesinde API URL'sini kontrol edin
+
+🔴 YAZDIRMA ÇALIŞMIYOR
+---------------------
+Belirtiler: Siparişler geliyor ama yazdırılmıyor
+
+Çözümler:
+□ "Test Merkezi" sekmesinde yazıcı testini yapın
+□ Yazıcı kuyruğunu kontrol edin (bekleyen işler var mı?)
+□ Kağıt ve mürekkep/toner durumunu kontrol edin
+□ Yazıcıyı kapatıp açın
+□ Windows yazıcı sorun gidericisini çalıştırın
+□ Yazıcı ayarlarından "Test sayfası yazdır"
+
+🔴 SİPARİŞLER GELMİYOR
+---------------------
+Belirtiler: Program çalışıyor ama sipariş gelmiyor
+
+Çözümler:
+□ "Sistemi Başlat" butonuna bastığınızı kontrol edin
+□ Bağlantı durumunun "Yeşil - Bağlı" olduğunu kontrol edin
+□ "Yenile" butonunu deneyin
+□ Ayarlar'da token'ın doğru olduğunu kontrol edin
+□ Sistem yöneticisiyle iletişime geçin
+
+🔴 PROGRAM YAVAŞ ÇALIŞIYOR
+-------------------------
+Belirtiler: Donma, gecikmeler
+
+Çözümler:
+□ İnternet hızınızı test edin
+□ Gereksiz programları kapatın
+□ Kontrol aralığını artırın (Ayarlar sekmesi)
+□ Bilgisayarı yeniden başlatın
+□ Log dosyalarını temizleyin
+
+📊 PERFORMANS İPUÇLARI
+======================
+✅ Programı sürekli açık tutun
+✅ Bilgisayarı uyku moduna almayın  
+✅ Düzenli olarak log dosyalarını temizleyin
+✅ Yazıcı kağıdını kontrol edin
+✅ İnternet bağlantısını stabil tutun
+✅ Yazıcı çevresini temiz tutun
+
+📞 ACİL YARDIM PROTOKOLÜ
+=======================
+Sorun devam ediyorsa:
+
+1. Log dosyasını açın:
+   - "Loglar" sekmesine gidin
+   - En son hata mesajlarını kopyalayın
+
+2. Sistem bilgilerini not alın:
+   - Windows sürümü
+   - Yazıcı modeli
+   - Hata mesajı
+
+3. Sistem yöneticisine iletin
+
+4. Varsa ekran görüntüsü alın
+
+🆘 ACİL DURUM ÇÖZÜMÜ
+===================
+Hiçbir şey çalışmıyorsa:
+
+1. Programı tamamen kapatın
+2. Bilgisayarı yeniden başlatın
+3. Yazıcıyı kapatıp açın
+4. İnternet bağlantısını test edin
+5. Programı "Yönetici olarak çalıştır"
+6. "Test Modu" ile başlatın
+
+Bu genellikle sorunların %90'ını çözer.
+
+📝 LOG DOSYALARİ
+===============
+Sorun giderme için log dosyaları çok önemlidir:
+- fabrika_log.txt (ana log)
+- super_fabrika_log.txt (detaylı log)
+
+Bu dosyalar program klasöründe oluşturulur.

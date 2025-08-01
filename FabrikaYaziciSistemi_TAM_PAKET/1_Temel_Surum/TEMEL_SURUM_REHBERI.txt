@@ -1,0 +1,20 @@
+
+🏭 TEMEL FABRİKA YAZICI SİSTEMİ
+==============================
+
+✨ ÖZELLIKLER
+- Basit ve kullanıcı dostu arayüz
+- Otomatik sipariş dinleme
+- Hızlı yazdırma
+- Temel durum gösterimi
+
+🚀 KULLANIM
+1. "Temel_Baslatma.bat" dosyasına çift tıklayın
+2. "Bağlantı Testi" yapın
+3. "Başlat" butonuna tıklayın
+4. Sistem otomatik çalışmaya başlar
+
+👥 KİMLER İÇİN
+- Basit kullanım isteyen fabrikalar
+- Az özellikle yetinen kullanıcılar
+- Hızlı kurulum isteyenler

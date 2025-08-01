@@ -30,4 +30,8 @@ urlpatterns = [
     path('api/<int:pk>/', views.OrderDetailAPIView.as_view(), name='api-order-detail'),
     path('api/<int:order_id>/status/', views.update_order_status_api, name='api-order-status'),
     path('api/templates/<int:template_id>/create-order/', views.create_order_from_template_api, name='api-create-from-template'),
+    
+    # Fabrika API'leri
+    path('api/factory/orders/', views.factory_orders_api, name='api-factory-orders'),
+    path('api/factory/mark-printed/', views.mark_order_printed_api, name='api-mark-printed'),
 ] 

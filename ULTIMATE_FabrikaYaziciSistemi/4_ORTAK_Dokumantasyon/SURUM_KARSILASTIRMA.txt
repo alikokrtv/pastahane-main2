@@ -1,0 +1,40 @@
+
+🔍 SÜRÜM KARŞILAŞTIRMA TABLOSU
+==============================
+
+                          TEMEL    GELİŞMİŞ    SÜPER
+                          -----    --------    -----
+Arayüz                      ⭐       ⭐⭐⭐       ⭐⭐⭐⭐⭐
+Kullanım Kolaylığı        ⭐⭐⭐⭐⭐    ⭐⭐⭐⭐      ⭐⭐⭐
+Yazıcı Yönetimi             ❌       ✅         ✅
+Otomatik Keşif              ❌       ❌         ✅
+Test Özellikleri            ❌       ⭐⭐        ⭐⭐⭐⭐⭐
+Ağ Yazıcı Desteği           ❌       ⭐         ⭐⭐⭐⭐⭐
+Log Sistemi               ⭐⭐       ⭐⭐⭐       ⭐⭐⭐⭐⭐
+Ayar Seçenekleri          ⭐⭐       ⭐⭐⭐⭐      ⭐⭐⭐⭐⭐
+Sorun Giderme             ⭐⭐       ⭐⭐⭐       ⭐⭐⭐⭐⭐
+
+🎯 DOĞRU SEÇİM REHBERİ
+======================
+
+🔹 TEMEL SÜRÜM SEÇİN EĞER:
+- İlk kez kullanıyorsanız
+- Tek bir USB yazıcınız varsa  
+- Basit ihtiyaçlarınız varsa
+- Hızlı kurulum istiyorsanız
+
+🔹 GELİŞMİŞ SÜRÜM SEÇİN EĞER:
+- Yazıcı kontrolü istiyorsanız
+- Test yazdırma ihtiyacınız varsa
+- Detaylı ayarlar istiyorsanız
+- Orta seviye kullanıcıysanız
+
+🔹 SÜPER GELİŞMİŞ SÜRÜM SEÇİN EĞER:
+- Birden fazla yazıcınız varsa
+- Ağ yazıcıları kullanıyorsanız
+- En gelişmiş özellikleri istiyorsanız
+- Teknik bilginiz iyiyse
+
+💡 KARARSIZ KALIYORSANIZ:
+GELİŞMİŞ SÜRÜM ile başlayın, gerekirse
+SÜPER GELİŞMİŞ'e geçebilirsiniz.

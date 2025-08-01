@@ -1,0 +1,175 @@
+
+🏭 ÇALIŞAN FABRİKA YAZICI SİSTEMİ - DETAYLI REHBER
+=================================================
+
+🎉 TEBRİKLER!
+Bu sürümde TÜM BUTONLAR gerçekten çalışır!
+Artık sadece görüntü değil, gerçek işlevsellik var.
+
+📋 SEKMELİ ARAYÜZ REHBERİ
+=========================
+
+1️⃣ ANA KONTROL SEKMESİ
+----------------------
+📊 Sistem Durumu:
+• 🖨️ Yazıcı durumu (seçili yazıcı gösterir)
+• 🔴/🟢 Bağlantı durumu (gerçek API kontrolü)
+• ⏸️/▶️ Servis durumu (çalışıyor/durduruldu)
+
+🎮 Kontrol Paneli:
+• ▶️ SİSTEMİ BAŞLAT - Otomatik sipariş dinlemeyi başlatır
+• ⏹️ SİSTEMİ DURDUR - Sistemi güvenli şekilde durdurur
+• 🔍 BAĞLANTI TESTİ - API bağlantısını gerçekten test eder
+• 🔄 YENİLE - Tüm verileri yeniler
+
+📦 Aktif Siparişler:
+• Gerçek siparişleri gösterir
+• API'den çekilen veriler
+• Yazdırma durumları
+
+2️⃣ YAZICI YÖNETİMİ SEKMESİ
+---------------------------
+🔧 Yazıcı Kontrolleri:
+• 🔄 YAZICILARI TARA - Sistemi gerçekten tarar, Windows yazıcılarını bulur
+• 🧪 SEÇİLİ YAZICIYI TEST ET - Gerçek test yazdırması yapar
+• ✅ YAZICI SEÇ - Seçili yazıcıyı aktif eder
+
+📋 Mevcut Yazıcılar:
+• Tüm sistem yazıcıları listelenir
+• Durum bilgileri (Hazır/Çevrimdışı/Hata)
+• Port ve sürücü bilgileri
+• Varsayılan yazıcı işaretlemesi
+
+📌 Seçili Yazıcı:
+• Aktif yazıcı bilgisini gösterir
+
+3️⃣ TEST MERKEZİ SEKMESİ
+-----------------------
+🎯 Test Seçenekleri:
+• ⚡ HIZLI TEST - Anında yazıcı bağlantı testi
+• 📄 METİN TESTİ - Türkçe karakter ve format testi
+• 🖨️ YAZICI DURUMU - Detaylı yazıcı bilgilerini gösterir
+• 🌐 AĞ TESTİ - İnternet ve API bağlantı kontrolü
+
+✏️ Özel Test Metni:
+• Kendi test metninizi yazabilirsiniz
+• 🖨️ ÖZEL METNİ YAZDIR - Yazdığınız metni gerçekten yazdırır
+
+📊 Test Sonuçları:
+• Tüm test sonuçları burada görünür
+• Gerçek zamanlı sonuç takibi
+
+4️⃣ AYARLAR SEKMESİ
+------------------
+🔗 API Ayarları:
+• API URL (varsayılan: https://siparis.tatopastabaklava.com)
+• Güvenlik Token (factory_printer_2024)
+• Kontrol Aralığı (30 saniye)
+
+💾 AYARLARI KAYDET:
+• Değişiklikleri kalıcı olarak kaydeder
+
+5️⃣ LOGLAR SEKMESİ
+-----------------
+📝 Sistem Logları:
+• Tüm sistem aktiviteleri
+• Hata mesajları
+• İşlem geçmişi
+
+Kontroller:
+• 🔄 LOGLARI YENİLE - Log ekranını günceller
+• 🗑️ LOGLARI TEMİZLE - Ekranı temizler
+• 💾 DOSYAYA KAYDET - Logları dosyaya kaydeder
+
+🔧 KURULUM VE KULLANIM
+======================
+
+📋 İLK KURULUM:
+1. Yazıcınızın bilgisayara bağlı ve açık olduğunu kontrol edin
+2. "🚀_CALISIR_BASLATMA.bat" dosyasını çalıştırın
+3. "Yazıcı Yönetimi" sekmesine gidin
+4. "YAZICILARI TARA" butonuna tıklayın (gerçekten tarayacak!)
+5. Yazıcınızı listeden seçin
+6. "YAZICI SEÇ" butonuna tıklayın
+7. "SEÇİLİ YAZICIYI TEST ET" ile test edin (gerçek yazdırma!)
+
+🌐 BAĞLANTI KURULUMU:
+1. "Ana Kontrol" sekmesine gidin
+2. "BAĞLANTI TESTİ" butonuna tıklayın (gerçek API testi!)
+3. Yeşil "Bağlantı: Başarılı" durumunu görmelisiniz
+4. API bağlantısı sağlandığında siparişler de yüklenecek
+
+▶️ SİSTEM BAŞLATMA:
+1. Yazıcı seçildiğinden ve test edildiğinden emin olun
+2. API bağlantısının başarılı olduğunu kontrol edin
+3. "SİSTEMİ BAŞLAT" butonuna tıklayın
+4. Sistem artık otomatik çalışmaya başlar
+5. Yeni siparişler geldiğinde otomatik yazdırılır
+
+🧪 TEST REHBERİ
+===============
+
+🔍 YAZICI TESTLERI:
+• Önce "YAZICILARI TARA" yapın
+• Yazıcınızı seçin
+• "SEÇİLİ YAZICIYI TEST ET" ile gerçek test yapın
+• Test sayfası yazıcıdan çıkacak
+
+⚡ HIZLI TESTLER:
+• "Test Merkezi" sekmesine gidin
+• "HIZLI TEST" - anında bağlantı kontrolü
+• "METİN TESTİ" - Türkçe karakter testi
+• "AĞ TESTİ" - internet ve API kontrolü
+
+✏️ ÖZEL TESTLER:
+• Test metin alanına kendi metninizi yazın
+• "ÖZEL METNİ YAZDIR" ile gerçek yazdırma
+• Sonuçları "Test Sonuçları" alanında takip edin
+
+🔧 SORUN GİDERME
+================
+
+🔴 YAZICI BULUNAMIYOR:
+□ Yazıcı açık mı?
+□ USB kablosu bağlı mı?
+□ Windows Ayarlar > Yazıcılar'da görünüyor mu?
+□ "YAZICILARI TARA" butonunu tekrar deneyin
+
+🔴 TEST YAZDIRMA ÇALIŞMIYOR:
+□ Yazıcıda kağıt var mı?
+□ Mürekkep/toner yeterli mi?
+□ Yazıcı hazır durumda mı?
+□ Başka bir program yazıcıyı kullanıyor mu?
+
+🔴 BAĞLANTI SORUNU:
+□ İnternet bağlantınız var mı?
+□ "AĞ TESTİ" ile kontrol edin
+□ Firewall yazıcı programını engelliyor mu?
+□ VPN kullanıyorsanız geçici kapatın
+
+🔴 SİPARİŞLER GELMİYOR:
+□ "BAĞLANTI TESTİ" başarılı mı?
+□ "SİSTEMİ BAŞLAT" butonuna bastınız mı?
+□ Yeşil "Bağlantı: Aktif" durumu görünüyor mu?
+□ Token doğru mu? (Ayarlar sekmesi)
+
+💡 İPUÇLARI
+============
+✅ Programı sürekli açık tutun
+✅ Bilgisayarı uyku moduna almayın
+✅ Düzenli test yazdırmaları yapın
+✅ Log ekranını takip edin
+✅ Yazıcı kağıdını kontrol edin
+
+🎯 ÖNEMLİ NOT
+=============
+Bu sürümde TÜM BUTONLAR gerçekten çalışır!
+• YAZICILARI TARA - gerçekten tarar
+• TEST ET - gerçek yazdırma yapar
+• BAĞLANTI TESTİ - API'yi kontrol eder
+• Diğer tüm butonlar da işlevsel
+
+Artık sadece görüntü yok, gerçek işlevsellik var! 🚀
+
+🎉 İYİ KULANIMLAR!
+=================

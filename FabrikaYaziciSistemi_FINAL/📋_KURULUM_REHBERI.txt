@@ -1,0 +1,106 @@
+
+🏭 FABRİKA YAZICI SİSTEMİ - KURULUM REHBERİ
+==========================================
+
+🚀 HIZLI KURULUM (2 DAKİKA)
+===========================
+
+1️⃣ PROGRAM BAŞLATMA
+-------------------
+"🚀_BASLATMA.bat" dosyasına çift tıklayın
+
+2️⃣ YAZICI AYARLAMA
+------------------
+Program açıldığında:
+• "Yazıcı Yönetimi" sekmesine gidin
+• "Yeniden Tara" butonuna tıklayın
+• Yazıcınızı seçin ve "Seç" butonuna tıklayın
+• "Test Et" ile yazıcınızı test edin
+
+3️⃣ BAĞLANTI KONTROLÜ
+--------------------
+• "Ana Kontrol" sekmesine gidin
+• "Bağlantı Testi" butonuna tıklayın
+• Yeşil "Bağlı" durumunu gördüğünüzde hazırsınız
+
+4️⃣ SİSTEMİ BAŞLATMA
+-------------------
+• "Sistemi Başlat" butonuna tıklayın
+• Artık siparişler otomatik yazdırılacak!
+
+🔧 DETAYLI KURULUM ADIMLARİ
+===========================
+
+📋 ÖN HAZIRLIK
+--------------
+□ Yazıcının bilgisayara bağlı olduğunu kontrol edin
+□ Yazıcının açık ve hazır olduğunu kontrol edin
+□ İnternet bağlantısının çalıştığını kontrol edin
+□ Windows Defender'ın programı engellemediğini kontrol edin
+
+🖥️ SİSTEM GEREKSİNİMLERİ
+------------------------
+✅ Windows 7/8/10/11 (64-bit önerilen)
+✅ En az 100 MB boş disk alanı
+✅ İnternet bağlantısı (sürekli)
+✅ USB veya ağ yazıcısı
+✅ .NET Framework (genellikle yüklü)
+
+🖨️ YAZICI KURULUMU
+------------------
+Eğer yazıcınız henüz kurulu değilse:
+
+1. Yazıcıyı USB ile bilgisayara bağlayın
+2. Windows Ayarlar > Yazıcılar ve Tarayıcılar
+3. "Yazıcı veya tarayıcı ekle" seçeneğine tıklayın
+4. Sistemin yazıcıyı bulmasını bekleyin
+5. Kurulum talimatlarını takip edin
+6. Test sayfası yazdırın
+
+🌐 AĞ YAZICI KURULUMU
+--------------------
+Ağ yazıcısı kullanıyorsanız:
+
+1. Yazıcının IP adresini öğrenin
+2. Windows Ayarlar > Yazıcılar ve Tarayıcılar
+3. "Yazıcı veya tarayıcı ekle"
+4. "İstediğim yazıcı listede yok"
+5. "TCP/IP adresi ile yazıcı ekle"
+6. IP adresini girin ve devam edin
+
+🔐 GÜVENLİK AYARLARI
+-------------------
+Windows Defender uyarısı verirse:
+
+1. "Ayrıntılar" linkine tıklayın
+2. "Yine de çalıştır" seçeneğini seçin
+3. Veya programı güvenlik istisnalarına ekleyin
+
+💡 İLK KULLANIM İPUÇLARI
+=======================
+□ İlk açılışta mutlaka yazıcı testini yapın
+□ Bağlantı testini yaparak API'nin çalıştığını kontrol edin
+□ Test yazdırma ile formatın doğru olduğunu kontrol edin
+□ Program sürekli açık tutulmalıdır
+□ Bilgisayar uyku moduna geçmemelidir
+
+🔧 SORUN ÇÖZME
+==============
+□ Program açılmıyor → Antivirüs kontrol edin
+□ Yazıcı bulunamıyor → USB'yi çıkarıp takın
+□ Bağlantı sorunu → İnternet kontrol edin
+□ Yazdırma çalışmıyor → Yazıcı test edin
+
+📞 YARDIM
+=========
+Bu rehberde çözemediğiniz sorunlar için:
+• "SORUN_GIDERME.txt" dosyasını okuyun
+• Log dosyalarını kontrol edin
+• Sistem yöneticisiyle iletişime geçin
+
+🎉 KURULUM TAMAMLANDI!
+=====================
+Artık şubelerden gelen siparişler
+fabrikada otomatik yazdırılacak!
+
+İyi kullanımlar! 🎯

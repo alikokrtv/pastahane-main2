@@ -1,0 +1,48 @@
+
+🏭 GELIŞMIŞ SÜRÜM
+Yazıcı yönetimi, test özellikli
+==================================================
+
+✨ ÖZELLIKLER
+===============
+✅ Sekmeli gelişmiş arayüz
+✅ Yazıcı yönetimi
+✅ Test yazdırma
+✅ Detaylı log sistemi
+✅ Gelişmiş ayarlar
+✅ Yazıcı durum kontrolü
+❌ Otomatik keşif yok
+
+👥 KİMLER KULLANMALI
+====================
+🔧 Yazıcı kontrolü isteyenler
+🧪 Test yazdırma ihtiyacı olanlar
+📊 Detaylı log isteyenler
+⚙️ Gelişmiş ayarlar isteyenler
+
+🚀 HIZLI BAŞLANGIÇ
+==================
+1. "Gelişmiş_Sürüm_BASLATMA.bat" dosyasına çift tıklayın
+2. Program otomatik olarak açılır
+3. İlk kurulum adımlarını takip edin
+4. Sistem çalışmaya başlar
+
+🔧 SİSTEM GEREKSİNİMLERİ
+=========================
+- Windows 7/8/10/11 (64-bit)
+- En az 50 MB boş alan
+- İnternet bağlantısı
+- USB veya ağ yazıcısı
+
+💡 İPUÇLARI
+============
+- İlk kurulumda mutlaka bağlantı testi yapın
+- Yazıcınızın açık olduğundan emin olun
+- Sorun yaşarsanız log dosyalarını kontrol edin
+
+📞 YARDIM
+=========
+Sorun yaşarsanız "4_ORTAK_Dokumantasyon" klasöründeki
+rehberleri okuyun veya sistem yöneticisiyle iletişime geçin.
+
+🎉 İYİ KULANIMLAR!

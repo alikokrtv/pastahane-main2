@@ -1,0 +1,48 @@
+
+🏭 TEMEL SÜRÜM
+Hızlı kurulum, basit kullanım
+==================================================
+
+✨ ÖZELLIKLER
+===============
+✅ Basit ve kullanıcı dostu arayüz
+✅ Otomatik sipariş dinleme
+✅ Hızlı yazdırma
+✅ Temel log sistemi
+✅ API bağlantı kontrolü
+❌ Yazıcı yönetimi yok
+❌ Gelişmiş test yok
+
+👥 KİMLER KULLANMALI
+====================
+👥 İlk kez kullananlar
+⚡ Hızlı kurulum isteyenler
+🎯 Basit ihtiyaçları olanlar
+💻 Tek yazıcısı olanlar
+
+🚀 HIZLI BAŞLANGIÇ
+==================
+1. "Temel_Sürüm_BASLATMA.bat" dosyasına çift tıklayın
+2. Program otomatik olarak açılır
+3. İlk kurulum adımlarını takip edin
+4. Sistem çalışmaya başlar
+
+🔧 SİSTEM GEREKSİNİMLERİ
+=========================
+- Windows 7/8/10/11 (64-bit)
+- En az 50 MB boş alan
+- İnternet bağlantısı
+- USB veya ağ yazıcısı
+
+💡 İPUÇLARI
+============
+- İlk kurulumda mutlaka bağlantı testi yapın
+- Yazıcınızın açık olduğundan emin olun
+- Sorun yaşarsanız log dosyalarını kontrol edin
+
+📞 YARDIM
+=========
+Sorun yaşarsanız "4_ORTAK_Dokumantasyon" klasöründeki
+rehberleri okuyun veya sistem yöneticisiyle iletişime geçin.
+
+🎉 İYİ KULANIMLAR!

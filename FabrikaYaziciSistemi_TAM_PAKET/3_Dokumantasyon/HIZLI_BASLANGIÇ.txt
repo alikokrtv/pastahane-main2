@@ -1,0 +1,63 @@
+
+🚀 HIZLI BAŞLANGIÇ REHBERİ
+=========================
+
+📋 SÜRÜM SEÇİMİ
+===============
+
+🔹 TEMEL SÜRÜM
+-------------
+✅ Basit ve hızlı kullanım
+✅ Temel özellikler
+✅ Kolay kurulum
+❌ Yazıcı yönetimi yok
+❌ Detaylı ayarlar yok
+
+Kimler kullanmalı:
+- İlk kez kullananlar
+- Basit ihtiyaçları olanlar
+- Hızlı başlamak isteyenler
+
+🔹 GELİŞMİŞ SÜRÜM
+-----------------
+✅ Otomatik yazıcı algılama
+✅ Yazıcı durum kontrolü
+✅ Test yazdırma
+✅ Detaylı log sistemi
+✅ Gelişmiş ayarlar
+✅ Sekmeli arayüz
+
+Kimler kullanmalı:
+- Detaylı kontrol isteyenler
+- Birden fazla yazıcısı olanlar
+- Gelişmiş özellik isteyenler
+
+⚡ HIZLI KURULUM
+===============
+
+1️⃣ SÜRÜM SEÇ
+- Temel kullanım → "1_Temel_Surum" klasörü
+- Gelişmiş kullanım → "2_Gelismis_Surum" klasörü
+
+2️⃣ BAŞLAT
+- Temel: "Temel_Baslatma.bat" çalıştır
+- Gelişmiş: "Gelismis_Baslatma.bat" çalıştır
+
+3️⃣ AYARLA
+- Bağlantı testi yap
+- Yazıcı seç (gelişmiş sürümde)
+- Sistemi başlat
+
+4️⃣ KULLAN
+- Artık siparişler otomatik yazdırılıyor!
+
+🔧 SORUN ÇÖZME
+==============
+- Program açılmıyor → Windows Defender'ı kontrol et
+- Yazıcı çalışmıyor → USB bağlantısını kontrol et
+- Bağlantı yok → İnternet bağlantısını kontrol et
+
+📞 YARDIM
+=========
+Detaylı bilgi için "3_Dokumantasyon" klasöründeki
+dosyaları okuyun.

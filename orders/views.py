@@ -340,3 +340,109 @@ def order_statistics_api(request):
     }
     
     return Response(statistics)
+
+
+from rest_framework.decorators import permission_classes
+from rest_framework.permissions import AllowAny
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def factory_orders_api(request):
+    """Fabrika için yeni siparişleri dinleme API'si (Kimlik doğrulama gerektirmez)"""
+    # Token tabanlı basit güvenlik
+    auth_token = request.GET.get('token')
+    if auth_token != 'factory_printer_2024':
+        return Response({'error': 'Unauthorized'}, status=status.HTTP_401_UNAUTHORIZED)
+    
+    # Yeni onaylanan siparişleri getir (son 24 saat)
+    from django.utils import timezone
+    from datetime import timedelta
+    
+    yesterday = timezone.now() - timedelta(hours=24)
+    
+    # Onaylanmış veya üretimde olan siparişleri getir
+    orders = Order.objects.filter(
+        status__in=['confirmed', 'pending'],
+        created_at__gte=yesterday
+    ).select_related('branch', 'created_by').prefetch_related('items__product')
+    
+    # Son kontrol edilen zamanı parametreden al
+    last_check = request.GET.get('last_check')
+    if last_check:
+        try:
+            from datetime import datetime
+            last_check_time = datetime.fromisoformat(last_check.replace('Z', '+00:00'))
+            orders = orders.filter(created_at__gte=last_check_time)
+        except:
+            pass  # Hatalı format, tüm siparişleri getir
+    
+    # Sipariş verilerini hazırla
+    orders_data = []
+    for order in orders:
+        items_data = []
+        for item in order.items.all():
+            items_data.append({
+                'product_name': item.product.name,
+                'quantity': float(item.quantity),
+                'unit': item.product.get_unit_display(),
+                'notes': item.notes
+            })
+        
+        orders_data.append({
+            'id': order.id,
+            'order_number': order.order_number,
+            'branch_name': order.branch.name,
+            'customer_name': order.customer_name,
+            'delivery_date': order.requested_delivery_date.isoformat(),
+            'status': order.get_status_display(),
+            'notes': order.notes,
+            'created_at': order.created_at.isoformat(),
+            'total_amount': float(order.total_amount),
+            'items': items_data,
+            'created_by': order.created_by.get_full_name() or order.created_by.username
+        })
+    
+    return Response({
+        'orders': orders_data,
+        'count': len(orders_data),
+        'timestamp': timezone.now().isoformat()
+    })
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def mark_order_printed_api(request):
+    """Siparişin yazdırıldığını işaretle"""
+    auth_token = request.data.get('token')
+    if auth_token != 'factory_printer_2024':
+        return Response({'error': 'Unauthorized'}, status=status.HTTP_401_UNAUTHORIZED)
+    
+    order_id = request.data.get('order_id')
+    if not order_id:
+        return Response({'error': 'order_id required'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    try:
+        order = Order.objects.get(id=order_id)
+        
+        # Sipariş durumunu 'in_production' yap
+        if order.status == 'pending':
+            order.status = 'confirmed'
+            order.save()
+            
+            # Durum geçmişi kaydet
+            OrderStatusHistory.objects.create(
+                order=order,
+                from_status='pending',
+                to_status='confirmed',
+                changed_by_id=1,  # System user
+                notes='Fabrika yazıcısından yazdırıldı'
+            )
+        
+        return Response({
+            'success': True,
+            'message': 'Sipariş yazdırıldı olarak işaretlendi',
+            'order_number': order.order_number
+        })
+        
+    except Order.DoesNotExist:
+        return Response({'error': 'Order not found'}, status=status.HTTP_404_NOT_FOUND)

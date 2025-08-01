@@ -1,0 +1,30 @@
+
+⚡ SÜPER HIZLI BAŞLANGIÇ
+======================
+
+🎯 3 ADIMDA HAZIR!
+==================
+
+1️⃣ BAŞLAT
+----------
+🚀_BASLATMA.bat dosyasına çift tık
+
+2️⃣ AYARLA  
+----------
+Yazıcı Yönetimi → Yazıcı seç → Test et
+
+3️⃣ ÇALIŞTIR
+-----------
+Ana Kontrol → Bağlantı Testi → Sistemi Başlat
+
+🎉 HAZIR! Siparişler otomatik yazdırılıyor!
+
+🔧 SORUN VARSA
+==============
+□ Yazıcı açık mı?
+□ İnternet var mı?
+□ Windows Defender engelliyor mu?
+
+📋 Detaylı yardım: KURULUM_REHBERI.txt
+
+Bu kadar basit! 🚀

@@ -1,0 +1,69 @@
+
+🔧 ULTIMATE SORUN GİDERME REHBERİ
+=================================
+
+🔴 PROGRAM AÇILMIYOR
+-------------------
+□ Windows Defender'ı geçici olarak kapatın
+□ Dosyaya sağ tık → "Yönetici olarak çalıştır"
+□ Antivirüs programının engellemediğini kontrol edin
+□ .NET Framework güncel olduğundan emin olun
+
+🔴 YAZICI BULUNAMIYOR  
+--------------------
+□ Yazıcının açık ve hazır olduğunu kontrol edin
+□ USB kablosunu çıkarıp takın
+□ Yazıcı sürücülerinin yüklendiğini kontrol edin
+□ Windows Yazıcılar ayarlarından yazıcıyı görebildiğinizi kontrol edin
+□ SÜPER GELİŞMİŞ sürümde "Yazıcı Keşfi" özelliğini kullanın
+
+🔴 API BAĞLANTI SORUNU
+---------------------
+□ İnternet bağlantınızı test edin (web sitesi açın)
+□ Firewall'un programı engellemediğini kontrol edin
+□ Şirket ağındaysanız IT departmanıyla konuşun
+□ VPN kullanıyorsanız geçici olarak kapatın
+□ Token'ın doğru olduğunu kontrol edin
+
+🔴 YAZDIRMA ÇALIŞMIYOR
+---------------------
+□ Test yazdırma özelliğini kullanın
+□ Yazıcı kuyruğunu kontrol edin
+□ Kağıt ve mürekkep/toner durumunu kontrol edin  
+□ Yazıcıyı yeniden başlatın
+□ Windows yazıcı sorun gidericisini çalıştırın
+
+🔴 PROGRAM YAVAŞ ÇALIŞIYOR
+-------------------------
+□ İnternet hızınızı test edin
+□ Kontrol aralığını artırın (Ayarlar)
+□ Gereksiz programları kapatın
+□ Bilgisayarı yeniden başlatın
+
+🔴 SİPARİŞLER GELMİYOR
+---------------------
+□ "Başlat" butonuna bastığınızı kontrol edin
+□ Yeşil "Bağlı" durumunu kontrol edin
+□ Manuel "Yenile" butonunu deneyin
+□ API token'ının doğru olduğunu kontrol edin
+□ Sistem yöneticisiyle iletişime geçin
+
+📞 ACİL YARDIM PROTOKOLÜ
+=======================
+1. Log dosyasını açın (fabrika_log.txt)
+2. En son hata mesajlarını kopyalayın
+3. Hangi sürümü kullandığınızı belirtin
+4. Sistem yöneticisine iletin
+5. Varsa ekran görüntüsü alın
+
+🏆 PERFORMANS İPUÇLARI
+=====================
+□ Programı sürekli açık tutun
+□ Bilgisayarı uyku moduna almayın
+□ Düzenli olarak log dosyalarını temizleyin
+□ Yazıcı kağıdını kontrol edin
+□ İnternet bağlantısını stabil tutun
+
+Bu rehber tüm sürümler için geçerlidir.
+Daha detaylı yardım için ilgili sürümün
+kendi rehberini okuyun.

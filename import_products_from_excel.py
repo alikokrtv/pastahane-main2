@@ -129,31 +129,138 @@ def import_products_from_excel():
         print(f"❌ Excel import hatası: {e}")
         return False
 
-def create_sample_branch():
-    """Örnek şube oluştur"""
-    branch, created = Branch.objects.get_or_create(
-        name='Ana Şube',
+def create_branches():
+    """Vega ve Çarşı şubelerini oluştur"""
+    branches = []
+    
+    # Vega şubesi
+    vega_branch, created = Branch.objects.get_or_create(
+        name='Vega',
         defaults={
-            'address': 'Merkez Mah. Pasta Sok. No:1',
-            'phone': '0212 123 45 67',
+            'branch_type': 'sales',
+            'address': 'Vega AVM, İstanbul',
+            'phone': '0212 456 78 90',
+            'email': 'vega@tatopastabaklava.com',
             'is_active': True
         }
     )
     if created:
-        print(f"✅ Şube oluşturuldu: {branch.name}")
+        print(f"✅ Şube oluşturuldu: {vega_branch.name}")
     else:
-        print(f"📋 Mevcut şube: {branch.name}")
-    return branch
+        print(f"📋 Mevcut şube: {vega_branch.name}")
+    branches.append(vega_branch)
+    
+    # Çarşı şubesi
+    carsi_branch, created = Branch.objects.get_or_create(
+        name='Çarşı',
+        defaults={
+            'branch_type': 'sales',
+            'address': 'Kapalıçarşı, İstanbul',
+            'phone': '0212 567 89 01',
+            'email': 'carsi@tatopastabaklava.com',
+            'is_active': True
+        }
+    )
+    if created:
+        print(f"✅ Şube oluşturuldu: {carsi_branch.name}")
+    else:
+        print(f"📋 Mevcut şube: {carsi_branch.name}")
+    branches.append(carsi_branch)
+    
+    # Fabrika şubesi
+    factory_branch, created = Branch.objects.get_or_create(
+        name='Fabrika',
+        defaults={
+            'branch_type': 'production',
+            'address': 'Fabrika Mah. Üretim Sok. No:1',
+            'phone': '0212 678 90 12',
+            'email': 'fabrika@tatopastabaklava.com',
+            'is_active': True
+        }
+    )
+    if created:
+        print(f"✅ Şube oluşturuldu: {factory_branch.name}")
+    else:
+        print(f"📋 Mevcut şube: {factory_branch.name}")
+    branches.append(factory_branch)
+    
+    return branches
+
+def create_branch_managers():
+    """Vega ve Çarşı şube müdürlerini oluştur"""
+    from django.contrib.auth import get_user_model
+    User = get_user_model()
+    
+    # Şubeleri al
+    try:
+        vega_branch = Branch.objects.get(name='Vega')
+        carsi_branch = Branch.objects.get(name='Çarşı')
+    except Branch.DoesNotExist:
+        print("❌ Şubeler bulunamadı. Önce şubeleri oluşturun.")
+        return False
+    
+    # Vega şube müdürü
+    vega_user, created = User.objects.get_or_create(
+        username='vega_mudur',
+        defaults={
+            'first_name': 'Vega',
+            'last_name': 'Şube Müdürü',
+            'email': 'vega@tatopastabaklava.com',
+            'role': 'branch_manager',
+            'branch': vega_branch,
+            'is_active': True,
+            'phone': '0532 111 22 33'
+        }
+    )
+    if created:
+        vega_user.set_password('vega123')
+        vega_user.save()
+        print(f"✅ Vega şube müdürü oluşturuldu: {vega_user.username}")
+    else:
+        print(f"📋 Mevcut kullanıcı: {vega_user.username}")
+    
+    # Çarşı şube müdürü
+    carsi_user, created = User.objects.get_or_create(
+        username='carsi_mudur',
+        defaults={
+            'first_name': 'Çarşı',
+            'last_name': 'Şube Müdürü',
+            'email': 'carsi@tatopastabaklava.com',
+            'role': 'branch_manager',
+            'branch': carsi_branch,
+            'is_active': True,
+            'phone': '0532 444 55 66'
+        }
+    )
+    if created:
+        carsi_user.set_password('carsi123')
+        carsi_user.save()
+        print(f"✅ Çarşı şube müdürü oluşturuldu: {carsi_user.username}")
+    else:
+        print(f"📋 Mevcut kullanıcı: {carsi_user.username}")
+    
+    print("\n🔐 Giriş Bilgileri:")
+    print(f"   Vega: Kullanıcı adı: vega_mudur, Şifre: vega123")
+    print(f"   Çarşı: Kullanıcı adı: carsi_mudur, Şifre: carsi123")
+    
+    return True
 
 if __name__ == "__main__":
     print("Excel ürün listesi Django sistemine aktarılıyor...\n")
     
-    # Örnek şube oluştur
-    create_sample_branch()
+    # Şubeleri oluştur
+    create_branches()
     
     # Ürünleri aktar
     if import_products_from_excel():
         print("\n🎉 Ürün aktarımı başarıyla tamamlandı!")
-        print("Artık şube müdürleri bu ürünlerden sipariş oluşturabilir.")
     else:
         print("\n❌ Ürün aktarımı başarısız oldu.")
+    
+    # Şube müdürlerini oluştur
+    print("\n👥 Şube müdürleri oluşturuluyor...")
+    if create_branch_managers():
+        print("\n🎉 Sistem kurulumu tamamlandı!")
+        print("Artık şube müdürleri sisteme giriş yapıp sipariş oluşturabilir.")
+    else:
+        print("\n❌ Kullanıcı oluşturma başarısız oldu.")

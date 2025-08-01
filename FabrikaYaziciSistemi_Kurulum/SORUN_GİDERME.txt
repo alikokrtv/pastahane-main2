@@ -1,0 +1,40 @@
+
+🔧 SORUN GİDERME REHBERİ
+=======================
+
+🔴 PROGRAM AÇILMIYOR
+-------------------
+□ Windows Defender'ı geçici olarak kapatın
+□ Dosyaya sağ tık → "Yönetici olarak çalıştır"
+□ Antivirüs programının engellemediğini kontrol edin
+
+🔴 BAĞLANTI SORUNU
+-----------------
+□ İnternet bağlantınızı test edin (chrome açıp site ziyaret edin)
+□ Firewall'un programı engellemediğini kontrol edin
+□ Şirket ağındaysanız IT departmanıyla konuşun
+
+🔴 YAZICI ÇALIŞMIYOR
+-------------------
+□ Yazıcının açık ve hazır olduğunu kontrol edin
+□ USB kablosunu çıkarıp takın
+□ 'TestYazdirma.bat' ile test yapın
+□ Windows'ta Yazıcılar'dan durumu kontrol edin
+
+🔴 SİPARİŞ GELMİYOR
+------------------
+□ "▶️ Başlat" butonuna bastığınızı kontrol edin
+□ Yeşil "🟢 Bağlı" yazısının görünür olduğunu kontrol edin
+□ "🔄 Yenile" butonuyla manuel kontrol yapın
+
+🔴 PROGRAM DONUYOR
+-----------------
+□ Task Manager'dan programı kapatın
+□ 'Baslatma.bat' ile yeniden başlatın
+□ Bilgisayarı yeniden başlatın
+
+📞 ACİL YARDIM
+-------------
+1. fabrika_log.txt dosyasını açın
+2. En son satırlardaki hata mesajını kopyalayın
+3. Sistem yöneticisiyle paylaşın

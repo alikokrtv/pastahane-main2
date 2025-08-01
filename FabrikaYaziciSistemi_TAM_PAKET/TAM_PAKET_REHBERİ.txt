@@ -1,0 +1,74 @@
+
+🏭 TATO PASTA & BAKLAVA - FABRİKA YAZICI SİSTEMİ
+===============================================
+
+📦 TAM KURULUM PAKETİ
+====================
+
+Bu pakette iki farklı sürüm bulunmaktadır:
+
+✅ TEMEL SÜRÜM - Basit ve hızlı kullanım
+✅ GELİŞMİŞ SÜRÜM - Detaylı kontrol ve yazıcı yönetimi
+
+🚀 HIZLI BAŞLANGIÇ
+=================
+
+1️⃣ "BAŞLAT.bat" dosyasına çift tıklayın
+2️⃣ Kullanmak istediğiniz sürümü seçin
+3️⃣ Program otomatik olarak başlar
+
+📁 PAKET İÇERİĞİ
+===============
+
+📂 1_Temel_Surum/
+   🔧 FabrikaYaziciSistemi.exe
+   ⚡ Temel_Baslatma.bat
+   📄 TEMEL_SURUM_REHBERI.txt
+
+📂 2_Gelismis_Surum/
+   🔧 GelismisFabrikaYazici.exe
+   ⚡ Gelismis_Baslatma.bat
+   📄 GELISMIS_SURUM_REHBERI.txt
+
+📂 3_Dokumantasyon/
+   📋 HIZLI_BASLANGIÇ.txt
+   📄 README_FABRIKA_SISTEMI.md
+   📄 KURULUM_TAMAMLANDI.md
+
+⚡ BAŞLAT.bat - Ana başlatma dosyası
+📄 TAM_PAKET_REHBERİ.txt - Bu dosya
+
+🎯 SÜRÜM SEÇİMİ
+==============
+
+🔹 TEMEL SÜRÜM
+- Basit arayüz
+- Temel yazdırma
+- Hızlı kurulum
+- Yeni başlayanlar için
+
+🔹 GELİŞMİŞ SÜRÜM
+- Otomatik yazıcı algılama
+- Yazıcı durum kontrolü
+- Test yazdırma
+- Detaylı log sistemi
+- Gelişmiş kullanıcılar için
+
+🔧 SİSTEM GEREKSİNİMLERİ
+=======================
+- Windows 7/8/10/11
+- En az 100 MB disk alanı
+- İnternet bağlantısı
+- USB veya ağ yazıcısı
+
+📞 DESTEK
+=========
+Sorun yaşarsanız:
+1. İlgili sürümün rehber dosyasını okuyun
+2. Log dosyalarını kontrol edin
+3. Sistem yöneticisiyle iletişime geçin
+
+🎉 SİSTEM HAZIR!
+===============
+Artık şubelerden gelen siparişler
+fabrikada otomatik yazdırılacak!

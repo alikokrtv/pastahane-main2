@@ -1,0 +1,33 @@
+
+⚡ SÜPER HIZLI BAŞLANGIÇ REHBERİ
+==============================
+
+🎯 3 ADIMDA BAŞLAYIN
+===================
+
+1️⃣ ANA BAŞLATMA
+--------------
+"🚀_ULTIMATE_BASLATMA.bat" dosyasına çift tıklayın
+
+2️⃣ SÜRÜM SEÇİMİ  
+---------------
+Kararsızsanız: "2" (Gelişmiş Sürüm) seçin
+
+3️⃣ İLK KURULUM
+--------------
+Program açıldığında:
+✅ Yazıcıyı seçin/kontrol edin
+✅ "Bağlantı Testi" yapın  
+✅ "Başlat" butonuna tıklayın
+
+🎉 HAZIR! Artık siparişler otomatik yazdırılıyor!
+
+🔧 SORUN YAŞIYORSANIZ
+====================
+□ Windows Defender'ı geçici kapatın
+□ Yazıcının açık olduğunu kontrol edin
+□ İnternet bağlantısını test edin
+
+📞 Yardım: "4_ORTAK_Dokumantasyon" klasörü
+
+Bu kadar basit! 🚀

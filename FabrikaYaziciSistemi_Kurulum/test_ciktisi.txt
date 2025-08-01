@@ -1,0 +1,11 @@
+Test yazdırma - Cum 01.08.2025 14:33:46,23 
+ 
+TATO PASTA & BAKLAVA 
+Fabrika Yazıcı Sistemi 
+ 
+Bu bir test çıktısıdır. 
+Eğer bu metni görebiliyorsanız 
+yazıcınız çalışıyor demektir. 
+ 
+Test tarihi: Cum 01.08.2025 
+Test saati: 14:33:46,25 
