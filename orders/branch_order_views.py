@@ -17,6 +17,53 @@ from .models import Order, OrderItem, OrderStatusHistory
 from users.models import Branch
 
 
+def format_order_for_whatsapp(order):
+    """Sipariş bilgilerini WhatsApp için güzel formatla"""
+    lines = []
+    lines.append("🏢 *TATO PASTA & BAKLAVA*")
+    lines.append("📋 *ÜRETİM SİPARİŞİ*")
+    lines.append("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+    lines.append("")
+    
+    lines.append(f"📝 *Sipariş No:* {order.order_number}")
+    lines.append(f"🏪 *Şube:* {order.branch.name}")
+    lines.append(f"📅 *Teslimat:* {order.requested_delivery_date.strftime('%d.%m.%Y')}")
+    lines.append(f"👤 *Sipariş Veren:* {order.created_by.get_full_name() or order.created_by.username}")
+    lines.append(f"⏰ *Sipariş Zamanı:* {order.created_at.strftime('%d.%m.%Y %H:%M')}")
+    
+    if order.notes:
+        lines.append(f"📌 *Özel Notlar:* {order.notes}")
+    
+    lines.append("")
+    lines.append("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+    lines.append("🍰 *ÜRETİM LİSTESİ*")
+    lines.append("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+    
+    total_quantity = 0
+    for item in order.items.all():
+        quantity = int(item.quantity)
+        lines.append(f"• *{item.product.name}*")
+        lines.append(f"   📦 {quantity} {item.product.get_unit_display()}")
+        
+        if item.notes:
+            lines.append(f"   💬 Not: _{item.notes}_")
+        
+        total_quantity += quantity
+    
+    lines.append("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+    lines.append(f"📊 *TOPLAM ÜRÜN:* {total_quantity} adet")
+    lines.append("")
+    lines.append("⚠️ *ÜRETİM TALİMATLARI:*")
+    lines.append("✅ Hijyen kurallarına uyunuz")
+    lines.append("✅ Teslimat tarihine dikkat ediniz")
+    lines.append("✅ Kalite kontrolü yapınız")
+    lines.append("")
+    lines.append("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+    lines.append("🏭 *TATO PASTA & BAKLAVA ÜRETİM*")
+    
+    return "\n".join(lines)
+
+
 class BranchOrderCreateView(LoginRequiredMixin, TemplateView):
     """Şube müdürleri için sipariş oluşturma arayüzü"""
     template_name = 'orders/branch_order_create.html'
@@ -54,6 +101,21 @@ def create_branch_order_ajax(request):
     """AJAX ile şube siparişi oluştur"""
     if request.method != 'POST':
         return JsonResponse({'success': False, 'error': 'Sadece POST istekleri kabul edilir'})
+    
+    # GÜNLÜK SİPARİŞ KONTROLÜ - Şube müdürü günde sadece 1 sipariş verebilir
+    today = timezone.now().date()
+    existing_order_today = Order.objects.filter(
+        branch=request.user.branch,
+        created_by=request.user,
+        created_at__date=today
+    ).exists()
+    
+    if existing_order_today:
+        return JsonResponse({
+            'success': False, 
+            'error': '⚠️ Bugün zaten sipariş verdiniz!\n\nGünde sadece 1 sipariş verebilirsiniz.\nMevcut siparişinizi düzenleyebilirsiniz.',
+            'daily_limit_reached': True
+        })
     
     try:
         data = json.loads(request.body)
@@ -130,11 +192,17 @@ def create_branch_order_ajax(request):
                 notes='Şube siparişi oluşturuldu'
             )
         
+        # WhatsApp için sipariş formatını hazırla
+        whatsapp_message = format_order_for_whatsapp(order)
+        
         return JsonResponse({
             'success': True,
             'message': 'Sipariş başarıyla oluşturuldu',
             'order_id': order.id,
-            'order_number': order.order_number
+            'order_number': order.order_number,
+            'show_whatsapp': True,
+            'whatsapp_message': whatsapp_message,
+            'whatsapp_phone': '905551234567'  # Üretim telefon numarası
         })
         
     except json.JSONDecodeError:

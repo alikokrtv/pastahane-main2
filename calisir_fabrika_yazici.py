@@ -765,53 +765,74 @@ class CalisanFabrikaYaziciProgram:
             self.log_message(f"❌ Yazdırma hatası: {str(e)}")
     
     def siparis_formatla(self, order):
-        """Siparişi üretim odaklı yazdırma formatına dönüştür"""
+        """Siparişi güzel ve profesyonel yazdırma formatına dönüştür"""
         lines = []
-        lines.append("=" * 50)
-        lines.append("      TATO PASTA & BAKLAVA")
-        lines.append("        ÜRETİM SİPARİŞİ")
-        lines.append("=" * 50)
+        
+        # Üst başlık - daha güzel görünüm
+        lines.append("╔" + "═" * 48 + "╗")
+        lines.append("║" + " " * 48 + "║")
+        lines.append("║" + "      🏢 TATO PASTA & BAKLAVA".ljust(48) + "║")
+        lines.append("║" + "        📋 ÜRETİM SİPARİŞİ".ljust(48) + "║")
+        lines.append("║" + " " * 48 + "║")
+        lines.append("╚" + "═" * 48 + "╝")
         lines.append("")
         
-        lines.append(f"Sipariş No    : {order['order_number']}")
-        lines.append(f"Şube          : {order['branch_name']}")
-        lines.append(f"Teslimat      : {self.format_date(order['delivery_date'])}")
-        lines.append(f"Sipariş Zamanı: {self.format_datetime(order['created_at'])}")
-        lines.append(f"Sipariş Veren : {order['created_by']}")
+        # Sipariş bilgileri
+        lines.append("┌─ 📋 SİPARİŞ BİLGİLERİ " + "─" * 24 + "┐")
+        lines.append(f"│ 📝 Sipariş No    : {order['order_number']:<22} │")
+        lines.append(f"│ 🏪 Şube          : {order['branch_name']:<22} │")
+        lines.append(f"│ 📅 Teslimat      : {self.format_date(order['delivery_date']):<22} │")
+        lines.append(f"│ ⏰ Sipariş Zamanı: {self.format_datetime(order['created_at']):<22} │")
+        lines.append(f"│ 👤 Sipariş Veren : {order['created_by']:<22} │")
         
         if order.get('notes'):
-            lines.append(f"Özel Notlar   : {order['notes']}")
+            lines.append(f"│ 📌 Özel Notlar   : {order['notes'][:22]:<22} │")
         
+        lines.append("└" + "─" * 48 + "┘")
         lines.append("")
-        lines.append("=" * 50)
-        lines.append("             ÜRETİM LİSTESİ")
-        lines.append("=" * 50)
+        
+        # Ürün listesi başlığı
+        lines.append("┌─ 🍰 ÜRETİM LİSTESİ " + "─" * 27 + "┐")
         
         total_items = 0
-        for item in order['items']:
-            # Sadece ürün adı ve miktarı göster
-            product_line = f"{item['product_name']:<35} {item['quantity']:>6.0f} {item['unit']}"
-            lines.append(product_line)
+        for i, item in enumerate(order['items'], 1):
+            quantity = int(item['quantity'])
+            
+            # Ürün satırı - daha güzel formatla
+            lines.append(f"│ {i:2d}. {item['product_name']:<28} │")
+            lines.append(f"│     📦 {quantity:>3d} {item['unit']:<25} │")
             
             if item.get('notes'):
-                lines.append(f"  → Not: {item['notes']}")
+                lines.append(f"│     💬 Not: {item['notes'][:32]:<32} │")
             
-            total_items += item['quantity']
+            if i < len(order['items']):  # Son ürün değilse ayırıcı çizgi
+                lines.append("│" + "─" * 48 + "│")
+            
+            total_items += quantity
         
-        lines.append("=" * 50)
-        lines.append(f"TOPLAM ÜRÜN ADETİ: {total_items:>6.0f}")
-        lines.append("")
-        lines.append("⚠️  ÜRETİM TALİMATLARI:")
-        lines.append("   • Hijyen kurallarına uyunuz")
-        lines.append("   • Teslimat tarihine dikkat ediniz")
-        lines.append("   • Kalite kontrolü yapınız")
+        lines.append("└" + "─" * 48 + "┘")
         lines.append("")
         
-        # Yazıcı ve yazdırma bilgisi
-        lines.append("-" * 50)
-        lines.append(f"Yazdırma: {datetime.now().strftime('%d.%m.%Y %H:%M:%S')}")
-        lines.append(f"Yazıcı  : {self.printer_manager.selected_printer}")
-        lines.append("=" * 50)
+        # Toplam ve talimatlar
+        lines.append("┌─ 📊 ÖZET VE TALİMATLAR " + "─" * 23 + "┐")
+        lines.append(f"│ 📦 TOPLAM ÜRÜN ADETİ: {total_items:>14d} adet │")
+        lines.append("│" + " " * 48 + "│")
+        lines.append("│ ⚠️  ÜRETİM TALİMATLARI:                   │")
+        lines.append("│ ✅ Hijyen kurallarına uyunuz              │")
+        lines.append("│ ✅ Teslimat tarihine dikkat ediniz        │")
+        lines.append("│ ✅ Kalite kontrolü yapınız                │")
+        lines.append("│ ✅ Tamamlandığında işaretleyiniz           │")
+        lines.append("└" + "─" * 48 + "┘")
+        lines.append("")
+        
+        # Alt bilgi
+        lines.append("┌─ 🖨️ YAZDIRMA BİLGİLERİ " + "─" * 22 + "┐")
+        lines.append(f"│ ⏰ Yazdırma: {datetime.now().strftime('%d.%m.%Y %H:%M:%S'):<25} │")
+        lines.append(f"│ 🖨️ Yazıcı  : {self.printer_manager.selected_printer[:25]:<25} │")
+        lines.append("└" + "─" * 48 + "┘")
+        lines.append("")
+        lines.append("        🏭 TATO PASTA & BAKLAVA ÜRETİM")
+        lines.append("           " + "═" * 26)
         lines.append("")
         
         return "\n".join(lines)

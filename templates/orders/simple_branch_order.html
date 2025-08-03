@@ -160,6 +160,47 @@
     </div>
 </div>
 
+<!-- WhatsApp Modal -->
+<div id="whatsapp-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden items-center justify-center z-50">
+    <div class="bg-white rounded-lg p-6 max-w-md mx-4 border-l-4 border-green-500">
+        <div class="flex items-center mb-4">
+            <div class="flex-shrink-0">
+                <i class="fab fa-whatsapp text-3xl text-green-500"></i>
+            </div>
+            <div class="ml-3">
+                <h3 class="text-lg font-medium text-gray-900">
+                    ✅ Sipariş Başarıyla Oluşturuldu!
+                </h3>
+                <p class="text-sm text-gray-600">
+                    Sipariş No: <span id="modal-order-number" class="font-semibold"></span>
+                </p>
+            </div>
+        </div>
+        
+        <div class="mb-4">
+            <p class="text-sm text-gray-700 mb-2">
+                📱 Sipariş bilgilerini WhatsApp ile üretim ekibine göndermek ister misiniz?
+            </p>
+            <div class="bg-gray-50 rounded-lg p-3 border max-h-40 overflow-y-auto">
+                <pre id="whatsapp-preview" class="text-xs text-gray-600 whitespace-pre-wrap font-mono"></pre>
+            </div>
+        </div>
+        
+        <div class="flex space-x-3">
+            <button id="send-whatsapp-btn" 
+                    class="flex-1 bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 font-medium">
+                <i class="fab fa-whatsapp mr-2"></i>
+                WhatsApp ile Gönder
+            </button>
+            <button id="skip-whatsapp-btn" 
+                    class="flex-1 bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 font-medium">
+                <i class="fas fa-times mr-2"></i>
+                Atla
+            </button>
+        </div>
+    </div>
+</div>
+
 <!-- Loading Modal -->
 <div id="loading-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden items-center justify-center z-50">
     <div class="bg-white rounded-lg p-6 max-w-sm mx-4">
@@ -255,6 +296,52 @@ function clearForm() {
     updateOrderSummary();
 }
 
+// WhatsApp modal functions
+function showWhatsAppModal(message, phone, orderNumber) {
+    const modal = document.getElementById('whatsapp-modal');
+    const previewElement = document.getElementById('whatsapp-preview');
+    const orderNumberElement = document.getElementById('modal-order-number');
+    
+    // Update modal content
+    orderNumberElement.textContent = orderNumber;
+    previewElement.textContent = message;
+    
+    // Show modal
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    
+    // WhatsApp send button
+    document.getElementById('send-whatsapp-btn').onclick = function() {
+        const encodedMessage = encodeURIComponent(message);
+        const whatsappUrl = `https://wa.me/${phone}?text=${encodedMessage}`;
+        
+        // Open WhatsApp
+        window.open(whatsappUrl, '_blank');
+        
+        // Close modal and clear form
+        hideWhatsAppModal();
+        clearForm();
+        
+        // Show success message
+        setTimeout(() => {
+            alert('📱 WhatsApp açıldı!\n\n✅ Sipariş başarıyla oluşturuldu!\n📋 Sipariş No: ' + orderNumber);
+        }, 500);
+    };
+    
+    // Skip button
+    document.getElementById('skip-whatsapp-btn').onclick = function() {
+        hideWhatsAppModal();
+        clearForm();
+        alert('✅ Sipariş başarıyla oluşturuldu!\n📋 Sipariş No: ' + orderNumber);
+    };
+}
+
+function hideWhatsAppModal() {
+    const modal = document.getElementById('whatsapp-modal');
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+}
+
 // Initialize when page loads
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Simple branch order page loaded');
@@ -319,10 +406,20 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('loading-modal').classList.remove('flex');
             
             if (data.success) {
-                alert('Sipariş başarıyla oluşturuldu!\nSipariş No: ' + data.order_number);
-                clearForm();
+                // Başarılı sipariş mesajı
+                const successMsg = `✅ Sipariş başarıyla oluşturuldu!\n📋 Sipariş No: ${data.order_number}`;
+                
+                // WhatsApp butonu göster
+                if (data.show_whatsapp) {
+                    showWhatsAppModal(data.whatsapp_message, data.whatsapp_phone || '905551234567', data.order_number);
+                } else {
+                    alert(successMsg);
+                    clearForm();
+                }
+            } else if (data.daily_limit_reached) {
+                alert('⚠️ GÜNLÜK SİPARİŞ LİMİTİ\n\n' + data.error);
             } else {
-                alert('Hata: ' + data.error);
+                alert('❌ Hata: ' + data.error);
             }
         })
         .catch(error => {
