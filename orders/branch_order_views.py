@@ -102,20 +102,20 @@ def create_branch_order_ajax(request):
     if request.method != 'POST':
         return JsonResponse({'success': False, 'error': 'Sadece POST istekleri kabul edilir'})
     
-    # GÜNLÜK SİPARİŞ KONTROLÜ - Şube müdürü günde sadece 1 sipariş verebilir
-    today = timezone.now().date()
-    existing_order_today = Order.objects.filter(
-        branch=request.user.branch,
-        created_by=request.user,
-        created_at__date=today
-    ).exists()
-    
-    if existing_order_today:
-        return JsonResponse({
-            'success': False, 
-            'error': '⚠️ Bugün zaten sipariş verdiniz!\n\nGünde sadece 1 sipariş verebilirsiniz.\nMevcut siparişinizi düzenleyebilirsiniz.',
-            'daily_limit_reached': True
-        })
+    # GÜNLÜK SİPARİŞ KONTROLÜ - ŞİMDİLİK KAPALI (TEST İÇİN)
+    # today = timezone.now().date()
+    # existing_order_today = Order.objects.filter(
+    #     branch=request.user.branch,
+    #     created_by=request.user,
+    #     created_at__date=today
+    # ).exists()
+    # 
+    # if existing_order_today:
+    #     return JsonResponse({
+    #         'success': False, 
+    #         'error': '⚠️ Bugün zaten sipariş verdiniz!\n\nGünde sadece 1 sipariş verebilirsiniz.\nMevcut siparişinizi düzenleyebilirsiniz.',
+    #         'daily_limit_reached': True
+    #     })
     
     try:
         data = json.loads(request.body)
