@@ -201,8 +201,8 @@ def create_branch_order_ajax(request):
             'order_id': order.id,
             'order_number': order.order_number,
             'show_whatsapp': True,
-            'whatsapp_message': whatsapp_message,
-            'whatsapp_phone': '905551234567'  # Üretim telefon numarası
+            'whatsapp_message': whatsapp_message
+            # Telefon numarası artık gerekmiyor - kullanıcı kendisi seçecek
         })
         
     except json.JSONDecodeError:

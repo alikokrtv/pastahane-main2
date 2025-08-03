@@ -179,7 +179,8 @@
         
         <div class="mb-4">
             <p class="text-sm text-gray-700 mb-2">
-                📱 Sipariş bilgilerini WhatsApp ile üretim ekibine göndermek ister misiniz?
+                📱 Sipariş bilgilerini WhatsApp ile göndermek ister misiniz?
+                <br><span class="text-xs text-gray-500">🎯 WhatsApp açılacak, mesajı göndereceğiniz kişiyi seçebilirsiniz</span>
             </p>
             <div class="bg-gray-50 rounded-lg p-3 border max-h-40 overflow-y-auto">
                 <pre id="whatsapp-preview" class="text-xs text-gray-600 whitespace-pre-wrap font-mono"></pre>
@@ -190,7 +191,7 @@
             <button id="send-whatsapp-btn" 
                     class="flex-1 bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 font-medium">
                 <i class="fab fa-whatsapp mr-2"></i>
-                WhatsApp ile Gönder
+                WhatsApp'ı Aç (Kişi Seç)
             </button>
             <button id="skip-whatsapp-btn" 
                     class="flex-1 bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 font-medium">
@@ -313,7 +314,8 @@ function showWhatsAppModal(message, phone, orderNumber) {
     // WhatsApp send button
     document.getElementById('send-whatsapp-btn').onclick = function() {
         const encodedMessage = encodeURIComponent(message);
-        const whatsappUrl = `https://wa.me/${phone}?text=${encodedMessage}`;
+        // WhatsApp'ı aç, kullanıcı kişi seçsin (telefon numarası olmadan)
+        const whatsappUrl = `https://api.whatsapp.com/send?text=${encodedMessage}`;
         
         // Open WhatsApp
         window.open(whatsappUrl, '_blank');
@@ -324,7 +326,7 @@ function showWhatsAppModal(message, phone, orderNumber) {
         
         // Show success message
         setTimeout(() => {
-            alert('📱 WhatsApp açıldı!\n\n✅ Sipariş başarıyla oluşturuldu!\n📋 Sipariş No: ' + orderNumber);
+            alert('📱 WhatsApp açıldı!\n\n✅ Sipariş başarıyla oluşturuldu!\n📋 Sipariş No: ' + orderNumber + '\n\n👤 Mesajı göndereceğiniz kişiyi seçin');
         }, 500);
     };
     
@@ -411,7 +413,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // WhatsApp butonu göster
                 if (data.show_whatsapp) {
-                    showWhatsAppModal(data.whatsapp_message, data.whatsapp_phone || '905551234567', data.order_number);
+                    showWhatsAppModal(data.whatsapp_message, '', data.order_number); // Telefon numarası boş
                 } else {
                     alert(successMsg);
                     clearForm();
