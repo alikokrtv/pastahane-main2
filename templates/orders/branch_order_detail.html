@@ -1,0 +1,221 @@
+{% extends 'branch_base.html' %}
+{% load static %}
+
+{% block title %}Sipariş Detayı - {{ order.order_number }}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-6">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <!-- Header -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-900">Sipariş Detayı</h1>
+                        <p class="text-sm text-gray-600 mt-1">{{ order.order_number }} - {{ order.branch.name }}</p>
+                    </div>
+                    <div class="flex space-x-3">
+                        <a href="{% url 'orders:branch_order_list' %}" 
+                           class="px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200">
+                            <i class="fas fa-arrow-left mr-2"></i>
+                            Geri Dön
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Order Info -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h2 class="text-lg font-semibold text-gray-900">📋 Sipariş Bilgileri</h2>
+            </div>
+            <div class="p-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-500 uppercase tracking-wide">Genel Bilgiler</h3>
+                        <dl class="mt-3 space-y-3">
+                            <div>
+                                <dt class="text-sm font-medium text-gray-900">Sipariş No</dt>
+                                <dd class="text-sm text-gray-600">{{ order.order_number }}</dd>
+                            </div>
+                            <div>
+                                <dt class="text-sm font-medium text-gray-900">Şube</dt>
+                                <dd class="text-sm text-gray-600">{{ order.branch.name }}</dd>
+                            </div>
+                            <div>
+                                <dt class="text-sm font-medium text-gray-900">Sipariş Veren</dt>
+                                <dd class="text-sm text-gray-600">{{ order.created_by.get_full_name|default:order.created_by.username }}</dd>
+                            </div>
+                            <div>
+                                <dt class="text-sm font-medium text-gray-900">Durum</dt>
+                                <dd>
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                        {% if order.status == 'pending' %}bg-yellow-100 text-yellow-800
+                                        {% elif order.status == 'confirmed' %}bg-blue-100 text-blue-800
+                                        {% elif order.status == 'in_production' %}bg-orange-100 text-orange-800
+                                        {% elif order.status == 'ready' %}bg-green-100 text-green-800
+                                        {% elif order.status == 'delivered' %}bg-green-100 text-green-800
+                                        {% else %}bg-gray-100 text-gray-800{% endif %}">
+                                        {{ order.get_status_display }}
+                                    </span>
+                                </dd>
+                            </div>
+                        </dl>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-500 uppercase tracking-wide">Tarihler</h3>
+                        <dl class="mt-3 space-y-3">
+                            <div>
+                                <dt class="text-sm font-medium text-gray-900">Sipariş Tarihi</dt>
+                                <dd class="text-sm text-gray-600">{{ order.created_at|date:"d.m.Y H:i" }}</dd>
+                            </div>
+                            <div>
+                                <dt class="text-sm font-medium text-gray-900">Teslimat Tarihi</dt>
+                                <dd class="text-sm text-gray-600">{{ order.requested_delivery_date|date:"d.m.Y" }}</dd>
+                            </div>
+                            {% if order.actual_delivery_date %}
+                            <div>
+                                <dt class="text-sm font-medium text-gray-900">Gerçek Teslimat</dt>
+                                <dd class="text-sm text-gray-600">{{ order.actual_delivery_date|date:"d.m.Y H:i" }}</dd>
+                            </div>
+                            {% endif %}
+                        </dl>
+                    </div>
+                </div>
+                
+                {% if order.notes %}
+                <div class="mt-6">
+                    <h3 class="text-sm font-medium text-gray-500 uppercase tracking-wide">Notlar</h3>
+                    <p class="mt-2 text-sm text-gray-600 bg-gray-50 rounded-md p-3">{{ order.notes }}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Order Items -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h2 class="text-lg font-semibold text-gray-900">🍰 Sipariş Kalemleri</h2>
+            </div>
+            <div class="overflow-hidden">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Ürün
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Miktar
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Birim
+                            </th>
+                            {% if order_items.0.notes %}
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Notlar
+                            </th>
+                            {% endif %}
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for item in order_items %}
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div>
+                                        <div class="text-sm font-medium text-gray-900">{{ item.product.name }}</div>
+                                        <div class="text-sm text-gray-500">SKU: {{ item.product.sku }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm font-semibold text-gray-900">{{ item.quantity|floatformat:0 }}</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-600">{{ item.product.get_unit_display }}</div>
+                            </td>
+                            {% if item.notes %}
+                            <td class="px-6 py-4">
+                                <div class="text-sm text-gray-600">{{ item.notes }}</div>
+                            </td>
+                            {% endif %}
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="px-6 py-4 text-center text-sm text-gray-500">
+                                Bu siparişte ürün bulunmuyor.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Status History -->
+        {% if status_history %}
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h2 class="text-lg font-semibold text-gray-900">📊 Durum Geçmişi</h2>
+            </div>
+            <div class="p-6">
+                <div class="flow-root">
+                    <ul class="-mb-8">
+                        {% for history in status_history %}
+                        <li>
+                            <div class="relative pb-8">
+                                {% if not forloop.last %}
+                                <span class="absolute top-4 left-4 -ml-px h-full w-0.5 bg-gray-200" aria-hidden="true"></span>
+                                {% endif %}
+                                <div class="relative flex space-x-3">
+                                    <div>
+                                        <span class="h-8 w-8 rounded-full 
+                                            {% if history.to_status == 'pending' %}bg-yellow-100
+                                            {% elif history.to_status == 'confirmed' %}bg-blue-100
+                                            {% elif history.to_status == 'in_production' %}bg-orange-100
+                                            {% elif history.to_status == 'ready' %}bg-green-100
+                                            {% else %}bg-gray-100{% endif %} 
+                                            flex items-center justify-center ring-8 ring-white">
+                                            <i class="fas fa-arrow-right h-3 w-3 
+                                                {% if history.to_status == 'pending' %}text-yellow-600
+                                                {% elif history.to_status == 'confirmed' %}text-blue-600
+                                                {% elif history.to_status == 'in_production' %}text-orange-600
+                                                {% elif history.to_status == 'ready' %}text-green-600
+                                                {% else %}text-gray-600{% endif %}"></i>
+                                        </span>
+                                    </div>
+                                    <div class="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
+                                        <div>
+                                            <p class="text-sm text-gray-900">
+                                                <strong>{{ history.get_to_status_display }}</strong>
+                                                {% if history.from_status %}
+                                                    (<em>{{ history.get_from_status_display }}</em> → <em>{{ history.get_to_status_display }}</em>)
+                                                {% endif %}
+                                            </p>
+                                            {% if history.notes %}
+                                            <p class="text-sm text-gray-600 mt-1">{{ history.notes }}</p>
+                                            {% endif %}
+                                            <p class="text-xs text-gray-500 mt-1">
+                                                {{ history.changed_by.get_full_name|default:history.changed_by.username }}
+                                            </p>
+                                        </div>
+                                        <div class="text-right text-sm whitespace-nowrap text-gray-500">
+                                            {{ history.changed_at|date:"d.m.Y H:i" }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+{% endblock %}
