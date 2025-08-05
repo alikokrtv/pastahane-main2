@@ -54,7 +54,7 @@ def format_order_for_whatsapp(order):
     
     # Kategorileri sırala
     category_order = [
-        'TURTA PASTALAR', 'BATON PASTALAR', 'DİLİM PASTALAR', 
+        'TURTA PASTALAR', 'DİLİM PASTALAR', 
         'SARMA GURUBU', 'SPESYEL ÜRÜNLER', 'SÜTSÜZ TATLILAR', 
         'PASTA ÇEŞİTLERİ', 'EKLER ÇEŞİTLERİ', 'DİĞER'
     ]
@@ -405,7 +405,6 @@ def categorize_products_for_factory(order_items):
     """Ürünleri fabrika yazdırma formatı için Excel kategorilerine ayır"""
     categories = {
         'TURTA_PASTALAR': [],
-        'BATON_PASTALAR': [],
         'DILIM_PASTALAR': [],
         'SARMA_GURUBU': [],
         'SPESYEL_URUNLER': [],
@@ -423,8 +422,6 @@ def categorize_products_for_factory(order_items):
             # Kategori adını template için uygun hale getir
             if category_name == 'TURTA PASTALAR':
                 categories['TURTA_PASTALAR'].append(item)
-            elif category_name == 'BATON PASTALAR':
-                categories['BATON_PASTALAR'].append(item)
             elif category_name == 'DİLİM PASTALAR':
                 categories['DILIM_PASTALAR'].append(item)
             elif category_name == 'SARMA GURUBU':
@@ -445,8 +442,6 @@ def categorize_products_for_factory(order_items):
             
             if any(keyword in product_name for keyword in ['turta', 'büyük pasta']):
                 categories['TURTA_PASTALAR'].append(item)
-            elif any(keyword in product_name for keyword in ['baton', 'uzun']):
-                categories['BATON_PASTALAR'].append(item)
             elif any(keyword in product_name for keyword in ['dilim', 'parça']):
                 categories['DILIM_PASTALAR'].append(item)
             elif any(keyword in product_name for keyword in ['sarma', 'rulo', 'karamelli']):

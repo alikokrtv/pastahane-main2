@@ -31,10 +31,9 @@ def create_new_categories():
     """Excel'deki yeni kategorileri oluştur"""
     print("\n📂 Yeni kategoriler oluşturuluyor...")
     
-    # Excel'deki renkli kategoriler
+    # Excel'deki renkli kategoriler (BATON PASTALAR kaldırıldı)
     categories = [
         {'name': 'TURTA PASTALAR', 'description': '4K, 0, 1, 2 kategorileri - Kırmızı alan', 'color': 'red'},
-        {'name': 'BATON PASTALAR', 'description': 'Baton şeklindeki pastalar - Mavi alan', 'color': 'blue'},  
         {'name': 'DİLİM PASTALAR', 'description': 'Dilim halinde satılan pastalar - Sarı alan', 'color': 'yellow'},
         {'name': 'SARMA GURUBU', 'description': 'Sarma tarzı tatlılar - Sarı alan', 'color': 'yellow'},
         {'name': 'SPESYEL ÜRÜNLER', 'description': 'Özel ürünler - Gri alan', 'color': 'gray'},
@@ -63,7 +62,7 @@ def import_excel_products():
     # Yeni kategorileri oluştur
     categories = create_new_categories()
     
-    # Excel'deki ürünler - tam liste
+    # Excel'deki ürünler - tam liste (BATON PASTALAR kaldırıldı)
     excel_products = {
         'TURTA PASTALAR': [
             'FISTIKLI ÇİKOLATA SİYAH',
@@ -90,18 +89,6 @@ def import_excel_products():
             'REDVELET MOR / SİYAH',
             'KÖSTEBEK MODELLİ PASTA',
             'UĞUR BÖCEĞİ'
-        ],
-        'BATON PASTALAR': [
-            'FISTIK ÇİKO MAGNUM SİYAH',
-            'FISTIK ÇİKO MAGNUM BEYAZ',
-            'KROKANKLI KAMEL ÇİKOLATA',
-            'CANAJ KAKO TOZLU',
-            'FRAMBUAZLI ÇİKOLATALI',
-            'PROFİTEROLLU ÇİKOLATALI',
-            'MUZ ÇİKOLATALI',
-            'ÇİLEK ÇİKOLATA',
-            'KARIŞIK MEYVELİ',
-            'MUZLU BATON SARMA'
         ],
         'DİLİM PASTALAR': [
             'FISTIK ÇİKO MAGNUM SİYAH',
@@ -192,7 +179,6 @@ def import_excel_products():
     # Kategori bazında fiyat haritası
     price_map = {
         'TURTA PASTALAR': 45.00,      # 4K kategorisi
-        'BATON PASTALAR': 40.00,      # ADET
         'DİLİM PASTALAR': 12.00,      # ADET  
         'SARMA GURUBU': 35.00,        # TEPSİ
         'SPESYEL ÜRÜNLER': 25.00,     # TEPSİ
@@ -204,7 +190,6 @@ def import_excel_products():
     # Kategori bazında birim haritası
     unit_map = {
         'TURTA PASTALAR': 'adet',
-        'BATON PASTALAR': 'adet', 
         'DİLİM PASTALAR': 'adet',
         'SARMA GURUBU': 'tepsi',
         'SPESYEL ÜRÜNLER': 'tepsi',

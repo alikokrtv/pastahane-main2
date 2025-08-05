@@ -230,27 +230,6 @@
 
         <!-- Orta Kolon -->
         <div class="column">
-            <!-- BATON PASTALAR -->
-            {% if categories.BATON_PASTALAR %}
-            <div class="category-section">
-                <div class="category-header ekmekin-pastalar">BATON PASTALAR</div>
-                <div class="category-content">
-                    <table class="product-table">
-                        {% for item in categories.BATON_PASTALAR %}
-                        <tr>
-                            <td class="product-name">{{ item.product.name }}</td>
-                            <td class="quantity-col">{{ item.quantity }}</td>
-                            <td class="unit-col">{{ item.product.get_unit_display|upper }}</td>
-                        </tr>
-                        {% endfor %}
-                    </table>
-                    <div style="border-top: 1px solid #000; padding: 2px; font-weight: bold; text-align: center;">
-                        TOPLAM: {{ categories.BATON_PASTALAR|length }} çeşit
-                    </div>
-                </div>
-            </div>
-            {% endif %}
-
             <!-- SARMA GURUBU -->
             {% if categories.SARMA_GURUBU %}
             <div class="category-section">
@@ -372,7 +351,6 @@
             <div style="display: flex; justify-content: space-between; font-size: 9px; margin-top: 3px;">
                 <div>
                     {% if categories.TURTA_PASTALAR %}TURTA: {{ categories.TURTA_PASTALAR|length }}{% endif %}
-                    {% if categories.BATON_PASTALAR %} | BATON: {{ categories.BATON_PASTALAR|length }}{% endif %}
                     {% if categories.DILIM_PASTALAR %} | DİLİM: {{ categories.DILIM_PASTALAR|length }}{% endif %}
                 </div>
                 <div>
