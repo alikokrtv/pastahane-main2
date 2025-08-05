@@ -28,7 +28,7 @@ def format_order_for_whatsapp(order):
     lines.append(f"📝 *Sipariş No:* {order.order_number}")
     lines.append(f"🏪 *Şube:* {order.branch.name}")
     lines.append(f"📅 *Teslimat:* {order.requested_delivery_date.strftime('%d.%m.%Y')}")
-    lines.append(f"👤 *Sipariş Veren:* {order.created_by.get_full_name() or order.created_by.username}")
+    lines.append(f"👤 *User ID:* {order.created_by.username}")
     lines.append(f"⏰ *Sipariş Zamanı:* {order.created_at.strftime('%d.%m.%Y %H:%M')}")
     
     if order.notes:
@@ -72,8 +72,8 @@ def format_order_for_whatsapp(order):
                 quantity = int(item.quantity)
                 unit = item.product.get_unit_display().upper()
                 
-                # WhatsApp formatı: İsim + Adet yanında
-                lines.append(f"• {item.product.name} *{quantity} {unit}*")
+                # WhatsApp formatı: İsim : Adet
+                lines.append(f"• {item.product.name}: *{quantity} {unit}*")
                 
                 if item.notes:
                     lines.append(f"  💬 Not: _{item.notes}_")
@@ -94,11 +94,6 @@ def format_order_for_whatsapp(order):
     for category_name, total in category_totals.items():
         lines.append(f"  • {category_name}: {total}")
     
-    lines.append("")
-    lines.append("⚠️ *ÜRETİM TALİMATLARI:*")
-    lines.append("✅ Hijyen kurallarına uyunuz")
-    lines.append("✅ Teslimat tarihine dikkat ediniz")
-    lines.append("✅ Kalite kontrolü yapınız")
     lines.append("")
     lines.append("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
     lines.append("🏭 *TATO PASTA & BAKLAVA ÜRETİM*")

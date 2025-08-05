@@ -80,28 +80,31 @@
             width: 100%;
             border-collapse: collapse;
             font-size: 9px;
+            border: 1px solid #000;
         }
         
         .product-table td {
-            border-bottom: 1px dotted #ccc;
-            padding: 1px 2px;
-            vertical-align: top;
+            border: 1px solid #999;
+            padding: 2px 4px;
+            vertical-align: middle;
+            background-color: white;
         }
         
         .product-name {
             font-size: 9px;
-            max-width: 120px;
-            overflow: hidden;
+            width: 70%;
+            border-right: 1px solid #666;
         }
         
         .quantity-col {
-            width: 25px;
+            width: 20%;
             text-align: center;
             font-weight: bold;
+            border-right: 1px solid #666;
         }
         
         .unit-col {
-            width: 30px;
+            width: 10%;
             text-align: center;
             font-size: 8px;
         }
@@ -153,7 +156,7 @@
         <div class="order-date">TARİH: {{ order.requested_delivery_date|date:"d.m" }}</div>
         <div style="clear: both;"></div>
         <div style="font-size: 10px; margin-top: 5px;">
-            Sipariş No: {{ order.order_number }} | Şube: {{ order.branch.name }}
+            Sipariş No: {{ order.order_number }} | Şube: {{ order.branch.name }} | User ID: {{ order.created_by.username }}
         </div>
     </div>
 
