@@ -6,6 +6,7 @@ import os
 import sys
 import django
 from pathlib import Path
+from decimal import Decimal
 
 # Django ayarlarını yükle
 BASE_DIR = Path(__file__).resolve().parent
@@ -218,7 +219,6 @@ def import_final_products(categories):
             
             try:
                 # Ürünü oluştur
-                from decimal import Decimal
                 product = Product.objects.create(
                     name=product_name,
                     category=category,
