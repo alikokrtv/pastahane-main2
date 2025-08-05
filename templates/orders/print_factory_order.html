@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fabrika Sipariş - {{ order.order_number }}</title>
+    <style>
+        @media print {
+            body { margin: 0; padding: 10px; }
+            .no-print { display: none; }
+            .page-break { page-break-after: always; }
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 11px;
+            line-height: 1.2;
+            margin: 0;
+            padding: 10px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #000;
+            padding-bottom: 8px;
+        }
+        
+        .company-info {
+            font-weight: bold;
+            font-size: 12px;
+            margin-bottom: 3px;
+        }
+        
+        .order-date {
+            float: right;
+            font-weight: bold;
+            border: 1px solid #000;
+            padding: 2px 5px;
+            margin-bottom: 5px;
+        }
+        
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 10px;
+        }
+        
+        .category-section {
+            flex: 1;
+            min-width: 180px;
+            border: 1px solid #000;
+            margin-bottom: 10px;
+        }
+        
+        .category-header {
+            text-align: center;
+            font-weight: bold;
+            font-size: 10px;
+            padding: 3px;
+            color: #000;
+        }
+        
+        /* Kategori renkleri - görseldeki gibi */
+        .kremali-pastalar { background-color: #ffcccc; }
+        .ekmekin-pastalar { background-color: #cce5ff; }
+        .dilim-pastalar { background-color: #fff2cc; }
+        .sarma-gurubu { background-color: #fff2cc; }
+        .spesyel-urunler { background-color: #e6e6e6; }
+        .sutsuz-tatlilar { background-color: #fff2cc; }
+        .diger-urunler { background-color: #f0f0f0; }
+        
+        .category-content {
+            padding: 5px;
+            background-color: white;
+        }
+        
+        .product-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 9px;
+        }
+        
+        .product-table td {
+            border-bottom: 1px dotted #ccc;
+            padding: 1px 2px;
+            vertical-align: top;
+        }
+        
+        .product-name {
+            font-size: 9px;
+            max-width: 120px;
+            overflow: hidden;
+        }
+        
+        .quantity-col {
+            width: 25px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .unit-col {
+            width: 30px;
+            text-align: center;
+            font-size: 8px;
+        }
+        
+        .print-controls {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: white;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .footer-info {
+            margin-top: 15px;
+            font-size: 9px;
+            text-align: center;
+            border-top: 1px solid #000;
+            padding-top: 5px;
+        }
+        
+        .three-column {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .column {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+    <!-- Print Controls -->
+    <div class="print-controls no-print">
+        <button onclick="window.print()" style="margin-right: 10px; padding: 5px 10px;">
+            🖨️ Yazdır
+        </button>
+        <button onclick="window.close()" style="padding: 5px 10px;">
+            ❌ Kapat
+        </button>
+    </div>
+
+    <!-- Header -->
+    <div class="header">
+        <div class="company-info">TATO PASTA & BAKLAVA</div>
+        <div class="company-info">Şirket Hattı: 0532 286 35 55</div>
+        <div class="order-date">TARİH: {{ order.requested_delivery_date|date:"d.m" }}</div>
+        <div style="clear: both;"></div>
+        <div style="font-size: 10px; margin-top: 5px;">
+            Sipariş No: {{ order.order_number }} | Şube: {{ order.branch.name }}
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="three-column">
+        <!-- Sol Kolon -->
+        <div class="column">
+            <!-- KREMALI PASTALAR -->
+            {% if categories.kremali_pastalar %}
+            <div class="category-section">
+                <div class="category-header kremali-pastalar">KREMALI PASTALAR</div>
+                <div class="category-content">
+                    <table class="product-table">
+                        {% for item in categories.kremali_pastalar %}
+                        <tr>
+                            <td class="product-name">{{ item.product.name }}</td>
+                            <td class="quantity-col">{{ item.quantity }}</td>
+                            <td class="unit-col">ADET</td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- DİLİM PASTALAR -->
+            {% if categories.dilim_pastalar %}
+            <div class="category-section">
+                <div class="category-header dilim-pastalar">DİLİM PASTALAR</div>
+                <div class="category-content">
+                    <table class="product-table">
+                        {% for item in categories.dilim_pastalar %}
+                        <tr>
+                            <td class="product-name">{{ item.product.name }}</td>
+                            <td class="quantity-col">{{ item.quantity }}</td>
+                            <td class="unit-col">ADET</td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Orta Kolon -->
+        <div class="column">
+            <!-- EKMEKIN PASTALAR -->
+            {% if categories.ekmekin_pastalar %}
+            <div class="category-section">
+                <div class="category-header ekmekin-pastalar">EKMEKIN PASTALAR</div>
+                <div class="category-content">
+                    <table class="product-table">
+                        {% for item in categories.ekmekin_pastalar %}
+                        <tr>
+                            <td class="product-name">{{ item.product.name }}</td>
+                            <td class="quantity-col">{{ item.quantity }}</td>
+                            <td class="unit-col">ADET</td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- SARMA GURUBU -->
+            {% if categories.sarma_gurubu %}
+            <div class="category-section">
+                <div class="category-header sarma-gurubu">SARMA GURUBU</div>
+                <div class="category-content">
+                    <table class="product-table">
+                        {% for item in categories.sarma_gurubu %}
+                        <tr>
+                            <td class="product-name">{{ item.product.name }}</td>
+                            <td class="quantity-col">{{ item.quantity }}</td>
+                            <td class="unit-col">TEPSİ</td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Sağ Kolon -->
+        <div class="column">
+            <!-- SPESYEL ÜRÜNLER -->
+            {% if categories.spesyel_urunler %}
+            <div class="category-section">
+                <div class="category-header spesyel-urunler">SPESYEL ÜRÜNLER</div>
+                <div class="category-content">
+                    <table class="product-table">
+                        {% for item in categories.spesyel_urunler %}
+                        <tr>
+                            <td class="product-name">{{ item.product.name }}</td>
+                            <td class="quantity-col">{{ item.quantity }}</td>
+                            <td class="unit-col">ADET</td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- SÜTSÜZ TATLILAR -->
+            {% if categories.sutsuz_tatlilar %}
+            <div class="category-section">
+                <div class="category-header sutsuz-tatlilar">SÜTSÜZ TATLILAR</div>
+                <div class="category-content">
+                    <table class="product-table">
+                        {% for item in categories.sutsuz_tatlilar %}
+                        <tr>
+                            <td class="product-name">{{ item.product.name }}</td>
+                            <td class="quantity-col">{{ item.quantity }}</td>
+                            <td class="unit-col">ADET</td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- DİĞER ÜRÜNLER -->
+            {% if categories.diger_urunler %}
+            <div class="category-section">
+                <div class="category-header diger-urunler">DİĞER ÜRÜNLER</div>
+                <div class="category-content">
+                    <table class="product-table">
+                        {% for item in categories.diger_urunler %}
+                        <tr>
+                            <td class="product-name">{{ item.product.name }}</td>
+                            <td class="quantity-col">{{ item.quantity }}</td>
+                            <td class="unit-col">{{ item.unit|upper }}</td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer-info">
+        <div>Sipariş Zamanı: {{ order.created_at|date:"d.m.Y H:i" }} | 
+             Yazdırma: {{ print_date|date:"d.m.Y H:i" }}</div>
+        {% if order.notes %}
+        <div style="margin-top: 5px;"><strong>Not:</strong> {{ order.notes }}</div>
+        {% endif %}
+    </div>
+
+    <script>
+        // Sayfa yüklendiğinde otomatik yazdırma dialogunu aç
+        window.onload = function() {
+            // 1 saniye bekle, sonra yazdırma dialogunu aç
+            setTimeout(function() {
+                window.print();
+            }, 1000);
+        };
+        
+        // Yazdırma tamamlandıktan sonra pencereyi kapat
+        window.onafterprint = function() {
+            setTimeout(function() {
+                window.close();
+            }, 2000);
+        };
+    </script>
+</body>
+</html>

@@ -364,6 +364,81 @@ def print_production_order(request, order_id):
     return render(request, 'orders/print_production_order.html', context)
 
 
+def categorize_products_for_factory(order_items):
+    """Ürünleri fabrika yazdırma formatı için kategorilere ayır"""
+    categories = {
+        'kremali_pastalar': [],
+        'ekmekin_pastalar': [],
+        'dilim_pastalar': [],
+        'sarma_gurubu': [],
+        'spesyel_urunler': [],
+        'sutsuz_tatlilar': [],
+        'diger_urunler': []
+    }
+    
+    for item in order_items:
+        product_name = item.product.name.lower()
+        categorized = False
+        
+        # KREMALI PASTALAR - krema içeren, meyvelimsi
+        if any(keyword in product_name for keyword in ['krema', 'kremalı', 'beyaz', 'vişne', 'çilek', 'muz', 'frambuaz']) and not any(exclude in product_name for exclude in ['çikolata', 'kakaolu']):
+            categories['kremali_pastalar'].append(item)
+            categorized = True
+            
+        # EKMEKIN PASTALAR - çikolatalı, kahverengi pastalar
+        elif any(keyword in product_name for keyword in ['çikolata', 'çikolatalı', 'kakaolu', 'brownie', 'tiramisu']) and 'dilim' not in product_name:
+            categories['ekmekin_pastalar'].append(item)
+            categorized = True
+            
+        # DİLİM PASTALAR - parça halinde satılan
+        elif any(keyword in product_name for keyword in ['dilim', 'parça']) and not any(exclude in product_name for exclude in ['sarma', 'rulo', 'baton']):
+            categories['dilim_pastalar'].append(item)
+            categorized = True
+            
+        # SARMA GURUBU - rulo şeklinde olan tatlılar
+        elif any(keyword in product_name for keyword in ['sarma', 'rulo', 'baton', 'karamelli']):
+            categories['sarma_gurubu'].append(item)
+            categorized = True
+            
+        # SPESYEL ÜRÜNLER - özel, premium ürünler
+        elif any(keyword in product_name for keyword in ['özel', 'spesyal', 'special', 'premium', 'bombası', 'çeşitleri', 'lotus', 'magnolya']):
+            categories['spesyel_urunler'].append(item)
+            categorized = True
+            
+        # SÜTSÜZ TATLILAR - şerbetli, tatlı sınıfı
+        elif any(keyword in product_name for keyword in ['tatlı', 'desert', 'sütsüz', 'şerbetli', 'supangle', 'profiterol', 'oreolu', 'yabanmersini']):
+            categories['sutsuz_tatlilar'].append(item)
+            categorized = True
+        
+        # Kategorize edilemeyenler DİĞER ÜRÜNLER'e git
+        if not categorized:
+            categories['diger_urunler'].append(item)
+    
+    return categories
+
+
+@login_required
+def print_factory_order(request, order_id):
+    """Fabrika formatında sipariş yazdırma sayfası"""
+    order = get_object_or_404(Order, id=order_id)
+    
+    # Sipariş kalemlerini al
+    order_items = OrderItem.objects.filter(
+        order=order
+    ).select_related('product', 'product__category').order_by('product__name')
+    
+    # Ürünleri fabrika kategorilerine göre ayır
+    categories = categorize_products_for_factory(order_items)
+    
+    context = {
+        'order': order,
+        'categories': categories,
+        'print_date': timezone.now(),
+    }
+    
+    return render(request, 'orders/print_factory_order.html', context)
+
+
 @login_required
 def simple_branch_order_create(request):
     """Şube müdürü için sade sipariş oluşturma sayfası"""

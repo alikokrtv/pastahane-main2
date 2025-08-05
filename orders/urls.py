@@ -23,6 +23,7 @@ urlpatterns = [
     # Üretim sipariş yönetimi
     path('production/', branch_order_views.production_orders_view, name='production_orders'),
     path('print/<int:order_id>/', branch_order_views.print_production_order, name='print_production_order'),
+    path('print-factory/<int:order_id>/', branch_order_views.print_factory_order, name='print_factory_order'),
     
     # API endpoints
     path('api/', views.OrderListAPIView.as_view(), name='api-order-list'),

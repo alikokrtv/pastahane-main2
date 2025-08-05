@@ -85,6 +85,10 @@ class FabrikaYaziciProgrami:
                                      command=self.manual_check)
         self.refresh_btn.pack(side=tk.LEFT, padx=5)
         
+        self.test_print_btn = ttk.Button(button_frame, text="🖨️ Test Yazdır", 
+                                        command=self.test_factory_print)
+        self.test_print_btn.pack(side=tk.LEFT, padx=5)
+        
         # Ayarlar butonu
         ttk.Button(button_frame, text="⚙️ Ayarlar", 
                   command=self.show_settings).pack(side=tk.RIGHT, padx=5)
@@ -231,6 +235,37 @@ class FabrikaYaziciProgrami:
         
         threading.Thread(target=test_in_thread, daemon=True).start()
     
+    def test_factory_print(self):
+        """Yeni fabrika formatını test et"""
+        self.log_message("🧪 Fabrika yazdırma formatı test ediliyor...")
+        
+        def test_print_in_thread():
+            try:
+                # Son siparişi al
+                url = f"{self.api_url}/orders/api/factory/orders/"
+                params = {'token': self.token}
+                
+                response = requests.get(url, params=params, timeout=10)
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    orders = data.get('orders', [])
+                    
+                    if orders:
+                        # İlk siparişi test yazdırması için kullan
+                        test_order = orders[0]
+                        self.root.after(0, lambda: self.log_message(f"🧪 Test sipariş: {test_order['order_number']}"))
+                        self.root.after(0, lambda: self.open_print_page(test_order['id']))
+                    else:
+                        self.root.after(0, lambda: self.log_message("⚠️ Test için sipariş bulunamadı"))
+                else:
+                    self.root.after(0, lambda: self.log_message(f"❌ Test hatası: {response.status_code}"))
+                    
+            except Exception as e:
+                self.root.after(0, lambda: self.log_message(f"❌ Test hatası: {str(e)}"))
+        
+        threading.Thread(target=test_print_in_thread, daemon=True).start()
+    
     def start_service(self):
         """Servisi başlat"""
         self.is_running = True
@@ -352,16 +387,11 @@ class FabrikaYaziciProgrami:
         try:
             self.log_message(f"🖨️ Yazdırılıyor: {order['order_number']} - {order['branch_name']}")
             
-            # Yazdırma formatını hazırla
+            # Yeni HTML formatında yazdırma sayfasını aç
+            self.open_print_page(order['id'])
+            
+            # Eski metin formatını da kaydet (yedek için)
             formatted_text = self.format_order_for_printing(order)
-            
-            # Konsola yazdır (test için)
-            print("\n" + "="*60)
-            print("YAZICI ÇIKTISI:")
-            print(formatted_text)
-            print("="*60)
-            
-            # Dosyaya kaydet
             self.save_order_to_file(order, formatted_text)
             
             # API'ye yazdırıldığını bildir
@@ -371,6 +401,18 @@ class FabrikaYaziciProgrami:
             
         except Exception as e:
             self.log_message(f"❌ Yazdırma hatası: {str(e)}")
+    
+    def open_print_page(self, order_id: int):
+        """Yeni HTML formatında yazdırma sayfasını aç"""
+        try:
+            print_url = f"{self.api_url}/orders/print-factory/{order_id}/"
+            self.log_message(f"🌐 Yazdırma sayfası açılıyor: {print_url}")
+            
+            # Tarayıcıda yazdırma sayfasını aç
+            webbrowser.open(print_url)
+            
+        except Exception as e:
+            self.log_message(f"⚠️ Yazdırma sayfası açma hatası: {str(e)}")
     
     def format_order_for_printing(self, order: Dict) -> str:
         """Siparişi yazdırma formatına dönüştür"""
