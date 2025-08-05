@@ -18,7 +18,7 @@ from users.models import Branch
 
 
 def format_order_for_whatsapp(order):
-    """Sipariş bilgilerini WhatsApp için güzel formatla"""
+    """Sipariş bilgilerini WhatsApp için kategorili formatla"""
     lines = []
     lines.append("🏢 *TATO PASTA & BAKLAVA*")
     lines.append("📋 *ÜRETİM SİPARİŞİ*")
@@ -39,19 +39,61 @@ def format_order_for_whatsapp(order):
     lines.append("🍰 *ÜRETİM LİSTESİ*")
     lines.append("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
     
-    total_quantity = 0
-    for item in order.items.all():
-        quantity = int(item.quantity)
-        lines.append(f"• *{item.product.name}*")
-        lines.append(f"   📦 {quantity} {item.product.get_unit_display()}")
-        
-        if item.notes:
-            lines.append(f"   💬 Not: _{item.notes}_")
-        
-        total_quantity += quantity
+    # Ürünleri kategoriye göre grupla
+    order_items = order.items.select_related('product', 'product__category').all()
+    items_by_category = {}
     
+    for item in order_items:
+        category_name = item.product.category.name if item.product.category else 'DİĞER'
+        if category_name not in items_by_category:
+            items_by_category[category_name] = []
+        items_by_category[category_name].append(item)
+    
+    total_quantity = 0
+    category_totals = {}
+    
+    # Kategorileri sırala
+    category_order = [
+        'TURTA PASTALAR', 'BATON PASTALAR', 'DİLİM PASTALAR', 
+        'SARMA GURUBU', 'SPESYEL ÜRÜNLER', 'SÜTSÜZ TATLILAR', 
+        'PASTA ÇEŞİTLERİ', 'EKLER ÇEŞİTLERİ', 'DİĞER'
+    ]
+    
+    for category_name in category_order:
+        if category_name in items_by_category:
+            items = items_by_category[category_name]
+            category_total = 0
+            
+            lines.append("")
+            lines.append(f"📂 *{category_name}*")
+            lines.append("─────────────────────────────────")
+            
+            for item in items:
+                quantity = int(item.quantity)
+                unit = item.product.get_unit_display().upper()
+                
+                # WhatsApp formatı: İsim + Adet yanında
+                lines.append(f"• {item.product.name} *{quantity} {unit}*")
+                
+                if item.notes:
+                    lines.append(f"  💬 Not: _{item.notes}_")
+                
+                category_total += quantity
+                total_quantity += quantity
+            
+            lines.append(f"📊 *{category_name} TOPLAM: {category_total} {unit}*")
+            category_totals[category_name] = category_total
+    
+    lines.append("")
     lines.append("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-    lines.append(f"📊 *TOPLAM ÜRÜN:* {total_quantity} adet")
+    lines.append(f"🎯 *GENEL TOPLAM: {total_quantity} ÜRÜN*")
+    lines.append("")
+    
+    # Kategori özetleri
+    lines.append("📋 *KATEGORİ ÖZETİ:*")
+    for category_name, total in category_totals.items():
+        lines.append(f"  • {category_name}: {total}")
+    
     lines.append("")
     lines.append("⚠️ *ÜRETİM TALİMATLARI:*")
     lines.append("✅ Hijyen kurallarına uyunuz")
@@ -365,54 +407,63 @@ def print_production_order(request, order_id):
 
 
 def categorize_products_for_factory(order_items):
-    """Ürünleri fabrika yazdırma formatı için kategorilere ayır"""
+    """Ürünleri fabrika yazdırma formatı için Excel kategorilerine ayır"""
     categories = {
-        'kremali_pastalar': [],
-        'ekmekin_pastalar': [],
-        'dilim_pastalar': [],
-        'sarma_gurubu': [],
-        'spesyel_urunler': [],
-        'sutsuz_tatlilar': [],
-        'diger_urunler': []
+        'TURTA_PASTALAR': [],
+        'BATON_PASTALAR': [],
+        'DILIM_PASTALAR': [],
+        'SARMA_GURUBU': [],
+        'SPESYEL_URUNLER': [],
+        'SUTSUZ_TATLILAR': [],
+        'PASTA_CESITLERI': [],
+        'EKLER_CESITLERI': [],
+        'DIGER': []
     }
     
     for item in order_items:
-        product_name = item.product.name.lower()
-        categorized = False
-        
-        # KREMALI PASTALAR - krema içeren, meyvelimsi
-        if any(keyword in product_name for keyword in ['krema', 'kremalı', 'beyaz', 'vişne', 'çilek', 'muz', 'frambuaz']) and not any(exclude in product_name for exclude in ['çikolata', 'kakaolu']):
-            categories['kremali_pastalar'].append(item)
-            categorized = True
+        # Önce ürünün kategorisine göre direkt eşleştir
+        if item.product.category:
+            category_name = item.product.category.name
             
-        # EKMEKIN PASTALAR - çikolatalı, kahverengi pastalar
-        elif any(keyword in product_name for keyword in ['çikolata', 'çikolatalı', 'kakaolu', 'brownie', 'tiramisu']) and 'dilim' not in product_name:
-            categories['ekmekin_pastalar'].append(item)
-            categorized = True
+            # Kategori adını template için uygun hale getir
+            if category_name == 'TURTA PASTALAR':
+                categories['TURTA_PASTALAR'].append(item)
+            elif category_name == 'BATON PASTALAR':
+                categories['BATON_PASTALAR'].append(item)
+            elif category_name == 'DİLİM PASTALAR':
+                categories['DILIM_PASTALAR'].append(item)
+            elif category_name == 'SARMA GURUBU':
+                categories['SARMA_GURUBU'].append(item)
+            elif category_name == 'SPESYEL ÜRÜNLER':
+                categories['SPESYEL_URUNLER'].append(item)
+            elif category_name == 'SÜTSÜZ TATLILAR':
+                categories['SUTSUZ_TATLILAR'].append(item)
+            elif category_name == 'PASTA ÇEŞİTLERİ':
+                categories['PASTA_CESITLERI'].append(item)
+            elif category_name == 'EKLER ÇEŞİTLERİ':
+                categories['EKLER_CESITLERI'].append(item)
+            else:
+                categories['DIGER'].append(item)
+        else:
+            # Kategori yoksa isim bazında ayır (fallback)
+            product_name = item.product.name.lower()
             
-        # DİLİM PASTALAR - parça halinde satılan
-        elif any(keyword in product_name for keyword in ['dilim', 'parça']) and not any(exclude in product_name for exclude in ['sarma', 'rulo', 'baton']):
-            categories['dilim_pastalar'].append(item)
-            categorized = True
-            
-        # SARMA GURUBU - rulo şeklinde olan tatlılar
-        elif any(keyword in product_name for keyword in ['sarma', 'rulo', 'baton', 'karamelli']):
-            categories['sarma_gurubu'].append(item)
-            categorized = True
-            
-        # SPESYEL ÜRÜNLER - özel, premium ürünler
-        elif any(keyword in product_name for keyword in ['özel', 'spesyal', 'special', 'premium', 'bombası', 'çeşitleri', 'lotus', 'magnolya']):
-            categories['spesyel_urunler'].append(item)
-            categorized = True
-            
-        # SÜTSÜZ TATLILAR - şerbetli, tatlı sınıfı
-        elif any(keyword in product_name for keyword in ['tatlı', 'desert', 'sütsüz', 'şerbetli', 'supangle', 'profiterol', 'oreolu', 'yabanmersini']):
-            categories['sutsuz_tatlilar'].append(item)
-            categorized = True
-        
-        # Kategorize edilemeyenler DİĞER ÜRÜNLER'e git
-        if not categorized:
-            categories['diger_urunler'].append(item)
+            if any(keyword in product_name for keyword in ['turta', 'büyük pasta']):
+                categories['TURTA_PASTALAR'].append(item)
+            elif any(keyword in product_name for keyword in ['baton', 'uzun']):
+                categories['BATON_PASTALAR'].append(item)
+            elif any(keyword in product_name for keyword in ['dilim', 'parça']):
+                categories['DILIM_PASTALAR'].append(item)
+            elif any(keyword in product_name for keyword in ['sarma', 'rulo', 'karamelli']):
+                categories['SARMA_GURUBU'].append(item)
+            elif any(keyword in product_name for keyword in ['bombası', 'çeşitleri', 'özel']):
+                categories['SPESYEL_URUNLER'].append(item)
+            elif any(keyword in product_name for keyword in ['supangle', 'profiterol', 'magnolya']):
+                categories['SUTSUZ_TATLILAR'].append(item)
+            elif any(keyword in product_name for keyword in ['ekler', 'ek']):
+                categories['EKLER_CESITLERI'].append(item)
+            else:
+                categories['PASTA_CESITLERI'].append(item)
     
     return categories
 
@@ -430,9 +481,13 @@ def print_factory_order(request, order_id):
     # Ürünleri fabrika kategorilerine göre ayır
     categories = categorize_products_for_factory(order_items)
     
+    # Toplam ürün sayısını hesapla
+    total_items = sum(int(item.quantity) for item in order_items)
+    
     context = {
         'order': order,
         'categories': categories,
+        'total_items': total_items,
         'print_date': timezone.now(),
     }
     
