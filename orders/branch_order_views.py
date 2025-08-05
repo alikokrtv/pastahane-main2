@@ -55,7 +55,7 @@ def format_order_for_whatsapp(order):
     # Kategorileri sırala
     category_order = [
         'TURTA PASTALAR', 'DİLİM PASTALAR', 
-        'SARMA GURUBU', 'SPESYEL ÜRÜNLER', 'SÜTSÜZ TATLILAR', 
+        'TEPSİLİ ÜRÜNLER', 'SPESYEL ÜRÜNLER', 'SÜTLÜ TATLILAR', 
         'PASTA ÇEŞİTLERİ', 'EKLER ÇEŞİTLERİ', 'DİĞER'
     ]
     
@@ -406,9 +406,9 @@ def categorize_products_for_factory(order_items):
     categories = {
         'TURTA_PASTALAR': [],
         'DILIM_PASTALAR': [],
-        'SARMA_GURUBU': [],
+        'TEPSILI_URUNLER': [],  # SARMA_GURUBU → TEPSİLİ ÜRÜNLER
         'SPESYEL_URUNLER': [],
-        'SUTSUZ_TATLILAR': [],
+        'SUTLU_TATLILAR': [],  # SUTSUZ → SÜTLÜ
         'PASTA_CESITLERI': [],
         'EKLER_CESITLERI': [],
         'DIGER': []
@@ -424,12 +424,12 @@ def categorize_products_for_factory(order_items):
                 categories['TURTA_PASTALAR'].append(item)
             elif category_name == 'DİLİM PASTALAR':
                 categories['DILIM_PASTALAR'].append(item)
-            elif category_name == 'SARMA GURUBU':
-                categories['SARMA_GURUBU'].append(item)
+            elif category_name == 'TEPSİLİ ÜRÜNLER':  # SARMA GURUBU → TEPSİLİ ÜRÜNLER
+                categories['TEPSILI_URUNLER'].append(item)
             elif category_name == 'SPESYEL ÜRÜNLER':
                 categories['SPESYEL_URUNLER'].append(item)
-            elif category_name == 'SÜTSÜZ TATLILAR':
-                categories['SUTSUZ_TATLILAR'].append(item)
+            elif category_name == 'SÜTLÜ TATLILAR':  # SÜTSÜZ → SÜTLÜ
+                categories['SUTLU_TATLILAR'].append(item)
             elif category_name == 'PASTA ÇEŞİTLERİ':
                 categories['PASTA_CESITLERI'].append(item)
             elif category_name == 'EKLER ÇEŞİTLERİ':
@@ -444,12 +444,12 @@ def categorize_products_for_factory(order_items):
                 categories['TURTA_PASTALAR'].append(item)
             elif any(keyword in product_name for keyword in ['dilim', 'parça']):
                 categories['DILIM_PASTALAR'].append(item)
-            elif any(keyword in product_name for keyword in ['sarma', 'rulo', 'karamelli']):
-                categories['SARMA_GURUBU'].append(item)
-            elif any(keyword in product_name for keyword in ['bombası', 'çeşitleri', 'özel']):
+            elif any(keyword in product_name for keyword in ['tepsi', 'sarma', 'rulo', 'karamelli']):  # tepsi eklendi
+                categories['TEPSILI_URUNLER'].append(item)  # SARMA_GURUBU → TEPSILI_URUNLER
+            elif any(keyword in product_name for keyword in ['bombası', 'özel']):  # çeşitleri kaldırıldı
                 categories['SPESYEL_URUNLER'].append(item)
-            elif any(keyword in product_name for keyword in ['supangle', 'profiterol', 'magnolya']):
-                categories['SUTSUZ_TATLILAR'].append(item)
+            elif any(keyword in product_name for keyword in ['supangle', 'profiterol', 'sütlü']):  # magnolya kaldırıldı
+                categories['SUTLU_TATLILAR'].append(item)  # SUTSUZ → SUTLU
             elif any(keyword in product_name for keyword in ['ekler', 'ek']):
                 categories['EKLER_CESITLERI'].append(item)
             else:

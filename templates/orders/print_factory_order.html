@@ -230,13 +230,13 @@
 
         <!-- Orta Kolon -->
         <div class="column">
-            <!-- SARMA GURUBU -->
-            {% if categories.SARMA_GURUBU %}
+            <!-- TEPSİLİ ÜRÜNLER -->
+            {% if categories.TEPSILI_URUNLER %}
             <div class="category-section">
-                <div class="category-header sarma-gurubu">SARMA GURUBU</div>
+                <div class="category-header sarma-gurubu">TEPSİLİ ÜRÜNLER</div>
                 <div class="category-content">
                     <table class="product-table">
-                        {% for item in categories.SARMA_GURUBU %}
+                        {% for item in categories.TEPSILI_URUNLER %}
                         <tr>
                             <td class="product-name">{{ item.product.name }}</td>
                             <td class="quantity-col">{{ item.quantity }}</td>
@@ -245,7 +245,7 @@
                         {% endfor %}
                     </table>
                     <div style="border-top: 1px solid #000; padding: 2px; font-weight: bold; text-align: center;">
-                        TOPLAM: {{ categories.SARMA_GURUBU|length }} çeşit
+                        TOPLAM: {{ categories.TEPSILI_URUNLER|length }} çeşit
                     </div>
                 </div>
             </div>
@@ -275,13 +275,13 @@
             </div>
             {% endif %}
 
-            <!-- SÜTSÜZ TATLILAR -->
-            {% if categories.SUTSUZ_TATLILAR %}
+            <!-- SÜTLÜ TATLILAR -->
+            {% if categories.SUTLU_TATLILAR %}
             <div class="category-section">
-                <div class="category-header sutsuz-tatlilar">SÜTSÜZ TATLILAR</div>
+                <div class="category-header sutsuz-tatlilar">SÜTLÜ TATLILAR</div>
                 <div class="category-content">
                     <table class="product-table">
-                        {% for item in categories.SUTSUZ_TATLILAR %}
+                        {% for item in categories.SUTLU_TATLILAR %}
                         <tr>
                             <td class="product-name">{{ item.product.name }}</td>
                             <td class="quantity-col">{{ item.quantity }}</td>
@@ -290,7 +290,7 @@
                         {% endfor %}
                     </table>
                     <div style="border-top: 1px solid #000; padding: 2px; font-weight: bold; text-align: center;">
-                        TOPLAM: {{ categories.SUTSUZ_TATLILAR|length }} çeşit
+                        TOPLAM: {{ categories.SUTLU_TATLILAR|length }} çeşit
                     </div>
                 </div>
             </div>
@@ -354,9 +354,9 @@
                     {% if categories.DILIM_PASTALAR %} | DİLİM: {{ categories.DILIM_PASTALAR|length }}{% endif %}
                 </div>
                 <div>
-                    {% if categories.SARMA_GURUBU %}SARMA: {{ categories.SARMA_GURUBU|length }}{% endif %}
+                    {% if categories.TEPSILI_URUNLER %}TEPSİ: {{ categories.TEPSILI_URUNLER|length }}{% endif %}
                     {% if categories.SPESYEL_URUNLER %} | SPESYAL: {{ categories.SPESYEL_URUNLER|length }}{% endif %}
-                    {% if categories.SUTSUZ_TATLILAR %} | SÜTSÜZ: {{ categories.SUTSUZ_TATLILAR|length }}{% endif %}
+                    {% if categories.SUTLU_TATLILAR %} | SÜTLÜ: {{ categories.SUTLU_TATLILAR|length }}{% endif %}
                 </div>
                 <div>
                     {% if categories.PASTA_CESITLERI %}PASTA: {{ categories.PASTA_CESITLERI|length }}{% endif %}
