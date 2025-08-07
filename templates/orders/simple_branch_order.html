@@ -161,7 +161,7 @@
 </div>
 
 <!-- Success Notification -->
-<div id="success-notification" class="fixed top-4 right-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded hidden z-50">
+<div id="success-notification" class="fixed top-4 right-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded hidden z-50 max-w-sm">
     <div class="flex">
         <div class="py-1">
             <i class="fas fa-check-circle text-green-500 mr-2"></i>
@@ -169,6 +169,70 @@
         <div>
             <p class="font-bold">✅ Sipariş Başarıyla Oluşturuldu!</p>
             <p class="text-sm">Sipariş No: <span id="success-order-number"></span></p>
+        </div>
+    </div>
+</div>
+
+<!-- WhatsApp Selection Modal -->
+<div id="whatsapp-selection-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden items-center justify-center z-50">
+    <div class="bg-white rounded-lg p-6 max-w-md mx-4 border-l-4 border-green-500">
+        <div class="flex items-center mb-4">
+            <div class="flex-shrink-0">
+                <i class="fab fa-whatsapp text-3xl text-green-500"></i>
+            </div>
+            <div class="ml-3">
+                <h3 class="text-lg font-medium text-gray-900">
+                    📱 WhatsApp ile Gönder
+                </h3>
+                <p class="text-sm text-gray-600">
+                    Sipariş No: <span id="modal-order-number-wp"></span>
+                </p>
+            </div>
+        </div>
+        
+        <p class="text-sm text-gray-700 mb-4">
+            Sipariş bilgilerini WhatsApp ile göndermek için platform seçin:
+        </p>
+        
+        <div class="space-y-3">
+            <!-- iPhone/iOS için buton -->
+            <button id="whatsapp-ios-btn" 
+                    class="w-full bg-gray-800 text-white px-4 py-3 rounded-md hover:bg-gray-900 font-medium text-sm flex items-center justify-center">
+                <i class="fab fa-apple mr-2"></i>
+                📱 iPhone - WhatsApp App
+            </button>
+            
+            <!-- Android için buton -->
+            <button id="whatsapp-android-btn" 
+                    class="w-full bg-green-600 text-white px-4 py-3 rounded-md hover:bg-green-700 font-medium text-sm flex items-center justify-center">
+                <i class="fab fa-android mr-2"></i>
+                🤖 Android - WhatsApp App
+            </button>
+            
+            <!-- Masaüstü için buton -->
+            <button id="whatsapp-desktop-btn" 
+                    class="w-full bg-blue-600 text-white px-4 py-3 rounded-md hover:bg-blue-700 font-medium text-sm flex items-center justify-center">
+                <i class="fas fa-desktop mr-2"></i>
+                💻 Masaüstü - WhatsApp Desktop
+            </button>
+            
+            <!-- Web için buton -->
+            <button id="whatsapp-web-btn" 
+                    class="w-full bg-green-500 text-white px-4 py-3 rounded-md hover:bg-green-600 font-medium text-sm flex items-center justify-center">
+                <i class="fas fa-globe mr-2"></i>
+                🌐 Tarayıcı - WhatsApp Web
+            </button>
+            
+            <!-- Atla butonu -->
+            <button id="skip-whatsapp-new-btn" 
+                    class="w-full bg-gray-400 text-white px-4 py-2 rounded-md hover:bg-gray-500 font-medium text-sm">
+                <i class="fas fa-times mr-1"></i>
+                Atla - Sadece Siparişi Kaydet
+            </button>
+        </div>
+        
+        <div class="mt-4 text-xs text-gray-500 text-center">
+            <p>💡 Cihazınıza uygun butonu seçin</p>
         </div>
     </div>
 </div>
@@ -268,7 +332,10 @@ function clearForm() {
     updateOrderSummary();
 }
 
-// Simplified WhatsApp function
+// Multi-platform WhatsApp functions
+let currentWhatsAppMessage = '';
+let currentOrderNumber = '';
+
 function openWhatsAppDirectly(message, orderNumber) {
     // Show success notification
     showSuccessNotification(orderNumber);
@@ -276,14 +343,83 @@ function openWhatsAppDirectly(message, orderNumber) {
     // Clear form
     clearForm();
     
-    // Open WhatsApp directly without modal
-    const encodedMessage = encodeURIComponent(message);
-    const whatsappUrl = `https://wa.me/?text=${encodedMessage}`;
+    // Store message and order number for modal use
+    currentWhatsAppMessage = message;
+    currentOrderNumber = orderNumber;
     
-    // Small delay for better UX
-    setTimeout(() => {
-        window.open(whatsappUrl, '_blank');
-    }, 1000);
+    // Show platform selection modal
+    showWhatsAppModal(message, orderNumber);
+}
+
+function showWhatsAppModal(message, orderNumber) {
+    const modal = document.getElementById('whatsapp-selection-modal');
+    const orderNumberElement = document.getElementById('modal-order-number-wp');
+    
+    orderNumberElement.textContent = orderNumber;
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    
+    setupWhatsAppButtons(message, orderNumber);
+}
+
+function hideWhatsAppModal() {
+    const modal = document.getElementById('whatsapp-selection-modal');
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+}
+
+function setupWhatsAppButtons(message, orderNumber) {
+    const encodedMessage = encodeURIComponent(message);
+    
+    // iOS/iPhone buton
+    document.getElementById('whatsapp-ios-btn').onclick = function() {
+        const iosUrl = `whatsapp://send?text=${encodedMessage}`;
+        try {
+            window.location.href = iosUrl;
+            hideWhatsAppModal();
+        } catch (error) {
+            // Fallback to web
+            window.open(`https://wa.me/?text=${encodedMessage}`, '_blank');
+            hideWhatsAppModal();
+        }
+    };
+    
+    // Android buton
+    document.getElementById('whatsapp-android-btn').onclick = function() {
+        const androidUrl = `whatsapp://send?text=${encodedMessage}`;
+        try {
+            window.location.href = androidUrl;
+            hideWhatsAppModal();
+        } catch (error) {
+            // Fallback to web
+            window.open(`https://wa.me/?text=${encodedMessage}`, '_blank');
+            hideWhatsAppModal();
+        }
+    };
+    
+    // Desktop buton
+    document.getElementById('whatsapp-desktop-btn').onclick = function() {
+        const desktopUrl = `whatsapp://send?text=${encodedMessage}`;
+        try {
+            window.location.href = desktopUrl;
+            hideWhatsAppModal();
+        } catch (error) {
+            // Fallback to web
+            window.open(`https://web.whatsapp.com/send?text=${encodedMessage}`, '_blank');
+            hideWhatsAppModal();
+        }
+    };
+    
+    // Web buton
+    document.getElementById('whatsapp-web-btn').onclick = function() {
+        window.open(`https://wa.me/?text=${encodedMessage}`, '_blank');
+        hideWhatsAppModal();
+    };
+    
+    // Skip buton
+    document.getElementById('skip-whatsapp-new-btn').onclick = function() {
+        hideWhatsAppModal();
+    };
 }
 
 function showSuccessNotification(orderNumber) {
@@ -293,10 +429,10 @@ function showSuccessNotification(orderNumber) {
     orderNumberElement.textContent = orderNumber;
     notification.classList.remove('hidden');
     
-    // Auto hide after 5 seconds
+    // Auto hide after 8 seconds (more time since there's a modal)
     setTimeout(() => {
         notification.classList.add('hidden');
-    }, 5000);
+    }, 8000);
 }
 
 // Initialize when page loads
