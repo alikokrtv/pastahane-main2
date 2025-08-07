@@ -5,11 +5,25 @@ from django.views.generic import TemplateView
 from django.db.models import Sum, Count, Q, F
 from django.utils import timezone
 from datetime import timedelta
+import logging
 
 from users.models import CustomUser, Branch
 from inventory.models import Inventory, StockMovement, Product
 from orders.models import Order
 from production.models import ProductionPlan, ProductionBatch
+
+# ViaPos entegrasyonu için
+try:
+    import sys
+    import os
+    sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+    from viapos_dashboard import get_dashboard_stats
+    VIAPOS_AVAILABLE = True
+except ImportError as e:
+    logging.getLogger(__name__).warning(f"ViaPos modülü yüklenemedi: {e}")
+    VIAPOS_AVAILABLE = False
+
+logger = logging.getLogger(__name__)
 
 
 class DashboardView(LoginRequiredMixin, TemplateView):
@@ -29,6 +43,19 @@ class DashboardView(LoginRequiredMixin, TemplateView):
             'user': user,
             'today': today,
         })
+        
+        # ViaPos pasta verileri
+        if VIAPOS_AVAILABLE:
+            try:
+                viapos_stats = get_dashboard_stats()
+                context['viapos_data'] = viapos_stats
+                context['viapos_available'] = True
+            except Exception as e:
+                logger.error(f"ViaPos veri çekme hatası: {e}")
+                context['viapos_available'] = False
+                context['viapos_error'] = str(e)
+        else:
+            context['viapos_available'] = False
         
         # Kullanıcının şube bilgileri
         if user.branch:
