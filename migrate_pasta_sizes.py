@@ -66,13 +66,15 @@ def migrate_pasta_sizes():
             new_product = Product.objects.create(
                 name=new_name,
                 category=product.category,
-                price=product.price,
-                cost=product.cost,
+                price_per_unit=product.price_per_unit,
+                cost_per_unit=product.cost_per_unit,
                 sku=f"{product.sku}-{size['code']}" if product.sku else None,
                 description=f"{product.description} - {size['display']} Boyut" if product.description else f"{size['display']} Boyut",
+                unit=product.unit,
+                barcode=None,  # Yeni ürün için barkod boş bırak
                 is_active=True,
-                quantity=product.quantity,
-                minimum_stock=product.minimum_stock
+                is_produced=product.is_produced,
+                shelf_life_days=product.shelf_life_days
             )
             
             print(f"  ✅ Oluşturuldu: {new_product.name}")
