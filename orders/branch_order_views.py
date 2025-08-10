@@ -135,22 +135,30 @@ class BranchOrderCreateView(LoginRequiredMixin, TemplateView):
                 if products.exists():
                     # Pasta çeşitleri için özel gruplandırma
                     if category_name == 'PASTA ÇEŞİTLERİ':
-                        # Pasta çeşitlerini grupla ve boyutları sütunlara yerleştir
+                        # Pasta çeşitlerini grupla ve boyutları sütunlara yerleştir (4K | 0 | 1 | 2)
                         pasta_groups: dict[str, dict] = {}
                         for product in products:
                             if ' - ' in product.name:
                                 base_name, size = product.name.split(' - ', 1)
                             else:
-                                base_name, size = product.name, 'Standart'
+                                base_name, size = product.name, None
 
                             if base_name not in pasta_groups:
-                                pasta_groups[base_name] = {'K4': None, 'No0': None, 'No1': None, 'No2': None, 'Standart': None}
+                                pasta_groups[base_name] = {'4K': None, '0': None, '1': None, '2': None}
 
-                            if size in pasta_groups[base_name]:
-                                pasta_groups[base_name][size] = product
-                            else:
-                                # Diğer boyut adı gelirse 'Standart' kolonuna koy
-                                pasta_groups[base_name]['Standart'] = product
+                            # Boyut adını normalize et
+                            normalized = size
+                            if size == 'K4':
+                                normalized = '4K'
+                            elif size == 'No0':
+                                normalized = '0'
+                            elif size == 'No1':
+                                normalized = '1'
+                            elif size == 'No2':
+                                normalized = '2'
+
+                            if normalized in pasta_groups[base_name]:
+                                pasta_groups[base_name][normalized] = product
 
                         products_by_category[category] = pasta_groups
                     else:
