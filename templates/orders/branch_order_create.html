@@ -104,45 +104,70 @@
                 
                 <div class="row">
                     {% if category.name == 'PASTA ÇEŞİTLERİ' %}
-                        <!-- Pasta çeşitleri için özel boyut seçenekli görünüm -->
-                        {% for pasta_name, sizes in products.items %}
+                        <!-- Pasta çeşitleri için tablo biçiminde 4 sütun: 4K | 0 | 1 | 2 -->
+                        {% for pasta_name, size_map in products.items %}
                         <div class="col-md-6 col-lg-4">
-                            <div class="product-card" data-base-slug="{{ pasta_name|slugify }}">
-                                <div class="d-flex justify-content-between align-items-start mb-2">
-                                    <h6 class="product-name mb-1">{{ pasta_name }}</h6>
-                                </div>
-                                
-                                <div class="text-muted small mb-2">
-                                    <i class="fas fa-balance-scale"></i> Adet - Boyut seçiniz
-                                </div>
-                                <div class="d-flex gap-2 mb-2">
-                                    <span class="badge badge-danger">4K</span>
-                                    <span class="badge badge-secondary">0</span>
-                                    <span class="badge badge-secondary">1</span>
-                                    <span class="badge badge-secondary">2</span>
-                                </div>
-
-                                <!-- Boyut seçenekleri -->
-                                <div class="size-options mb-3">
-                                    {% for size_info in sizes %}
-                                    <div class="size-option mb-2" data-product-id="{{ size_info.product.id }}">
-                                        <div class="d-flex align-items-center justify-content-between">
-                                            <span class="badge badge-outline-primary">{{ size_info.size }}</span>
-                                            <div class="quantity-controls">
-                                                <button type="button" class="btn btn-sm btn-outline-secondary btn-quantity" onclick="decreaseQuantity({{ size_info.product.id }})">
-                                                    <i class="fas fa-minus"></i>
-                                                </button>
-                                                <input type="number" class="form-control form-control-sm quantity-input mx-2" 
-                                                       id="quantity-{{ size_info.product.id }}" value="0" min="0" max="999"
-                                                       onchange="updateQuantity({{ size_info.product.id }}, this.value)"
-                                                       onkeyup="updateQuantity({{ size_info.product.id }}, this.value)">
-                                                <button type="button" class="btn btn-sm btn-outline-secondary btn-quantity" onclick="increaseQuantity({{ size_info.product.id }})">
-                                                    <i class="fas fa-plus"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    {% endfor %}
+                            <div class="product-card">
+                                <h6 class="product-name mb-2">{{ pasta_name }}</h6>
+                                <div class="table-responsive">
+                                    <table class="table table-sm mb-0">
+                                        <thead>
+                                            <tr class="table-danger">
+                                                <th class="text-center">4K</th>
+                                                <th class="text-center">0</th>
+                                                <th class="text-center">1</th>
+                                                <th class="text-center">2</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                {% with p=size_map.K4 %}
+                                                <td class="text-center align-middle">
+                                                    {% if p %}
+                                                    <div class="d-inline-flex align-items-center">
+                                                        <button type="button" class="btn btn-sm btn-outline-secondary btn-quantity" onclick="decreaseQuantity({{ p.id }})"><i class="fas fa-minus"></i></button>
+                                                        <input type="number" class="form-control form-control-sm quantity-input mx-2" id="quantity-{{ p.id }}" value="0" min="0" max="999" onchange="updateQuantity({{ p.id }}, this.value)" onkeyup="updateQuantity({{ p.id }}, this.value)">
+                                                        <button type="button" class="btn btn-sm btn-outline-secondary btn-quantity" onclick="increaseQuantity({{ p.id }})"><i class="fas fa-plus"></i></button>
+                                                    </div>
+                                                    {% endif %}
+                                                </td>
+                                                {% endwith %}
+                                                {% with p=size_map.No0 %}
+                                                <td class="text-center align-middle">
+                                                    {% if p %}
+                                                    <div class="d-inline-flex align-items-center">
+                                                        <button type="button" class="btn btn-sm btn-outline-secondary btn-quantity" onclick="decreaseQuantity({{ p.id }})"><i class="fas fa-minus"></i></button>
+                                                        <input type="number" class="form-control form-control-sm quantity-input mx-2" id="quantity-{{ p.id }}" value="0" min="0" max="999" onchange="updateQuantity({{ p.id }}, this.value)" onkeyup="updateQuantity({{ p.id }}, this.value)">
+                                                        <button type="button" class="btn btn-sm btn-outline-secondary btn-quantity" onclick="increaseQuantity({{ p.id }})"><i class="fas fa-plus"></i></button>
+                                                    </div>
+                                                    {% endif %}
+                                                </td>
+                                                {% endwith %}
+                                                {% with p=size_map.No1 %}
+                                                <td class="text-center align-middle">
+                                                    {% if p %}
+                                                    <div class="d-inline-flex align-items-center">
+                                                        <button type="button" class="btn btn-sm btn-outline-secondary btn-quantity" onclick="decreaseQuantity({{ p.id }})"><i class="fas fa-minus"></i></button>
+                                                        <input type="number" class="form-control form-control-sm quantity-input mx-2" id="quantity-{{ p.id }}" value="0" min="0" max="999" onchange="updateQuantity({{ p.id }}, this.value)" onkeyup="updateQuantity({{ p.id }}, this.value)">
+                                                        <button type="button" class="btn btn-sm btn-outline-secondary btn-quantity" onclick="increaseQuantity({{ p.id }})"><i class="fas fa-plus"></i></button>
+                                                    </div>
+                                                    {% endif %}
+                                                </td>
+                                                {% endwith %}
+                                                {% with p=size_map.No2 %}
+                                                <td class="text-center align-middle">
+                                                    {% if p %}
+                                                    <div class="d-inline-flex align-items-center">
+                                                        <button type="button" class="btn btn-sm btn-outline-secondary btn-quantity" onclick="decreaseQuantity({{ p.id }})"><i class="fas fa-minus"></i></button>
+                                                        <input type="number" class="form-control form-control-sm quantity-input mx-2" id="quantity-{{ p.id }}" value="0" min="0" max="999" onchange="updateQuantity({{ p.id }}, this.value)" onkeyup="updateQuantity({{ p.id }}, this.value)">
+                                                        <button type="button" class="btn btn-sm btn-outline-secondary btn-quantity" onclick="increaseQuantity({{ p.id }})"><i class="fas fa-plus"></i></button>
+                                                    </div>
+                                                    {% endif %}
+                                                </td>
+                                                {% endwith %}
+                                            </tr>
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         </div>
