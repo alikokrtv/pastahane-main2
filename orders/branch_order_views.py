@@ -52,11 +52,11 @@ def format_order_for_whatsapp(order):
     total_quantity = 0
     category_totals = {}
     
-    # Kategorileri sırala
+    # Kategorileri sırala (Yeni Excel listesine göre)
     category_order = [
-        'TURTA PASTALAR', 'DİLİM PASTALAR', 
-        'TEPSİLİ ÜRÜNLER', 'SPESYEL ÜRÜNLER', 'SÜTLÜ TATLILAR', 
-        'PASTA ÇEŞİTLERİ', 'EKLER ÇEŞİTLERİ', 'DİĞER'
+        'PASTA ÇEŞİTLERİ', 'DİLİM PASTALAR', 
+        'TEPSİLİ ÜRÜNLER', 'SPESYAL ÜRÜNLER', 'SÜTLÜ TATLILAR', 
+        'EKLER ÇEŞİTLERİ', 'DİĞER'
     ]
     
     for category_name in category_order:
@@ -108,18 +108,41 @@ class BranchOrderCreateView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         
-        # Aktif ürünleri kategorilere göre grupla
-        categories = ProductCategory.objects.filter(
+        # Kategori sıralaması tanımla (PASTA ÇEŞİTLERİ en üstte)
+        category_order = [
+            'PASTA ÇEŞİTLERİ',
+            'DİLİM PASTALAR', 
+            'TEPSİLİ ÜRÜNLER',
+            'SPESYAL ÜRÜNLER',
+            'SÜTLÜ TATLILAR',
+            'EKLER ÇEŞİTLERİ'
+        ]
+        
+        # Aktif kategorileri al
+        all_categories = ProductCategory.objects.filter(
             is_active=True,
             products__is_active=True
         ).distinct().prefetch_related('products')
         
-        # Ürünleri kategorilere göre organize et
+        # Ürünleri kategorilere göre organize et (sıralı şekilde)
         products_by_category = {}
-        for category in categories:
-            products = category.products.filter(is_active=True).order_by('name')
-            if products.exists():
-                products_by_category[category] = products
+        
+        # Önce belirtilen sırayla kategorileri ekle
+        for category_name in category_order:
+            try:
+                category = all_categories.get(name=category_name)
+                products = category.products.filter(is_active=True).order_by('name')
+                if products.exists():
+                    products_by_category[category] = products
+            except ProductCategory.DoesNotExist:
+                continue
+        
+        # Sonra kalan kategorileri ekle (varsa)
+        for category in all_categories:
+            if category.name not in category_order:
+                products = category.products.filter(is_active=True).order_by('name')
+                if products.exists():
+                    products_by_category[category] = products
         
         # Yarın için varsayılan teslimat tarihi
         tomorrow = timezone.now().date() + timedelta(days=1)
@@ -404,12 +427,11 @@ def print_production_order(request, order_id):
 def categorize_products_for_factory(order_items):
     """Ürünleri fabrika yazdırma formatı için Excel kategorilerine ayır"""
     categories = {
-        'TURTA_PASTALAR': [],
+        'PASTA_CESITLERI': [],  # En üste
         'DILIM_PASTALAR': [],
-        'TEPSILI_URUNLER': [],  # SARMA_GURUBU → TEPSİLİ ÜRÜNLER
-        'SPESYEL_URUNLER': [],
-        'SUTLU_TATLILAR': [],  # SUTSUZ → SÜTLÜ
-        'PASTA_CESITLERI': [],
+        'TEPSILI_URUNLER': [],  
+        'SPESYAL_URUNLER': [],
+        'SUTLU_TATLILAR': [],  
         'EKLER_CESITLERI': [],
         'DIGER': []
     }
@@ -419,19 +441,17 @@ def categorize_products_for_factory(order_items):
         if item.product.category:
             category_name = item.product.category.name
             
-            # Kategori adını template için uygun hale getir
-            if category_name == 'TURTA PASTALAR':
-                categories['TURTA_PASTALAR'].append(item)
+            # Kategori adını template için uygun hale getir (Yeni Excel listesine göre)
+            if category_name == 'PASTA ÇEŞİTLERİ':
+                categories['PASTA_CESITLERI'].append(item)
             elif category_name == 'DİLİM PASTALAR':
                 categories['DILIM_PASTALAR'].append(item)
-            elif category_name == 'TEPSİLİ ÜRÜNLER':  # SARMA GURUBU → TEPSİLİ ÜRÜNLER
+            elif category_name == 'TEPSİLİ ÜRÜNLER':
                 categories['TEPSILI_URUNLER'].append(item)
-            elif category_name == 'SPESYEL ÜRÜNLER':
-                categories['SPESYEL_URUNLER'].append(item)
-            elif category_name == 'SÜTLÜ TATLILAR':  # SÜTSÜZ → SÜTLÜ
+            elif category_name == 'SPESYAL ÜRÜNLER':
+                categories['SPESYAL_URUNLER'].append(item)
+            elif category_name == 'SÜTLÜ TATLILAR':
                 categories['SUTLU_TATLILAR'].append(item)
-            elif category_name == 'PASTA ÇEŞİTLERİ':
-                categories['PASTA_CESITLERI'].append(item)
             elif category_name == 'EKLER ÇEŞİTLERİ':
                 categories['EKLER_CESITLERI'].append(item)
             else:
@@ -440,19 +460,18 @@ def categorize_products_for_factory(order_items):
             # Kategori yoksa isim bazında ayır (fallback)
             product_name = item.product.name.lower()
             
-            if any(keyword in product_name for keyword in ['turta', 'büyük pasta']):
-                categories['TURTA_PASTALAR'].append(item)
+            if any(keyword in product_name for keyword in ['ekler', 'ek']):
+                categories['EKLER_CESITLERI'].append(item)
             elif any(keyword in product_name for keyword in ['dilim', 'parça']):
                 categories['DILIM_PASTALAR'].append(item)
-            elif any(keyword in product_name for keyword in ['tepsi', 'sarma', 'rulo', 'karamelli']):  # tepsi eklendi
-                categories['TEPSILI_URUNLER'].append(item)  # SARMA_GURUBU → TEPSILI_URUNLER
-            elif any(keyword in product_name for keyword in ['bombası', 'özel']):  # çeşitleri kaldırıldı
-                categories['SPESYEL_URUNLER'].append(item)
-            elif any(keyword in product_name for keyword in ['supangle', 'profiterol', 'sütlü']):  # magnolya kaldırıldı
-                categories['SUTLU_TATLILAR'].append(item)  # SUTSUZ → SUTLU
-            elif any(keyword in product_name for keyword in ['ekler', 'ek']):
-                categories['EKLER_CESITLERI'].append(item)
+            elif any(keyword in product_name for keyword in ['tepsi', 'sarma', 'rulo', 'malaga']):
+                categories['TEPSILI_URUNLER'].append(item)
+            elif any(keyword in product_name for keyword in ['bombası', 'şörözbek', 'özel']):
+                categories['SPESYAL_URUNLER'].append(item)
+            elif any(keyword in product_name for keyword in ['supangle', 'profiterol', 'magnolya', 'sütlü']):
+                categories['SUTLU_TATLILAR'].append(item)
             else:
+                # Diğer her şey pasta çeşitleri kategorisine gider
                 categories['PASTA_CESITLERI'].append(item)
     
     return categories
@@ -491,15 +510,40 @@ def simple_branch_order_create(request):
         messages.error(request, 'Bir şubeye bağlı olmanız gerekiyor.')
         return redirect('users:login')
     
-    # Aktif ürünleri kategoriye göre grupla
-    products = Product.objects.filter(is_active=True).select_related('category').order_by('category__name', 'name')
+    # Kategori sıralaması tanımla (PASTA ÇEŞİTLERİ en üstte)
+    category_order = [
+        'PASTA ÇEŞİTLERİ',
+        'DİLİM PASTALAR', 
+        'TEPSİLİ ÜRÜNLER',
+        'SPESYAL ÜRÜNLER',
+        'SÜTLÜ TATLILAR',
+        'EKLER ÇEŞİTLERİ'
+    ]
+    
+    # Aktif ürünleri al
+    products = Product.objects.filter(is_active=True).select_related('category').order_by('name')
+    
+    # Ürünleri kategorilere göre organize et (sıralı şekilde)
     products_by_category = {}
     
+    # Önce belirtilen sırayla kategorileri ekle
+    for category_name in category_order:
+        category_products = [p for p in products if p.category and p.category.name == category_name]
+        if category_products:
+            products_by_category[category_name] = category_products
+    
+    # Sonra kalan kategorileri ekle (varsa)
     for product in products:
-        category_name = product.category.name if product.category else 'Diğer'
-        if category_name not in products_by_category:
-            products_by_category[category_name] = []
-        products_by_category[category_name].append(product)
+        if product.category:
+            category_name = product.category.name
+            if category_name not in category_order and category_name not in products_by_category:
+                products_by_category[category_name] = [p for p in products if p.category and p.category.name == category_name]
+        else:
+            # Kategorisi olmayan ürünler
+            if 'Diğer' not in products_by_category:
+                products_by_category['Diğer'] = []
+            if product not in products_by_category['Diğer']:
+                products_by_category['Diğer'].append(product)
     
     # Yarının tarihi
     tomorrow = timezone.now().date() + timedelta(days=1)

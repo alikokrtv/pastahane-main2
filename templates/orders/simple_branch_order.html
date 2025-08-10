@@ -191,48 +191,34 @@
         </div>
         
         <p class="text-sm text-gray-700 mb-4">
-            Sipariş bilgilerini WhatsApp ile göndermek için platform seçin:
+            Cihazınızı seçin, WhatsApp otomatik açılacak:
         </p>
         
         <div class="space-y-3">
             <!-- iPhone/iOS için buton -->
             <button id="whatsapp-ios-btn" 
-                    class="w-full bg-gray-800 text-white px-4 py-3 rounded-md hover:bg-gray-900 font-medium text-sm flex items-center justify-center">
-                <i class="fab fa-apple mr-2"></i>
-                📱 iPhone - WhatsApp App
+                    class="w-full bg-gray-800 text-white px-4 py-4 rounded-md hover:bg-gray-900 font-medium text-lg flex items-center justify-center">
+                <i class="fab fa-apple mr-3 text-xl"></i>
+                📱 iPhone
             </button>
             
             <!-- Android için buton -->
             <button id="whatsapp-android-btn" 
-                    class="w-full bg-green-600 text-white px-4 py-3 rounded-md hover:bg-green-700 font-medium text-sm flex items-center justify-center">
-                <i class="fab fa-android mr-2"></i>
-                🤖 Android - WhatsApp App
-            </button>
-            
-            <!-- Masaüstü için buton -->
-            <button id="whatsapp-desktop-btn" 
-                    class="w-full bg-blue-600 text-white px-4 py-3 rounded-md hover:bg-blue-700 font-medium text-sm flex items-center justify-center">
-                <i class="fas fa-desktop mr-2"></i>
-                💻 Masaüstü - WhatsApp Desktop
-            </button>
-            
-            <!-- Web için buton -->
-            <button id="whatsapp-web-btn" 
-                    class="w-full bg-green-500 text-white px-4 py-3 rounded-md hover:bg-green-600 font-medium text-sm flex items-center justify-center">
-                <i class="fas fa-globe mr-2"></i>
-                🌐 Tarayıcı - WhatsApp Web
+                    class="w-full bg-green-600 text-white px-4 py-4 rounded-md hover:bg-green-700 font-medium text-lg flex items-center justify-center">
+                <i class="fab fa-android mr-3 text-xl"></i>
+                🤖 Android
             </button>
             
             <!-- Atla butonu -->
             <button id="skip-whatsapp-new-btn" 
-                    class="w-full bg-gray-400 text-white px-4 py-2 rounded-md hover:bg-gray-500 font-medium text-sm">
+                    class="w-full bg-gray-400 text-white px-4 py-3 rounded-md hover:bg-gray-500 font-medium text-sm">
                 <i class="fas fa-times mr-1"></i>
-                Atla - Sadece Siparişi Kaydet
+                Atla - WhatsApp Gönderme
             </button>
         </div>
         
         <div class="mt-4 text-xs text-gray-500 text-center">
-            <p>💡 Cihazınıza uygun butonu seçin</p>
+            <p>💡 Cihazınızı seçin ve WhatsApp otomatik açılsın</p>
         </div>
     </div>
 </div>
@@ -371,49 +357,30 @@ function hideWhatsAppModal() {
 function setupWhatsAppButtons(message, orderNumber) {
     const encodedMessage = encodeURIComponent(message);
     
-    // iOS/iPhone buton
+    // iOS/iPhone buton - Direkt WhatsApp aç
     document.getElementById('whatsapp-ios-btn').onclick = function() {
         const iosUrl = `whatsapp://send?text=${encodedMessage}`;
-        try {
-            window.location.href = iosUrl;
-            hideWhatsAppModal();
-        } catch (error) {
-            // Fallback to web
-            window.open(`https://wa.me/?text=${encodedMessage}`, '_blank');
-            hideWhatsAppModal();
-        }
+        window.location.href = iosUrl;
+        hideWhatsAppModal();
+        
+        // 2 saniye sonra fallback olarak web açılabilir
+        setTimeout(() => {
+            // Sadece hata durumunda web sayfasını aç
+            // window.open(`https://wa.me/?text=${encodedMessage}`, '_blank');
+        }, 2000);
     };
     
-    // Android buton
+    // Android buton - Direkt WhatsApp aç
     document.getElementById('whatsapp-android-btn').onclick = function() {
         const androidUrl = `whatsapp://send?text=${encodedMessage}`;
-        try {
-            window.location.href = androidUrl;
-            hideWhatsAppModal();
-        } catch (error) {
-            // Fallback to web
-            window.open(`https://wa.me/?text=${encodedMessage}`, '_blank');
-            hideWhatsAppModal();
-        }
-    };
-    
-    // Desktop buton
-    document.getElementById('whatsapp-desktop-btn').onclick = function() {
-        const desktopUrl = `whatsapp://send?text=${encodedMessage}`;
-        try {
-            window.location.href = desktopUrl;
-            hideWhatsAppModal();
-        } catch (error) {
-            // Fallback to web
-            window.open(`https://web.whatsapp.com/send?text=${encodedMessage}`, '_blank');
-            hideWhatsAppModal();
-        }
-    };
-    
-    // Web buton
-    document.getElementById('whatsapp-web-btn').onclick = function() {
-        window.open(`https://wa.me/?text=${encodedMessage}`, '_blank');
+        window.location.href = androidUrl;
         hideWhatsAppModal();
+        
+        // 2 saniye sonra fallback olarak web açılabilir
+        setTimeout(() => {
+            // Sadece hata durumunda web sayfasını aç
+            // window.open(`https://wa.me/?text=${encodedMessage}`, '_blank');
+        }, 2000);
     };
     
     // Skip buton
