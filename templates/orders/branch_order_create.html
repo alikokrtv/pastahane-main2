@@ -122,10 +122,10 @@
                                         <tbody>
                                             <tr>
                                                 <td class="text-center align-middle">
-                                                    <span class="me-2 text-primary fw-semibold">4K</span>
                                                     {% with p=size_map.4K %}
                                                     {% if p %}
-                                                    <div class="d-inline-flex align-items-center" data-product-id="{{ p.id }}">
+                                                    <div class="d-flex align-items-center justify-content-center" data-product-id="{{ p.id }}">
+                                                        <span class="me-2 text-primary fw-semibold">4K</span>
                                                         <button type="button" class="btn btn-sm btn-outline-secondary btn-quantity" onclick="decreaseQuantity({{ p.id }})"><i class="fas fa-minus"></i></button>
                                                         <input type="number" class="form-control form-control-sm quantity-input mx-2" id="quantity-{{ p.id }}" value="0" min="0" max="999" onchange="updateQuantity({{ p.id }}, this.value)" onkeyup="updateQuantity({{ p.id }}, this.value)">
                                                         <button type="button" class="btn btn-sm btn-outline-secondary btn-quantity" onclick="increaseQuantity({{ p.id }})"><i class="fas fa-plus"></i></button>
@@ -134,10 +134,10 @@
                                                     {% endwith %}
                                                 </td>
                                                 <td class="text-center align-middle">
-                                                    <span class="me-2 text-primary fw-semibold">No0</span>
                                                     {% with p=size_map.0 %}
                                                     {% if p %}
-                                                    <div class="d-inline-flex align-items-center" data-product-id="{{ p.id }}">
+                                                    <div class="d-flex align-items-center justify-content-center" data-product-id="{{ p.id }}">
+                                                        <span class="me-2 text-primary fw-semibold">No0</span>
                                                         <button type="button" class="btn btn-sm btn-outline-secondary btn-quantity" onclick="decreaseQuantity({{ p.id }})"><i class="fas fa-minus"></i></button>
                                                         <input type="number" class="form-control form-control-sm quantity-input mx-2" id="quantity-{{ p.id }}" value="0" min="0" max="999" onchange="updateQuantity({{ p.id }}, this.value)" onkeyup="updateQuantity({{ p.id }}, this.value)">
                                                         <button type="button" class="btn btn-sm btn-outline-secondary btn-quantity" onclick="increaseQuantity({{ p.id }})"><i class="fas fa-plus"></i></button>
@@ -146,10 +146,10 @@
                                                     {% endwith %}
                                                 </td>
                                                 <td class="text-center align-middle">
-                                                    <span class="me-2 text-primary fw-semibold">No1</span>
                                                     {% with p=size_map.1 %}
                                                     {% if p %}
-                                                    <div class="d-inline-flex align-items-center" data-product-id="{{ p.id }}">
+                                                    <div class="d-flex align-items-center justify-content-center" data-product-id="{{ p.id }}">
+                                                        <span class="me-2 text-primary fw-semibold">No1</span>
                                                         <button type="button" class="btn btn-sm btn-outline-secondary btn-quantity" onclick="decreaseQuantity({{ p.id }})"><i class="fas fa-minus"></i></button>
                                                         <input type="number" class="form-control form-control-sm quantity-input mx-2" id="quantity-{{ p.id }}" value="0" min="0" max="999" onchange="updateQuantity({{ p.id }}, this.value)" onkeyup="updateQuantity({{ p.id }}, this.value)">
                                                         <button type="button" class="btn btn-sm btn-outline-secondary btn-quantity" onclick="increaseQuantity({{ p.id }})"><i class="fas fa-plus"></i></button>
@@ -158,10 +158,10 @@
                                                     {% endwith %}
                                                 </td>
                                                 <td class="text-center align-middle">
-                                                    <span class="me-2 text-primary fw-semibold">No2</span>
                                                     {% with p=size_map.2 %}
                                                     {% if p %}
-                                                    <div class="d-inline-flex align-items-center" data-product-id="{{ p.id }}">
+                                                    <div class="d-flex align-items-center justify-content-center" data-product-id="{{ p.id }}">
+                                                        <span class="me-2 text-primary fw-semibold">No2</span>
                                                         <button type="button" class="btn btn-sm btn-outline-secondary btn-quantity" onclick="decreaseQuantity({{ p.id }})"><i class="fas fa-minus"></i></button>
                                                         <input type="number" class="form-control form-control-sm quantity-input mx-2" id="quantity-{{ p.id }}" value="0" min="0" max="999" onchange="updateQuantity({{ p.id }}, this.value)" onkeyup="updateQuantity({{ p.id }}, this.value)">
                                                         <button type="button" class="btn btn-sm btn-outline-secondary btn-quantity" onclick="increaseQuantity({{ p.id }})"><i class="fas fa-plus"></i></button>
