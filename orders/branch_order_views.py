@@ -135,24 +135,23 @@ class BranchOrderCreateView(LoginRequiredMixin, TemplateView):
                 if products.exists():
                     # Pasta çeşitleri için özel gruplandırma
                     if category_name == 'PASTA ÇEŞİTLERİ':
-                        # Pasta çeşitlerini grupla (boyut bilgisini çıkar)
-                        pasta_groups = {}
+                        # Pasta çeşitlerini grupla ve boyutları sütunlara yerleştir
+                        pasta_groups: dict[str, dict] = {}
                         for product in products:
-                            # "FISTIKLI BEYAZ - K4" -> "FISTIKLI BEYAZ"
                             if ' - ' in product.name:
-                                base_name = product.name.split(' - ')[0]
-                                size = product.name.split(' - ')[1]
+                                base_name, size = product.name.split(' - ', 1)
                             else:
-                                base_name = product.name
-                                size = 'Standart'
-                            
+                                base_name, size = product.name, 'Standart'
+
                             if base_name not in pasta_groups:
-                                pasta_groups[base_name] = []
-                            pasta_groups[base_name].append({
-                                'size': size,
-                                'product': product
-                            })
-                        
+                                pasta_groups[base_name] = {'K4': None, 'No0': None, 'No1': None, 'No2': None, 'Standart': None}
+
+                            if size in pasta_groups[base_name]:
+                                pasta_groups[base_name][size] = product
+                            else:
+                                # Diğer boyut adı gelirse 'Standart' kolonuna koy
+                                pasta_groups[base_name]['Standart'] = product
+
                         products_by_category[category] = pasta_groups
                     else:
                         products_by_category[category] = products
