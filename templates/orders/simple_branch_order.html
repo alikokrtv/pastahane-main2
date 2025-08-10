@@ -15,8 +15,8 @@
                         <p class="text-sm text-gray-600 mt-1">{{ user.branch.name }} - {{ today|date:"d F Y" }}</p>
                     </div>
                     <div class="text-right">
-                        <p class="text-sm text-gray-500">Hoş geldiniz</p>
-                        <p class="font-medium text-gray-900">{{ user.get_full_name|default:user.username }}</p>
+                        <p class="text-sm text-gray-500">Şube</p>
+                        <p class="font-medium text-gray-900">{{ user.branch.name }}</p>
                     </div>
                 </div>
             </div>
