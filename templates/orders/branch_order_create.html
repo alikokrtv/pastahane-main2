@@ -121,8 +121,9 @@
                                         </thead>
                                         <tbody>
                                             <tr>
-                                                {% with p=size_map.4K %}
                                                 <td class="text-center align-middle">
+                                                    <span class="me-2 text-primary fw-semibold">4K</span>
+                                                    {% with p=size_map.4K %}
                                                     {% if p %}
                                                     <div class="d-inline-flex align-items-center">
                                                         <button type="button" class="btn btn-sm btn-outline-secondary btn-quantity" onclick="decreaseQuantity({{ p.id }})"><i class="fas fa-minus"></i></button>
@@ -130,10 +131,11 @@
                                                         <button type="button" class="btn btn-sm btn-outline-secondary btn-quantity" onclick="increaseQuantity({{ p.id }})"><i class="fas fa-plus"></i></button>
                                                     </div>
                                                     {% endif %}
+                                                    {% endwith %}
                                                 </td>
-                                                {% endwith %}
-                                                {% with p=size_map.0 %}
                                                 <td class="text-center align-middle">
+                                                    <span class="me-2 text-primary fw-semibold">No0</span>
+                                                    {% with p=size_map.0 %}
                                                     {% if p %}
                                                     <div class="d-inline-flex align-items-center">
                                                         <button type="button" class="btn btn-sm btn-outline-secondary btn-quantity" onclick="decreaseQuantity({{ p.id }})"><i class="fas fa-minus"></i></button>
@@ -141,10 +143,11 @@
                                                         <button type="button" class="btn btn-sm btn-outline-secondary btn-quantity" onclick="increaseQuantity({{ p.id }})"><i class="fas fa-plus"></i></button>
                                                     </div>
                                                     {% endif %}
+                                                    {% endwith %}
                                                 </td>
-                                                {% endwith %}
-                                                {% with p=size_map.1 %}
                                                 <td class="text-center align-middle">
+                                                    <span class="me-2 text-primary fw-semibold">No1</span>
+                                                    {% with p=size_map.1 %}
                                                     {% if p %}
                                                     <div class="d-inline-flex align-items-center">
                                                         <button type="button" class="btn btn-sm btn-outline-secondary btn-quantity" onclick="decreaseQuantity({{ p.id }})"><i class="fas fa-minus"></i></button>
@@ -152,10 +155,11 @@
                                                         <button type="button" class="btn btn-sm btn-outline-secondary btn-quantity" onclick="increaseQuantity({{ p.id }})"><i class="fas fa-plus"></i></button>
                                                     </div>
                                                     {% endif %}
+                                                    {% endwith %}
                                                 </td>
-                                                {% endwith %}
-                                                {% with p=size_map.2 %}
                                                 <td class="text-center align-middle">
+                                                    <span class="me-2 text-primary fw-semibold">No2</span>
+                                                    {% with p=size_map.2 %}
                                                     {% if p %}
                                                     <div class="d-inline-flex align-items-center">
                                                         <button type="button" class="btn btn-sm btn-outline-secondary btn-quantity" onclick="decreaseQuantity({{ p.id }})"><i class="fas fa-minus"></i></button>
@@ -163,8 +167,8 @@
                                                         <button type="button" class="btn btn-sm btn-outline-secondary btn-quantity" onclick="increaseQuantity({{ p.id }})"><i class="fas fa-plus"></i></button>
                                                     </div>
                                                     {% endif %}
+                                                    {% endwith %}
                                                 </td>
-                                                {% endwith %}
                                             </tr>
                                         </tbody>
                                     </table>
@@ -287,12 +291,14 @@ let selectedItems = {};
 let products = {
     {% for category, products in products_by_category.items %}
         {% if category.name == 'PASTA ÇEŞİTLERİ' %}
-            {% for pasta_name, sizes in products.items %}
-                {% for size_info in sizes %}
-                {{ size_info.product.id }}: {
-                    'name': '{{ pasta_name|escapejs }} - {{ size_info.size|escapejs }}',
-                    'unit': '{{ size_info.product.get_unit_display|escapejs }}'
-                },
+            {% for pasta_name, size_map in products.items %}
+                {% for size_key, p in size_map.items %}
+                    {% if p %}
+                    {{ p.id }}: {
+                        'name': '{{ pasta_name|escapejs }} - {{ size_key|escapejs }}',
+                        'unit': '{{ p.get_unit_display|escapejs }}'
+                    },
+                    {% endif %}
                 {% endfor %}
             {% endfor %}
         {% else %}
