@@ -565,24 +565,27 @@ def simple_branch_order_create(request):
                 
                 for product in category_products:
                     if ' - ' in product.name:
+                        # Boyut bilgisi olan ürünler (ideal format)
                         base_name, size = product.name.split(' - ', 1)
+                        
+                        # Boyut adını normalize et
+                        display_size = size
+                        if size == 'K4':
+                            display_size = '4K'
+                        elif size == 'No0':
+                            display_size = '0'
+                        elif size == 'No1':
+                            display_size = '1'
+                        elif size == 'No2':
+                            display_size = '2'
                     else:
-                        # Boyutu olmayan ürünleri atla
-                        continue
+                        # Boyut bilgisi olmayan ürünler (production format)
+                        # Her pasta için varsayılan boyut olarak "Standart" kullan
+                        base_name = product.name
+                        display_size = 'Standart'
 
                     if base_name not in pasta_groups:
                         pasta_groups[base_name] = []
-
-                    # Boyut adını normalize et ve size_info objesi oluştur
-                    display_size = size
-                    if size == 'K4':
-                        display_size = '4K'
-                    elif size == 'No0':
-                        display_size = '0'
-                    elif size == 'No1':
-                        display_size = '1'
-                    elif size == 'No2':
-                        display_size = '2'
 
                     # Template için size_info objesi oluştur
                     size_info = {
@@ -591,8 +594,8 @@ def simple_branch_order_create(request):
                     }
                     pasta_groups[base_name].append(size_info)
 
-                # Boyutları sırala: 4K, 0, 1, 2
-                size_order = ['4K', '0', '1', '2']
+                # Boyutları sırala: 4K, 0, 1, 2, Standart
+                size_order = ['4K', '0', '1', '2', 'Standart']
                 for base_name in pasta_groups:
                     pasta_groups[base_name].sort(key=lambda x: size_order.index(x['size']) if x['size'] in size_order else 999)
 
