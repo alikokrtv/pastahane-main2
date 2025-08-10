@@ -14,10 +14,8 @@ urlpatterns = [
     
     # Şube sipariş yönetimi
     path('branch/', branch_order_views.branch_order_list, name='branch_order_list'),
-    # Varsayılan oluşturma sayfası: tablo görünümlü (PASTA: 4K|0|1|2)
-    path('branch/create/', branch_order_views.BranchOrderCreateView.as_view(), name='branch_order_create'),
-    # Eski sade sayfa ayrı path altında
-    path('branch/create/simple/', branch_order_views.simple_branch_order_create, name='branch_order_create_simple'),
+    path('branch/create/', branch_order_views.simple_branch_order_create, name='branch_order_create'),
+    path('branch/create/advanced/', branch_order_views.BranchOrderCreateView.as_view(), name='branch_order_create_advanced'),
     path('branch/<int:order_id>/', branch_order_views.branch_order_detail, name='branch_order_detail'),
     path('branch/<int:order_id>/update-status/', branch_order_views.update_order_status_ajax, name='update_order_status_ajax'),
     path('branch/create-ajax/', branch_order_views.create_branch_order_ajax, name='create_branch_order_ajax'),
