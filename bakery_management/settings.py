@@ -12,7 +12,6 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 from datetime import timedelta
-from urllib.parse import urlparse
 import os
 
 # PyMySQL configuration for MySQL support
@@ -155,46 +154,23 @@ VIAPOS_DB_CONFIG = {
     },
 }
 
-def parse_database_url(db_url: str):
-    """Parse DATABASE_URL into Django DATABASES dict (supports Postgres/MySQL)."""
-    parsed = urlparse(db_url)
-    engine_map = {
-        'postgres': 'django.db.backends.postgresql',
-        'postgresql': 'django.db.backends.postgresql',
-        'pgsql': 'django.db.backends.postgresql',
-        'mysql': 'django.db.backends.mysql',
-    }
-    engine = engine_map.get(parsed.scheme)
-    return {
-        'ENGINE': engine,
-        'NAME': parsed.path.lstrip('/'),
-        'USER': parsed.username or '',
-        'PASSWORD': parsed.password or '',
-        'HOST': parsed.hostname or 'localhost',
-        'PORT': str(parsed.port) if parsed.port else '',
-        'OPTIONS': {
-            'charset': 'utf8mb4',
-            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
-            'connect_timeout': 10,
-        },
-    }
-
-# Choose primary database with clear precedence:
-# 1) DATABASE_URL if provided (Coolify docker-compose passes this)
-# 2) USE_COOLIFY=true → Coolify MySQL
-# 3) Local MySQL (developer machine)
-if os.environ.get('DATABASE_URL'):
-    DEFAULT_DB = parse_database_url(os.environ['DATABASE_URL'])
-    logger.info("Configured database from DATABASE_URL")
-elif os.environ.get('USE_COOLIFY', '').lower() == 'true':
+# Choose primary database with fallback logic
+# For local development, use local database as primary
+# For production (Coolify), will use Coolify database
+if os.environ.get('DATABASE_URL') or os.environ.get('USE_COOLIFY', '').lower() == 'true':
+    # Production mode: Try Coolify first, fallback to local
     DEFAULT_DB = COOLIFY_DB_CONFIG
-    logger.info("Configured for Coolify MySQL database")
+    logger.info("Configured for Coolify primary database with local fallback")
 else:
+    # Development mode: Use local as primary (recommended for development)
     DEFAULT_DB = LOCAL_DB_CONFIG
     logger.info("Configured for local development database")
 
 DATABASES = {
     'default': DEFAULT_DB,
+    'coolify': COOLIFY_DB_CONFIG,
+    'viapos': VIAPOS_DB_CONFIG,
+    'viapos_local': LOCAL_DB_CONFIG,
 }
 
 

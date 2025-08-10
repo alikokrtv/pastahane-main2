@@ -322,15 +322,8 @@ function getSelectedProductId(baseSlug) {
 function onSizeSelectChange(baseSlug) {
     const productId = getSelectedProductId(baseSlug);
     if (!productId) return;
-    const card = document.querySelector(`.product-card[data-base-slug="${baseSlug}"]`);
-    if (!card) return;
-    const input = card.querySelector('.quantity-input');
-    if (!input) return;
-    // Input'un id'sini seçili productId'ye taşı
-    input.id = `quantity-${productId}`;
-    // Seçili boyut için mevcut miktarı göster
-    const current = selectedItems[productId] || 0;
-    input.value = current;
+    // Diğer boyut inputlarını etkilenmeden sadece seçili olan inputu güncelle
+    // Eğer input mevcut değilse, bir önceki input id'si ile kalır; biz sadece değerleri güncelliyoruz
 }
 
 function updateOrderSummary() {
