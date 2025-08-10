@@ -107,36 +107,36 @@
                         <!-- Pasta çeşitleri için özel boyut seçenekli görünüm -->
                         {% for pasta_name, sizes in products.items %}
                         <div class="col-md-6 col-lg-4">
-                            <div class="product-card">
+                            <div class="product-card" data-base-slug="{{ pasta_name|slugify }}">
                                 <div class="d-flex justify-content-between align-items-start mb-2">
                                     <h6 class="product-name mb-1">{{ pasta_name }}</h6>
                                 </div>
                                 
                                 <div class="text-muted small mb-3">
-                                    <i class="fas fa-balance-scale"></i> Adet - Boyut seçiniz
+                                    <i class="fas fa-balance-scale"></i>
+                                    <select class="form-control form-control-sm d-inline-block w-auto ml-1 size-select"
+                                            id="size-select-{{ pasta_name|slugify }}"
+                                            onchange="onSizeSelectChange('{{ pasta_name|slugify }}')">
+                                        {% for size_info in sizes %}
+                                        <option value="{{ size_info.product.id }}">{{ size_info.size }}</option>
+                                        {% endfor %}
+                                    </select>
                                 </div>
-                                
-                                <!-- Boyut seçenekleri -->
-                                <div class="size-options mb-3">
-                                    {% for size_info in sizes %}
-                                    <div class="size-option mb-2" data-product-id="{{ size_info.product.id }}">
-                                        <div class="d-flex align-items-center justify-content-between">
-                                            <span class="badge badge-outline-primary">{{ size_info.size }}</span>
-                                            <div class="quantity-controls">
-                                                <button type="button" class="btn btn-sm btn-outline-secondary btn-quantity" onclick="decreaseQuantity({{ size_info.product.id }})">
-                                                    <i class="fas fa-minus"></i>
-                                                </button>
-                                                <input type="number" class="form-control form-control-sm quantity-input mx-2" 
-                                                       id="quantity-{{ size_info.product.id }}" value="0" min="0" max="999"
-                                                       onchange="updateQuantity({{ size_info.product.id }}, this.value)"
-                                                       onkeyup="updateQuantity({{ size_info.product.id }}, this.value)">
-                                                <button type="button" class="btn btn-sm btn-outline-secondary btn-quantity" onclick="increaseQuantity({{ size_info.product.id }})">
-                                                    <i class="fas fa-plus"></i>
-                                                </button>
-                                            </div>
-                                        </div>
+
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div class="quantity-controls">
+                                        <button type="button" class="btn btn-sm btn-outline-secondary btn-quantity" onclick="decreaseQuantity(getSelectedProductId('{{ pasta_name|slugify }}'))">
+                                            <i class="fas fa-minus"></i>
+                                        </button>
+                                        <!-- input id ilk seçenek product id'si ile başlar -->
+                                        <input type="number" class="form-control form-control-sm quantity-input mx-2"
+                                               id="quantity-{% with sizes.0.product.id as first_id %}{{ first_id }}{% endwith %}" value="0" min="0" max="999"
+                                               onchange="updateQuantity(getSelectedProductId('{{ pasta_name|slugify }}'), this.value)"
+                                               onkeyup="updateQuantity(getSelectedProductId('{{ pasta_name|slugify }}'), this.value)">
+                                        <button type="button" class="btn btn-sm btn-outline-secondary btn-quantity" onclick="increaseQuantity(getSelectedProductId('{{ pasta_name|slugify }}'))">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
                                     </div>
-                                    {% endfor %}
                                 </div>
                             </div>
                         </div>
@@ -311,6 +311,26 @@ function decreaseQuantity(productId) {
 function quickAdd(productId, quantity) {
     const currentQuantity = parseInt($(`#quantity-${productId}`).val()) || 0;
     updateQuantity(productId, currentQuantity + quantity);
+}
+
+// Size select helper'ları
+function getSelectedProductId(baseSlug) {
+    const select = document.getElementById(`size-select-${baseSlug}`);
+    return select ? parseInt(select.value) : null;
+}
+
+function onSizeSelectChange(baseSlug) {
+    const productId = getSelectedProductId(baseSlug);
+    if (!productId) return;
+    const card = document.querySelector(`.product-card[data-base-slug="${baseSlug}"]`);
+    if (!card) return;
+    const input = card.querySelector('.quantity-input');
+    if (!input) return;
+    // Input'un id'sini seçili productId'ye taşı
+    input.id = `quantity-${productId}`;
+    // Seçili boyut için mevcut miktarı göster
+    const current = selectedItems[productId] || 0;
+    input.value = current;
 }
 
 function updateOrderSummary() {
