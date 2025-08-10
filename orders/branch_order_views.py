@@ -551,25 +551,31 @@ def simple_branch_order_create(request):
     for category_name in category_order:
         category_products = [p for p in products if p.category and p.category.name == category_name]
         if category_products:
-            # Pasta çeşitleri için özel gruplandırma
+            # Pasta çeşitleri için özel gruplandırma (4 sütun: 4K | 0 | 1 | 2)
             if category_name == 'PASTA ÇEŞİTLERİ':
                 pasta_groups = {}
                 for product in category_products:
-                    # "FISTIKLI BEYAZ - K4" -> "FISTIKLI BEYAZ"
                     if ' - ' in product.name:
-                        base_name = product.name.split(' - ')[0]
-                        size = product.name.split(' - ')[1]
+                        base_name, size = product.name.split(' - ', 1)
                     else:
-                        base_name = product.name
-                        size = 'Standart'
-                    
+                        # Boyutu olmayan ürünleri atla
+                        base_name, size = product.name, None
+
                     if base_name not in pasta_groups:
-                        pasta_groups[base_name] = []
-                    pasta_groups[base_name].append({
-                        'size': size,
-                        'product': product
-                    })
-                
+                        pasta_groups[base_name] = {'4K': None, '0': None, '1': None, '2': None}
+
+                    # No0/No1/No2 → 0/1/2'ye eşle
+                    normalized = size
+                    if size == 'No0':
+                        normalized = '0'
+                    elif size == 'No1':
+                        normalized = '1'
+                    elif size == 'No2':
+                        normalized = '2'
+
+                    if normalized in pasta_groups[base_name]:
+                        pasta_groups[base_name][normalized] = product
+
                 products_by_category[category_name] = pasta_groups
             else:
                 products_by_category[category_name] = category_products
