@@ -562,6 +562,7 @@ def simple_branch_order_create(request):
             # Pasta çeşitleri için özel gruplandırma (4 sütun: 4K | 0 | 1 | 2)
             if category_name == 'PASTA ÇEŞİTLERİ':
                 pasta_groups = {}
+                
                 for product in category_products:
                     if ' - ' in product.name:
                         base_name, size = product.name.split(' - ', 1)
