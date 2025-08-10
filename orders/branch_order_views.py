@@ -133,7 +133,29 @@ class BranchOrderCreateView(LoginRequiredMixin, TemplateView):
                 category = all_categories.get(name=category_name)
                 products = category.products.filter(is_active=True).order_by('name')
                 if products.exists():
-                    products_by_category[category] = products
+                    # Pasta çeşitleri için özel gruplandırma
+                    if category_name == 'PASTA ÇEŞİTLERİ':
+                        # Pasta çeşitlerini grupla (boyut bilgisini çıkar)
+                        pasta_groups = {}
+                        for product in products:
+                            # "FISTIKLI BEYAZ - K4" -> "FISTIKLI BEYAZ"
+                            if ' - ' in product.name:
+                                base_name = product.name.split(' - ')[0]
+                                size = product.name.split(' - ')[1]
+                            else:
+                                base_name = product.name
+                                size = 'Standart'
+                            
+                            if base_name not in pasta_groups:
+                                pasta_groups[base_name] = []
+                            pasta_groups[base_name].append({
+                                'size': size,
+                                'product': product
+                            })
+                        
+                        products_by_category[category] = pasta_groups
+                    else:
+                        products_by_category[category] = products
             except ProductCategory.DoesNotExist:
                 continue
         
@@ -530,14 +552,36 @@ def simple_branch_order_create(request):
     for category_name in category_order:
         category_products = [p for p in products if p.category and p.category.name == category_name]
         if category_products:
-            products_by_category[category_name] = category_products
+            # Pasta çeşitleri için özel gruplandırma
+            if category_name == 'PASTA ÇEŞİTLERİ':
+                pasta_groups = {}
+                for product in category_products:
+                    # "FISTIKLI BEYAZ - K4" -> "FISTIKLI BEYAZ"
+                    if ' - ' in product.name:
+                        base_name = product.name.split(' - ')[0]
+                        size = product.name.split(' - ')[1]
+                    else:
+                        base_name = product.name
+                        size = 'Standart'
+                    
+                    if base_name not in pasta_groups:
+                        pasta_groups[base_name] = []
+                    pasta_groups[base_name].append({
+                        'size': size,
+                        'product': product
+                    })
+                
+                products_by_category[category_name] = pasta_groups
+            else:
+                products_by_category[category_name] = category_products
     
     # Sonra kalan kategorileri ekle (varsa)
     for product in products:
         if product.category:
             category_name = product.category.name
             if category_name not in category_order and category_name not in products_by_category:
-                products_by_category[category_name] = [p for p in products if p.category and p.category.name == category_name]
+                remaining_products = [p for p in products if p.category and p.category.name == category_name]
+                products_by_category[category_name] = remaining_products
         else:
             # Kategorisi olmayan ürünler
             if 'Diğer' not in products_by_category:
