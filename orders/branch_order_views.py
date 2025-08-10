@@ -567,22 +567,33 @@ def simple_branch_order_create(request):
                         base_name, size = product.name.split(' - ', 1)
                     else:
                         # Boyutu olmayan ürünleri atla
-                        base_name, size = product.name, None
+                        continue
 
                     if base_name not in pasta_groups:
-                        pasta_groups[base_name] = {'4K': None, '0': None, '1': None, '2': None}
+                        pasta_groups[base_name] = []
 
-                    # No0/No1/No2 → 0/1/2'ye eşle
-                    normalized = size
-                    if size == 'No0':
-                        normalized = '0'
+                    # Boyut adını normalize et ve size_info objesi oluştur
+                    display_size = size
+                    if size == 'K4':
+                        display_size = '4K'
+                    elif size == 'No0':
+                        display_size = '0'
                     elif size == 'No1':
-                        normalized = '1'
+                        display_size = '1'
                     elif size == 'No2':
-                        normalized = '2'
+                        display_size = '2'
 
-                    if normalized in pasta_groups[base_name]:
-                        pasta_groups[base_name][normalized] = product
+                    # Template için size_info objesi oluştur
+                    size_info = {
+                        'size': display_size,
+                        'product': product
+                    }
+                    pasta_groups[base_name].append(size_info)
+
+                # Boyutları sırala: 4K, 0, 1, 2
+                size_order = ['4K', '0', '1', '2']
+                for base_name in pasta_groups:
+                    pasta_groups[base_name].sort(key=lambda x: size_order.index(x['size']) if x['size'] in size_order else 999)
 
                 products_by_category[category_name] = pasta_groups
             else:
