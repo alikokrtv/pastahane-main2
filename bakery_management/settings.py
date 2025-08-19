@@ -144,8 +144,8 @@ VIAPOS_DB_CONFIG = {
     'NAME': 'viapospr2_site',
     'USER': 'viapospr2_site',
     'PASSWORD': 'uCSPYXXNS3DuJrwWmf3e',
-    'HOST': 'localhost',
-    'PORT': '3306',
+    'HOST': os.environ.get('VIAPOS_HOST', 'localhost'),
+    'PORT': os.environ.get('VIAPOS_PORT', '3306'),
     'OPTIONS': {
         'charset': 'utf8mb4',
         'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
