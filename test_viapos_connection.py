@@ -21,6 +21,9 @@ def test_viapos_connection():
     try:
         # Viapos veritabanı bağlantısını al (settings.DATABASES['viapos'])
         viapos_db = connections['viapos']
+        # Bağlanmadan önce hangi host/port kullanılacak göster
+        settings_dict = viapos_db.settings_dict
+        print(f"   Kullanılacak host: {settings_dict.get('HOST')} | port: {settings_dict.get('PORT')}")
         
         # Bağlantıyı test et
         with viapos_db.cursor() as cursor:
