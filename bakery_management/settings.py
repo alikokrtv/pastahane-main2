@@ -143,7 +143,7 @@ VIAPOS_DB_CONFIG = {
     'ENGINE': 'django.db.backends.mysql',
     'NAME': 'viapospr2_site',
     'USER': 'viapospr2_site',
-    'PASSWORD': 'uCSPYXXNS3DuJrwWmf3',
+    'PASSWORD': 'uCSPYXXNS3DuJrwWmf3e',
     'HOST': 'localhost',
     'PORT': '3306',
     'OPTIONS': {

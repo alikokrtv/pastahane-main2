@@ -19,8 +19,8 @@ from django.core.exceptions import ImproperlyConfigured
 def test_viapos_connection():
     """Viapos veritabanı bağlantısını test et"""
     try:
-        # Yerel Viapos veritabanı bağlantısını al
-        viapos_db = connections['viapos_local']
+        # Viapos veritabanı bağlantısını al (settings.DATABASES['viapos'])
+        viapos_db = connections['viapos']
         
         # Bağlantıyı test et
         with viapos_db.cursor() as cursor:

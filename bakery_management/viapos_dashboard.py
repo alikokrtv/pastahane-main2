@@ -34,30 +34,27 @@ def execute_viapos_query(query, params=None):
         return []
 
 def get_pasta_summary():
-    """Pasta dilimleri özet verisi"""
+    """Pasta/dilim/turta benzeri ürünler için özet verisi (urunler tablosu)."""
     query = """
     SELECT 
-        stokadi,
-        grup1,
-        grup2,
+        urun,
         satis,
-        birim,
-        aktif,
-        kayittarihi
-    FROM stok 
-    WHERE aktif = '1' 
-    AND (
-        LOWER(stokadi) LIKE '%pasta%' OR 
-        LOWER(stokadi) LIKE '%dilim%' OR 
-        LOWER(stokadi) LIKE '%turta%' OR
-        LOWER(stokadi) LIKE '%kek%' OR
-        LOWER(stokadi) LIKE '%tart%'
+        birin,
+        grub,
+        kayittarih
+    FROM urunler
+    WHERE (
+        LOWER(urun) LIKE '%pasta%' OR 
+        LOWER(urun) LIKE '%dilim%' OR 
+        LOWER(urun) LIKE '%turta%' OR
+        LOWER(urun) LIKE '%kek%' OR
+        LOWER(urun) LIKE '%tart%'
     )
-    ORDER BY stokadi
+    ORDER BY urun
     """
-    
+
     results = execute_viapos_query(query)
-    
+
     # Kategori bazında gruplama
     categories = {
         'Dilim Pastalar': [],
@@ -65,38 +62,36 @@ def get_pasta_summary():
         'Kekler': [],
         'Diğer Pastalar': []
     }
-    
+
     total_items = 0
     total_value = Decimal('0')
-    
+
     for item in results:
         total_items += 1
         try:
             price = Decimal(str(item.get('satis', 0) or 0))
             total_value += price
-        except:
+        except Exception:
             price = Decimal('0')
-        
-        # Kategori belirleme
-        stok_adi = item.get('stokadi', '').lower()
-        if 'dilim' in stok_adi or 'parça' in stok_adi:
+
+        name_lc = item.get('urun', '').lower()
+        if 'dilim' in name_lc or 'parça' in name_lc:
             category = 'Dilim Pastalar'
-        elif 'turta' in stok_adi or 'büyük' in stok_adi:
+        elif 'turta' in name_lc or 'büyük' in name_lc:
             category = 'Turta Pastalar'
-        elif 'kek' in stok_adi:
+        elif 'kek' in name_lc:
             category = 'Kekler'
         else:
             category = 'Diğer Pastalar'
-        
+
         categories[category].append({
-            'name': item.get('stokadi', ''),
+            'name': item.get('urun', ''),
             'price': float(price),
-            'unit': item.get('birim', 'ADET'),
-            'group1': item.get('grup1', ''),
-            'group2': item.get('grup2', ''),
-            'date_added': item.get('kayittarihi')
+            'unit': item.get('birin', 'ADET'),
+            'group': item.get('grub', ''),
+            'date_added': item.get('kayittarih')
         })
-    
+
     return {
         'categories': categories,
         'total_items': total_items,
@@ -105,40 +100,41 @@ def get_pasta_summary():
     }
 
 def get_recent_sales():
-    """Son satışları getir"""
+    """Son satışları getir (satislar + fisno)."""
     query = """
     SELECT 
-        h.hareketkodu,
-        h.islem,
-        h.firmaadi,
-        h.toplam,
-        h.kayittarihi,
-        h.parabirimi
-    FROM hareket h
-    WHERE h.aktif = '1' 
-    AND h.kayittarihi >= DATE_SUB(NOW(), INTERVAL 7 DAY)
-    ORDER BY h.kayittarihi DESC
+        s.id,
+        s.fisno,
+        s.tarih,
+        s.musteriadi,
+        s.toplam,
+        s.urun,
+        s.adet,
+        s.fiyat
+    FROM satislar s
+    WHERE s.tarih >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+    ORDER BY s.tarih DESC
     LIMIT 10
     """
-    
+
     results = execute_viapos_query(query)
-    
+
     sales_data = []
     for sale in results:
         try:
             amount = Decimal(str(sale.get('toplam', 0) or 0))
-        except:
+        except Exception:
             amount = Decimal('0')
-        
+
         sales_data.append({
-            'code': sale.get('hareketkodu'),
-            'type': sale.get('islem'),
-            'customer': sale.get('firmaadi', 'Bilinmeyen'),
+            'code': sale.get('fisno'),
+            'type': sale.get('urun'),
+            'customer': sale.get('musteriadi', 'Bilinmeyen'),
             'amount': float(amount),
-            'currency': sale.get('parabirimi', 'TL'),
-            'date': sale.get('kayittarihi')
+            'currency': 'TL',
+            'date': sale.get('tarih')
         })
-    
+
     return sales_data
 
 def get_dashboard_stats():
@@ -146,12 +142,11 @@ def get_dashboard_stats():
     pasta_summary = get_pasta_summary()
     recent_sales = get_recent_sales()
     
-    # Günlük satış toplamı
+    # Günlük satış toplamı (fisno.toplam)
     today_query = """
     SELECT COALESCE(SUM(toplam), 0) as daily_total
-    FROM hareket 
-    WHERE aktif = '1' 
-    AND DATE(kayittarihi) = CURDATE()
+    FROM fisno
+    WHERE DATE(tarih) = CURDATE()
     AND toplam > 0
     """
     
@@ -163,12 +158,11 @@ def get_dashboard_stats():
         except:
             daily_total = 0
     
-    # Haftalık satış toplamı
+    # Haftalık satış toplamı (fisno.toplam)
     weekly_query = """
     SELECT COALESCE(SUM(toplam), 0) as weekly_total
-    FROM hareket 
-    WHERE aktif = '1' 
-    AND kayittarihi >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+    FROM fisno
+    WHERE tarih >= DATE_SUB(NOW(), INTERVAL 7 DAY)
     AND toplam > 0
     """
     

@@ -36,7 +36,7 @@ def create_viapos_database():
 def import_sql_dump():
     """SQL dump dosyasını yerel veritabanına import et"""
     try:
-        sql_file = "viapospr2_site_1753946368.sql"
+        sql_file = "viapospr2_site_1755604571.sql"
         
         # MySQL komut satırı ile import et
         cmd = [
