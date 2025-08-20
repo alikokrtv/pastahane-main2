@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import TemplateView
 from django.db.models import Sum, Count, Q, F
+from django.db.models.functions import TruncDate, TruncHour
 from django.utils import timezone
 from datetime import timedelta
 import logging
@@ -10,18 +11,10 @@ import logging
 from users.models import CustomUser, Branch
 from inventory.models import Inventory, StockMovement, Product
 from orders.models import Order
+from sales.models import Satislar
 from production.models import ProductionPlan, ProductionBatch
 
-# ViaPos entegrasyonu için
-try:
-    import sys
-    import os
-    sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-    from viapos_dashboard import get_dashboard_stats
-    VIAPOS_AVAILABLE = True
-except ImportError as e:
-    logging.getLogger(__name__).warning(f"ViaPos modülü yüklenemedi: {e}")
-    VIAPOS_AVAILABLE = False
+VIAPOS_AVAILABLE = True  # Satislar tablosunu kullanacağız
 
 logger = logging.getLogger(__name__)
 
@@ -44,18 +37,50 @@ class DashboardView(LoginRequiredMixin, TemplateView):
             'today': today,
         })
         
-        # ViaPos pasta verileri
-        if VIAPOS_AVAILABLE:
-            try:
-                viapos_stats = get_dashboard_stats()
-                context['viapos_data'] = viapos_stats
-                context['viapos_available'] = True
-            except Exception as e:
-                logger.error(f"ViaPos veri çekme hatası: {e}")
-                context['viapos_available'] = False
-                context['viapos_error'] = str(e)
-        else:
+        # ViaPos satislar verileri (external 'viapos' DB)
+        try:
+            tz = timezone.get_current_timezone()
+            now = timezone.now().astimezone(tz)
+            start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+            end = start + timedelta(days=1)
+
+            qs_today = Satislar.objects.using('viapos').filter(tarih__gte=start, tarih__lt=end)
+            ciro = qs_today.aggregate(ciro=Sum('toplam'))['ciro'] or 0
+            fis_sayisi = qs_today.values('fisno').distinct().count()
+            satir = qs_today.count()
+            ortalama_fis = (ciro / fis_sayisi) if fis_sayisi else 0
+
+            # Son 7 gün ciro
+            start7 = (now - timedelta(days=6)).replace(hour=0, minute=0, second=0, microsecond=0)
+            qs7 = Satislar.objects.using('viapos').filter(tarih__date__gte=start7.date())
+            ciro_son_7_gun = list(
+                qs7.annotate(gun=TruncDate('tarih'))
+                   .values('gun')
+                   .annotate(ciro=Sum('toplam'))
+                   .order_by('gun')
+            )
+
+            # Bugün saatlik ciro
+            saatlik = list(
+                qs_today.annotate(saat=TruncHour('tarih'))
+                        .values('saat')
+                        .annotate(ciro=Sum('toplam'))
+                        .order_by('saat')
+            )
+
+            context['viapos_data'] = {
+                'ciro': ciro,
+                'fis_sayisi': fis_sayisi,
+                'satir': satir,
+                'ortalama_fis': ortalama_fis,
+                'ciro_son_7_gun': ciro_son_7_gun,
+                'saatlik_satis_bugun': saatlik,
+            }
+            context['viapos_available'] = True
+        except Exception as e:
+            logger.error(f"ViaPos veri çekme hatası: {e}")
             context['viapos_available'] = False
+            context['viapos_error'] = str(e)
         
         # Kullanıcının şube bilgileri
         if user.branch:
