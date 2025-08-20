@@ -67,6 +67,7 @@ INSTALLED_APPS = [
     'production',
     'sales',
     'reports',
+    'pos',
 ]
 
 MIDDLEWARE = [
@@ -173,6 +174,9 @@ DATABASES = {
     'viapos': VIAPOS_DB_CONFIG,
     'viapos_local': LOCAL_DB_CONFIG,
 }
+
+# Route all models in 'pos' app to the 'viapos' database (read-only, unmanaged)
+DATABASE_ROUTERS = ['pos.db_router.PosRouter']
 
 
 # Password validation
