@@ -11,8 +11,7 @@ import logging
 from users.models import CustomUser, Branch
 from inventory.models import Inventory, StockMovement, Product
 from orders.models import Order
-from pos.models import Satislar
-from dashboard import services
+from sales.models import Satislar
 from production.models import ProductionPlan, ProductionBatch
 
 VIAPOS_AVAILABLE = True  # Satislar tablosunu kullanacağız
@@ -40,19 +39,42 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         
         # ViaPos satislar verileri (external 'viapos' DB)
         try:
-            # KPI servisleri doğrudan PosRouter sayesinde 'viapos' DB'yi kullanır
-            kpis = services.kpi_today()
-            revenue_last7 = services.revenue_by_day(7)
-            payments = services.payment_distribution()
-            top_items = services.top_products(10)
+            tz = timezone.get_current_timezone()
+            now = timezone.now().astimezone(tz)
+            start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+            end = start + timedelta(days=1)
+
+            qs_today = Satislar.objects.using('viapos').filter(tarih__gte=start, tarih__lt=end)
+            ciro = qs_today.aggregate(ciro=Sum('toplam'))['ciro'] or 0
+            fis_sayisi = qs_today.values('fisno').distinct().count()
+            satir = qs_today.count()
+            ortalama_fis = (ciro / fis_sayisi) if fis_sayisi else 0
+
+            # Son 7 gün ciro
+            start7 = (now - timedelta(days=6)).replace(hour=0, minute=0, second=0, microsecond=0)
+            qs7 = Satislar.objects.using('viapos').filter(tarih__date__gte=start7.date())
+            ciro_son_7_gun = list(
+                qs7.annotate(gun=TruncDate('tarih'))
+                   .values('gun')
+                   .annotate(ciro=Sum('toplam'))
+                   .order_by('gun')
+            )
+
+            # Bugün saatlik ciro
+            saatlik = list(
+                qs_today.annotate(saat=TruncHour('tarih'))
+                        .values('saat')
+                        .annotate(ciro=Sum('toplam'))
+                        .order_by('saat')
+            )
 
             context['viapos_data'] = {
-                'daily_total': kpis['ciro'],
-                'avg_ticket': kpis['ortalama_fis'],
-                'weekly_total': sum(item['ciro'] for item in revenue_last7) if revenue_last7 else 0,
-                'revenue_last7': revenue_last7,
-                'payment_dist': payments,
-                'top_products': top_items,
+                'ciro': ciro,
+                'fis_sayisi': fis_sayisi,
+                'satir': satir,
+                'ortalama_fis': ortalama_fis,
+                'ciro_son_7_gun': ciro_son_7_gun,
+                'saatlik_satis_bugun': saatlik,
             }
             context['viapos_available'] = True
         except Exception as e:

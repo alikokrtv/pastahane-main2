@@ -20,31 +20,6 @@
                 </div>
             </div>
         </div>
-
-        <!-- Avg Ticket Card -->
-        <div class="bg-white overflow-hidden shadow-lg rounded-lg border border-gray-200 hover:shadow-xl transition-shadow duration-300">
-            <div class="p-6">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0">
-                        <div class="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">
-                            <i class="fas fa-receipt text-indigo-600"></i>
-                        </div>
-                    </div>
-                    <div class="ml-4 w-0 flex-1">
-                        <dl>
-                            <dt class="text-sm font-medium text-gray-500 truncate">Ortalama Fiş</dt>
-                            <dd class="text-2xl font-semibold text-gray-900">
-                                {% if viapos_available and viapos_data %}
-                                    ₺{{ viapos_data.avg_ticket|floatformat:2 }}
-                                {% else %}
-                                    - ₺
-                                {% endif %}
-                            </dd>
-                        </dl>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 
     <!-- Quick Stats Grid -->
@@ -248,49 +223,6 @@
                         </table>
                     </div>
                 </div>
-                {% endif %}
-            </div>
-        </div>
-    </div>
-    {% if viapos_available and viapos_data %}
-    <!-- Ödeme türü dağılımı ve En çok satanlar -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <div class="bg-white shadow-lg rounded-lg border border-gray-200">
-            <div class="px-6 py-4 border-b border-gray-200">
-                <h3 class="text-lg font-semibold text-gray-900">Ödeme Dağılımı</h3>
-            </div>
-            <div class="p-6">
-                {% if viapos_data.payment_dist %}
-                <ul class="space-y-2">
-                    {% for item in viapos_data.payment_dist %}
-                    <li class="flex justify-between text-sm">
-                        <span class="text-gray-600">{{ item.odemesi|default:"Bilinmeyen" }}</span>
-                        <span class="font-medium text-gray-900">₺{{ item.ciro|floatformat:2 }}</span>
-                    </li>
-                    {% endfor %}
-                </ul>
-                {% else %}
-                <p class="text-gray-500 text-sm">Veri yok</p>
-                {% endif %}
-            </div>
-        </div>
-
-        <div class="bg-white shadow-lg rounded-lg border border-gray-200">
-            <div class="px-6 py-4 border-b border-gray-200">
-                <h3 class="text-lg font-semibold text-gray-900">En Çok Satan Ürünler</h3>
-            </div>
-            <div class="p-6">
-                {% if viapos_data.top_products %}
-                <ol class="list-decimal list-inside space-y-2 text-sm">
-                    {% for item in viapos_data.top_products %}
-                    <li class="flex justify-between">
-                        <span class="text-gray-700 truncate pr-2">{{ item.urun|default:"Bilinmeyen" }}</span>
-                        <span class="text-gray-900">₺{{ item.ciro|floatformat:2 }} ({{ item.adet }})</span>
-                    </li>
-                    {% endfor %}
-                </ol>
-                {% else %}
-                <p class="text-gray-500 text-sm">Veri yok</p>
                 {% endif %}
             </div>
         </div>
