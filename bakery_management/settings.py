@@ -141,11 +141,12 @@ LOCAL_DB_CONFIG = {
 
 VIAPOS_DB_CONFIG = {
     'ENGINE': 'django.db.backends.mysql',
-    'NAME': os.environ.get('VIAPOS_NAME', 'viapospr2_site'),
-    'USER': os.environ.get('VIAPOS_USER', 'viapospr2_site'),
-    'PASSWORD': os.environ.get('VIAPOS_PASSWORD', 'uCSPYXXNS3DuJrwWmf3e'),
-    'HOST': os.environ.get('VIAPOS_HOST', 'localhost'),
-    'PORT': os.environ.get('VIAPOS_PORT', '3306'),
+    # Accept both VIAPOS_* and VIAPOS_DB_* names; fallback to COOLIFY defaults
+    'NAME': os.environ.get('VIAPOS_NAME', os.environ.get('VIAPOS_DB_NAME', 'viapos')),
+    'USER': os.environ.get('VIAPOS_USER', os.environ.get('VIAPOS_DB_USER', os.environ.get('COOLIFY_DB_USER', COOLIFY_DB_CONFIG['USER']))),
+    'PASSWORD': os.environ.get('VIAPOS_PASSWORD', os.environ.get('VIAPOS_DB_PASSWORD', os.environ.get('COOLIFY_DB_PASSWORD', COOLIFY_DB_CONFIG['PASSWORD']))),
+    'HOST': os.environ.get('VIAPOS_HOST', os.environ.get('VIAPOS_DB_HOST', os.environ.get('COOLIFY_DB_HOST', COOLIFY_DB_CONFIG['HOST']))),
+    'PORT': os.environ.get('VIAPOS_PORT', os.environ.get('VIAPOS_DB_PORT', os.environ.get('COOLIFY_DB_PORT', COOLIFY_DB_CONFIG['PORT']))),
     'OPTIONS': {
         'charset': 'utf8mb4',
         'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
