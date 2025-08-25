@@ -199,6 +199,10 @@
                             <thead>
                                 <tr>
                                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Müşteri</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Ürün</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Kasiyer</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Ödeme</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Şube</th>
                                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">İşlem</th>
                                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Tutar</th>
                                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Tarih</th>
@@ -210,6 +214,10 @@
                                     <td class="px-4 py-2 text-sm text-gray-900">
                                         {{ sale.customer|default:"Bilinmeyen"|truncatewords:2 }}
                                     </td>
+                                    <td class="px-4 py-2 text-sm text-gray-600">{{ sale.product|default:"-"|truncatewords:3 }}</td>
+                                    <td class="px-4 py-2 text-sm text-gray-600">{{ sale.cashier|default:"-" }}</td>
+                                    <td class="px-4 py-2 text-sm text-gray-600">{{ sale.payment|default:"-" }}</td>
+                                    <td class="px-4 py-2 text-sm text-gray-600">{{ sale.branch|default:"Genel" }}</td>
                                     <td class="px-4 py-2 text-sm text-gray-600">{{ sale.type }}</td>
                                     <td class="px-4 py-2 text-sm font-medium {% if sale.amount > 0 %}text-green-600{% else %}text-red-600{% endif %}">
                                         ₺{{ sale.amount|floatformat:2 }}
@@ -217,6 +225,86 @@
                                     <td class="px-4 py-2 text-sm text-gray-500">
                                         {{ sale.date|date:"d.m H:i" }}
                                     </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if viapos_data.by_product_today %}
+                <div class="mt-6 border-t pt-6">
+                    <h4 class="text-md font-semibold text-gray-800 mb-4">
+                        <i class="fas fa-list text-green-500 mr-2"></i>Bugün Ürün Bazında Satış
+                    </h4>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead>
+                                <tr>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Ürün</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Adet</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Ciro</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200">
+                                {% for row in viapos_data.by_product_today|slice:":10" %}
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-4 py-2 text-sm text-gray-900">{{ row.urun|default:"-"|truncatewords:4 }}</td>
+                                    <td class="px-4 py-2 text-sm text-gray-600">{{ row.quantity|default:0 }}</td>
+                                    <td class="px-4 py-2 text-sm font-medium text-green-600">₺{{ row.total|floatformat:2 }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if viapos_data.by_payment_today %}
+                <div class="mt-6">
+                    <h4 class="text-md font-semibold text-gray-800 mb-4">
+                        <i class="fas fa-wallet text-purple-500 mr-2"></i>Bugün Ödeme Tipine Göre Ciro
+                    </h4>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead>
+                                <tr>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Ödeme</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Ciro</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200">
+                                {% for row in viapos_data.by_payment_today %}
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-4 py-2 text-sm text-gray-900">{{ row.odemesi|default:"-" }}</td>
+                                    <td class="px-4 py-2 text-sm font-medium text-green-600">₺{{ row.total|floatformat:2 }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if viapos_data.by_branch_today %}
+                <div class="mt-6">
+                    <h4 class="text-md font-semibold text-gray-800 mb-4">
+                        <i class="fas fa-store text-indigo-500 mr-2"></i>Bugün Şubeye Göre Ciro
+                    </h4>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead>
+                                <tr>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Şube</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Ciro</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200">
+                                {% for row in viapos_data.by_branch_today %}
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-4 py-2 text-sm text-gray-900">{{ row.branch }}</td>
+                                    <td class="px-4 py-2 text-sm font-medium text-green-600">₺{{ row.total|floatformat:2 }}</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>

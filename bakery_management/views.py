@@ -27,9 +27,19 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         user = self.request.user
         
-        # Bugün ve bu hafta tarihleri
-        today = timezone.now().date()
-        week_ago = today - timedelta(days=7)
+        # Bugün ve bu haftaki tarihler
+        now = timezone.localtime()
+        today = now.date()
+        week_ago = today - timedelta(days=6)
+        
+        # Basit kasa/kasiyer -> şube tespiti (ihtiyaca göre genişletilebilir)
+        def detect_branch(cashier: str | None) -> str:
+            name = (cashier or '').lower()
+            if 'carsi' in name or 'çarşı' in name:
+                return 'Çarşı'
+            if 'vega' in name:
+                return 'Vega'
+            return 'Genel'
         
         # Temel dashboard verileri
         context.update({
@@ -64,7 +74,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
             # Haftalık toplam ciro
             weekly_total = qs7.aggregate(total=Sum('toplam'))['total'] or 0
 
-            # Son satışlar (bugünden) – şablonun beklediği yapıya dönüştür
+            # Son satışlar – şablonun beklediği yapıya dönüştür
             recent_qs = Satislar.objects.using('viapos').order_by('-tarih')[:10]
             recent_sales = [
                 {
@@ -72,9 +82,37 @@ class DashboardView(LoginRequiredMixin, TemplateView):
                     'type': s.odemesi or 'Satış',
                     'amount': float(s.toplam or 0),
                     'date': s.tarih,
+                    'product': s.urun,
+                    'cashier': s.satisiyapan,
+                    'payment': s.odemesi,
+                    'barcode': getattr(s, 'barkod', None),
+                    'group': getattr(s, 'grub', None),
+                    'branch': detect_branch(s.satisiyapan),
                 }
                 for s in recent_qs
             ]
+
+            # Bugün ürün bazında satış (miktar ve ciro)
+            by_product_today = list(
+                qs_today.values('urun')
+                        .annotate(quantity=Sum('adet'), total=Sum('toplam'))
+                        .order_by('-total')
+            )
+
+            # Bugün ödeme tipine göre ciro
+            by_payment_today = list(
+                qs_today.values('odemesi')
+                        .annotate(total=Sum('toplam'))
+                        .order_by('-total')
+            )
+
+            # Bugün şubeye göre ciro (Python tarafında tespit edilen branch ile)
+            branch_totals = {}
+            for s in qs_today:
+                b = detect_branch(s.satisiyapan)
+                branch_totals.setdefault(b, 0)
+                branch_totals[b] += float(s.toplam or 0)
+            by_branch_today = [{'branch': k, 'total': v} for k, v in sorted(branch_totals.items(), key=lambda x: -x[1])]
 
             # Bugün saatlik ciro
             saatlik = list(
@@ -95,6 +133,9 @@ class DashboardView(LoginRequiredMixin, TemplateView):
                 'daily_total': ciro,
                 'weekly_total': weekly_total,
                 'recent_sales': recent_sales,
+                'by_product_today': by_product_today,
+                'by_payment_today': by_payment_today,
+                'by_branch_today': by_branch_today,
             }
             context['viapos_available'] = True
         except Exception as e:
