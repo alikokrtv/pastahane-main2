@@ -58,7 +58,7 @@
           <td class="px-3 py-2 text-sm">{{ r.customer }}</td>
           <td class="px-3 py-2 text-sm">{{ r.product }}</td>
           <td class="px-3 py-2 text-sm">{{ r.group }}</td>
-          <td class="px-3 py-2 text-sm">{{ r.quantity|floatformat:0 }}</td>
+          <td class="px-3 py-2 text-sm">{{ r.quantity_display }}</td>
           <td class="px-3 py-2 text-sm">{{ r.unit|upper }}</td>
           <td class="px-3 py-2 text-sm">₺{{ r.price|floatformat:2 }}</td>
           <td class="px-3 py-2 text-sm font-medium">₺{{ r.amount|floatformat:2 }}</td>

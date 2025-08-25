@@ -62,17 +62,49 @@ class ViaposSalesListView(LoginRequiredMixin, TemplateView):
             return 'Vega'
         return 'Genel'
 
+    def _norm(self, s: str | None) -> str:
+        return (s or '').strip().upper()
+
     def _detect_unit(self, product: str | None, group: str | None) -> str:
-        """Heuristik birim tespiti: 'gr' veya 'adet'"""
-        p = (product or '').lower()
-        g = (group or '').lower()
-        gram_hints = [' gr', 'gr ', 'kg', ' kilo', 'dilim', 'kg ', ' kg']
-        gram_groups = ['kg', 'kg ürünler', 'kg urunler', 'dilim', 'pastalar dilim']
-        if any(h in p for h in gram_hints):
-            return 'gr'
-        if any(x in g for x in gram_groups):
-            return 'gr'
-        return 'adet'
+        """Önce ürün/grup sözlükleri; sonra heuristik. Çıktı: 'KG' | 'ADET'"""
+        p = self._norm(product)
+        g = self._norm(group)
+
+        PRODUCT_UNIT = {
+            'MUZ SARMA DILIM': 'ADET',  # varyasyonlar
+            'MUZ SARMA DİLİM': 'ADET',
+            'TEK DILIM': 'ADET',
+            'TEK DİLİM': 'ADET',
+        }
+        GROUP_UNIT = {
+            'PASTALAR': 'ADET',
+            'SARMA GRUBU': 'KG',
+            'TEPSI TATLILAR': 'ADET',
+            'TEPSİ TATLILAR': 'ADET',
+            'SUTLU TATLILAR': 'ADET',
+            'SÜTLÜ TATLILAR': 'ADET',
+            'BAKLAVALAR': 'KG',
+            'DIGER': 'ADET',
+            'DİĞER': 'ADET',
+            'ICECEK': 'ADET',
+            'İÇECEK': 'ADET',
+            'MUM-MAYTAP': 'ADET',
+        }
+
+        if p in PRODUCT_UNIT:
+            return PRODUCT_UNIT[p]
+        if g in GROUP_UNIT:
+            return GROUP_UNIT[g]
+
+        # Heuristik fallback
+        p_low = p.lower()
+        g_low = g.lower()
+        kg_keywords = [' kg', 'kg ', 'kg.', ' kilo', 'kilogram']
+        kg_groups = ['kg', 'kg.', 'kg urunler', 'kg ürünler']
+        kg_products = ['baklava', 'kadayıf', 'kadayif', 'tulumba', 'şekerpare', 'sekerpare', 'şöbiyet', 'sobiyet', 'künefe', 'kunefe']
+        if any(k in p_low for k in kg_keywords) or any(gk in g_low for gk in kg_groups) or any(k in p_low for k in kg_products):
+            return 'KG'
+        return 'ADET'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -128,6 +160,11 @@ class ViaposSalesListView(LoginRequiredMixin, TemplateView):
         rows = []
         for s in page_obj.object_list:
             unit = self._detect_unit(getattr(s, 'urun', None), getattr(s, 'grub', None))
+            try:
+                q = float(s.adet or 0)
+            except Exception:
+                q = 0.0
+            quantity_display = f"{q:.3f}" if unit == 'KG' else f"{q:.0f}"
             rows.append({
                 'id': s.id,
                 'fisno': s.fisno,
@@ -136,6 +173,7 @@ class ViaposSalesListView(LoginRequiredMixin, TemplateView):
                 'product': s.urun,
                 'group': getattr(s, 'grub', None),
                 'quantity': s.adet,
+                'quantity_display': quantity_display,
                 'unit': unit,
                 'price': s.fiyat,
                 'amount': s.toplam,
@@ -177,13 +215,12 @@ class ViaposSalesExportView(LoginRequiredMixin, View):
     def _detect_unit(self, product: str | None, group: str | None) -> str:
         p = (product or '').lower()
         g = (group or '').lower()
-        gram_hints = [' gr', 'gr ', 'kg', ' kilo', 'dilim', 'kg ', ' kg']
-        gram_groups = ['kg', 'kg ürünler', 'kg urunler', 'dilim', 'pastalar dilim']
-        if any(h in p for h in gram_hints):
-            return 'gr'
-        if any(x in g for x in gram_groups):
-            return 'gr'
-        return 'adet'
+        kg_keywords = [' kg', 'kg ', 'kg.', ' kilo', 'kilogram']
+        kg_groups = ['kg', 'kg.', 'kg urunler', 'kg ürünler']
+        kg_products = ['baklava', 'kadayıf', 'kadayif', 'tulumba', 'şekerpare', 'sekerpare', 'şöbiyet', 'sobiyet', 'künefe', 'kunefe']
+        if any(k in p for k in kg_keywords) or any(gk in g for gk in kg_groups) or any(k in p for k in kg_products):
+            return 'KG'
+        return 'ADET'
 
     def get(self, request):
         qs = Satislar.objects.using('viapos').all().order_by('-tarih')

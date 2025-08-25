@@ -40,6 +40,17 @@ class DashboardView(LoginRequiredMixin, TemplateView):
             if 'vega' in name:
                 return 'Vega'
             return 'Genel'
+
+        def detect_unit(product: str | None, group: str | None) -> str:
+            """Heuristik birim tespiti: 'KG' veya 'ADET'"""
+            p = (product or '').lower()
+            g = (group or '').lower()
+            kg_keywords = [' kg', 'kg ', 'kg.', ' kilo', 'kilogram']
+            kg_groups = ['kg', 'kg.', 'kg urunler', 'kg ürünler']
+            kg_products = ['baklava', 'kadayıf', 'kadayif', 'tulumba', 'şekerpare', 'sekerpare', 'şöbiyet', 'sobiyet', 'künefe', 'kunefe']
+            if any(k in p for k in kg_keywords) or any(gk in g for gk in kg_groups) or any(k in p for k in kg_products):
+                return 'KG'
+            return 'ADET'
         
         # Temel dashboard verileri
         context.update({
@@ -84,6 +95,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
                     'date': s.tarih,
                     'product': s.urun,
                     'quantity': float(s.adet or 0),
+                    'unit': detect_unit(getattr(s, 'urun', None), getattr(s, 'grub', None)),
                     'cashier': s.satisiyapan,
                     'payment': s.odemesi,
                     'barcode': getattr(s, 'barkod', None),
@@ -92,6 +104,11 @@ class DashboardView(LoginRequiredMixin, TemplateView):
                 }
                 for s in recent_qs
             ]
+
+            # quantity_display ekle (KG -> 3 ondalık, ADET -> tam sayı)
+            for item in recent_sales:
+                q = float(item.get('quantity') or 0)
+                item['quantity_display'] = f"{q:.3f}" if item.get('unit') == 'KG' else f"{q:.0f}"
 
             # Bugün ürün bazında satış (miktar ve ciro)
             by_product_today = list(
