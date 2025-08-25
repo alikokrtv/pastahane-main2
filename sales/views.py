@@ -164,21 +164,30 @@ class ViaposSalesListView(LoginRequiredMixin, TemplateView):
                 q = float(s.adet or 0)
             except Exception:
                 q = 0.0
-            # If KG and adet is 0 or ~1, derive from toplam/fiyat
+            # Infer from price and amount if adet is 0 or ~1
+            try:
+                price = float(s.fiyat or 0)
+                amount = float(s.toplam or 0)
+            except Exception:
+                price = 0.0
+                amount = 0.0
             q_eff = q
-            if unit == 'KG':
-                try:
-                    price = float(s.fiyat or 0)
-                    amount = float(s.toplam or 0)
-                except Exception:
-                    price = 0.0
-                    amount = 0.0
-                if q <= 0.0 or abs(q - 1.0) < 1e-6:
-                    if price > 0:
-                        q_eff = amount / price
-                # Avoid -0.000
-                if abs(q_eff) < 1e-9:
-                    q_eff = 0.0
+            if price > 0 and (q <= 0.0 or abs(q - 1.0) < 1e-6):
+                ratio = amount / price
+                # If ratio close to an integer, it's likely ADET sale
+                nearest = round(ratio)
+                if abs(ratio - nearest) < 1e-6:
+                    unit = 'ADET'
+                    q_eff = float(nearest)
+                else:
+                    unit = 'KG'
+                    q_eff = ratio
+            elif unit == 'KG' and price > 0 and q == 0:
+                # Fallback
+                q_eff = amount / price
+            # Avoid -0.000
+            if abs(q_eff) < 1e-9:
+                q_eff = 0.0
             quantity_display = f"{q_eff:.3f}" if unit == 'KG' else f"{q_eff:.0f}"
             rows.append({
                 'id': s.id,
@@ -274,22 +283,27 @@ class ViaposSalesExportView(LoginRequiredMixin, View):
         writer.writerow(['ID','Fis No','Tarih','Müşteri','Ürün','Grup','Miktar','Birim','Fiyat','Tutar','Kar','Ödeme','Kasiyer','Şube','Barkod'])
         for s in qs:
             unit = self._detect_unit(getattr(s, 'urun', None), getattr(s, 'grub', None))
-            # Effective quantity for KG
+            # Infer quantity and possibly unit from price/amount
             try:
                 q = float(s.adet or 0)
             except Exception:
                 q = 0.0
+            try:
+                price = float(s.fiyat or 0)
+                amount = float(s.toplam or 0)
+            except Exception:
+                price = 0.0
+                amount = 0.0
             q_eff = q
-            if unit == 'KG':
-                try:
-                    price = float(s.fiyat or 0)
-                    amount = float(s.toplam or 0)
-                except Exception:
-                    price = 0.0
-                    amount = 0.0
-                if q <= 0.0 or abs(q - 1.0) < 1e-6:
-                    if price > 0:
-                        q_eff = amount / price
+            if price > 0 and (q <= 0.0 or abs(q - 1.0) < 1e-6):
+                ratio = amount / price
+                nearest = round(ratio)
+                if abs(ratio - nearest) < 1e-6:
+                    unit = 'ADET'
+                    q_eff = float(nearest)
+                else:
+                    unit = 'KG'
+                    q_eff = ratio
             writer.writerow([
                 s.id,
                 s.fisno,
