@@ -115,9 +115,9 @@ COOLIFY_DB_CONFIG = {
     'ENGINE': 'django.db.backends.mysql',
     'NAME': os.environ.get('COOLIFY_DB_NAME', 'viapos'),
     'USER': os.environ.get('COOLIFY_DB_USER', 'root'),
-    'PASSWORD': os.environ.get('COOLIFY_DB_PASSWORD', 'X6KkhehbbE8eBFgmSS8hzWzegaY8qhV0uiSL2iIYENpLx85389e70CNzVyM9Ey8qh'),
-    'HOST': os.environ.get('COOLIFY_DB_HOST', 'h80w4kwwsocg0g004k8wo8gg'),
-    'PORT': os.environ.get('COOLIFY_DB_PORT', '3306'),
+    'PASSWORD': os.environ.get('COOLIFY_DB_PASSWORD', '6KkhehbbE8eBFgmSS8hzWzegaY8qhV0uiSL2iIYENpLx85389e70CNzVyM9Ey8qh'),
+    'HOST': os.environ.get('COOLIFY_DB_HOST', '31.97.58.73'),
+    'PORT': os.environ.get('COOLIFY_DB_PORT', '5555'),
     'OPTIONS': {
         'charset': 'utf8mb4',
         'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
