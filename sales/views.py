@@ -62,6 +62,18 @@ class ViaposSalesListView(LoginRequiredMixin, TemplateView):
             return 'Vega'
         return 'Genel'
 
+    def _detect_unit(self, product: str | None, group: str | None) -> str:
+        """Heuristik birim tespiti: 'gr' veya 'adet'"""
+        p = (product or '').lower()
+        g = (group or '').lower()
+        gram_hints = [' gr', 'gr ', 'kg', ' kilo', 'dilim', 'kg ', ' kg']
+        gram_groups = ['kg', 'kg ürünler', 'kg urunler', 'dilim', 'pastalar dilim']
+        if any(h in p for h in gram_hints):
+            return 'gr'
+        if any(x in g for x in gram_groups):
+            return 'gr'
+        return 'adet'
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         qs = Satislar.objects.using('viapos').all().order_by('-tarih')
@@ -115,6 +127,7 @@ class ViaposSalesListView(LoginRequiredMixin, TemplateView):
         # Prepare rows
         rows = []
         for s in page_obj.object_list:
+            unit = self._detect_unit(getattr(s, 'urun', None), getattr(s, 'grub', None))
             rows.append({
                 'id': s.id,
                 'fisno': s.fisno,
@@ -123,6 +136,7 @@ class ViaposSalesListView(LoginRequiredMixin, TemplateView):
                 'product': s.urun,
                 'group': getattr(s, 'grub', None),
                 'quantity': s.adet,
+                'unit': unit,
                 'price': s.fiyat,
                 'amount': s.toplam,
                 'profit': s.kar,
@@ -160,6 +174,16 @@ class ViaposSalesExportView(LoginRequiredMixin, View):
         if 'vega' in name:
             return 'Vega'
         return 'Genel'
+    def _detect_unit(self, product: str | None, group: str | None) -> str:
+        p = (product or '').lower()
+        g = (group or '').lower()
+        gram_hints = [' gr', 'gr ', 'kg', ' kilo', 'dilim', 'kg ', ' kg']
+        gram_groups = ['kg', 'kg ürünler', 'kg urunler', 'dilim', 'pastalar dilim']
+        if any(h in p for h in gram_hints):
+            return 'gr'
+        if any(x in g for x in gram_groups):
+            return 'gr'
+        return 'adet'
 
     def get(self, request):
         qs = Satislar.objects.using('viapos').all().order_by('-tarih')
@@ -195,8 +219,9 @@ class ViaposSalesExportView(LoginRequiredMixin, View):
         response = HttpResponse(content_type='text/csv; charset=utf-8')
         response['Content-Disposition'] = 'attachment; filename="viapos_sales.csv"'
         writer = csv.writer(response)
-        writer.writerow(['ID','Fis No','Tarih','Müşteri','Ürün','Grup','Adet','Fiyat','Tutar','Kar','Ödeme','Kasiyer','Şube','Barkod'])
+        writer.writerow(['ID','Fis No','Tarih','Müşteri','Ürün','Grup','Miktar','Birim','Fiyat','Tutar','Kar','Ödeme','Kasiyer','Şube','Barkod'])
         for s in qs:
+            unit = self._detect_unit(getattr(s, 'urun', None), getattr(s, 'grub', None))
             writer.writerow([
                 s.id,
                 s.fisno,
@@ -205,6 +230,7 @@ class ViaposSalesExportView(LoginRequiredMixin, View):
                 s.urun,
                 getattr(s, 'grub', ''),
                 s.adet,
+                unit,
                 s.fiyat,
                 s.toplam,
                 s.kar,

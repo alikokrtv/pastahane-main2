@@ -38,7 +38,8 @@
           <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Müşteri</th>
           <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Ürün</th>
           <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Grup</th>
-          <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Adet</th>
+          <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Miktar</th>
+          <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Birim</th>
           <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Fiyat</th>
           <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Tutar</th>
           <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Kar</th>
@@ -58,6 +59,7 @@
           <td class="px-3 py-2 text-sm">{{ r.product }}</td>
           <td class="px-3 py-2 text-sm">{{ r.group }}</td>
           <td class="px-3 py-2 text-sm">{{ r.quantity|floatformat:0 }}</td>
+          <td class="px-3 py-2 text-sm">{{ r.unit|upper }}</td>
           <td class="px-3 py-2 text-sm">₺{{ r.price|floatformat:2 }}</td>
           <td class="px-3 py-2 text-sm font-medium">₺{{ r.amount|floatformat:2 }}</td>
           <td class="px-3 py-2 text-sm">₺{{ r.profit|floatformat:2 }}</td>
