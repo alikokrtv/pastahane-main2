@@ -83,6 +83,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
                     'amount': float(s.toplam or 0),
                     'date': s.tarih,
                     'product': s.urun,
+                    'quantity': float(s.adet or 0),
                     'cashier': s.satisiyapan,
                     'payment': s.odemesi,
                     'barcode': getattr(s, 'barkod', None),
