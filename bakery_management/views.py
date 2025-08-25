@@ -68,7 +68,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
             recent_qs = Satislar.objects.using('viapos').order_by('-tarih')[:10]
             recent_sales = [
                 {
-                    'customer': s.musteriad,
+                    'customer': s.musteriadi,
                     'type': s.odemesi or 'Satış',
                     'amount': float(s.toplam or 0),
                     'date': s.tarih,
