@@ -207,7 +207,7 @@ class ViaposSalesListView(LoginRequiredMixin, TemplateView):
                 'date': s.tarih,
                 'customer': s.musteriadi,
                 'product': s.urun,
-                'group': getattr(s, 'grub', None),
+                'group': getattr(s, 'grub', '') ,
                 'quantity': q_eff,
                 'quantity_display': quantity_display,
                 'unit': unit_display,

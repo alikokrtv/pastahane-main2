@@ -13,6 +13,8 @@ class Satislar(models.Model):
     kar = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
     odemesi = models.CharField(max_length=50, null=True, blank=True)
     satisiyapan = models.CharField(max_length=100, null=True, blank=True)
+    grub = models.CharField(max_length=255, null=True, blank=True, db_column='grub')
+    barkod = models.CharField(max_length=100, null=True, blank=True, db_column='barkod')
 
     class Meta:
         managed = False  # Var olan tablo
