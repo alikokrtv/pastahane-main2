@@ -164,7 +164,22 @@ class ViaposSalesListView(LoginRequiredMixin, TemplateView):
                 q = float(s.adet or 0)
             except Exception:
                 q = 0.0
-            quantity_display = f"{q:.3f}" if unit == 'KG' else f"{q:.0f}"
+            # If KG and adet is 0 or ~1, derive from toplam/fiyat
+            q_eff = q
+            if unit == 'KG':
+                try:
+                    price = float(s.fiyat or 0)
+                    amount = float(s.toplam or 0)
+                except Exception:
+                    price = 0.0
+                    amount = 0.0
+                if q <= 0.0 or abs(q - 1.0) < 1e-6:
+                    if price > 0:
+                        q_eff = amount / price
+                # Avoid -0.000
+                if abs(q_eff) < 1e-9:
+                    q_eff = 0.0
+            quantity_display = f"{q_eff:.3f}" if unit == 'KG' else f"{q_eff:.0f}"
             rows.append({
                 'id': s.id,
                 'fisno': s.fisno,
@@ -172,7 +187,7 @@ class ViaposSalesListView(LoginRequiredMixin, TemplateView):
                 'customer': s.musteriadi,
                 'product': s.urun,
                 'group': getattr(s, 'grub', None),
-                'quantity': s.adet,
+                'quantity': q_eff,
                 'quantity_display': quantity_display,
                 'unit': unit,
                 'price': s.fiyat,
@@ -259,6 +274,22 @@ class ViaposSalesExportView(LoginRequiredMixin, View):
         writer.writerow(['ID','Fis No','Tarih','Müşteri','Ürün','Grup','Miktar','Birim','Fiyat','Tutar','Kar','Ödeme','Kasiyer','Şube','Barkod'])
         for s in qs:
             unit = self._detect_unit(getattr(s, 'urun', None), getattr(s, 'grub', None))
+            # Effective quantity for KG
+            try:
+                q = float(s.adet or 0)
+            except Exception:
+                q = 0.0
+            q_eff = q
+            if unit == 'KG':
+                try:
+                    price = float(s.fiyat or 0)
+                    amount = float(s.toplam or 0)
+                except Exception:
+                    price = 0.0
+                    amount = 0.0
+                if q <= 0.0 or abs(q - 1.0) < 1e-6:
+                    if price > 0:
+                        q_eff = amount / price
             writer.writerow([
                 s.id,
                 s.fisno,
@@ -266,7 +297,7 @@ class ViaposSalesExportView(LoginRequiredMixin, View):
                 s.musteriadi,
                 s.urun,
                 getattr(s, 'grub', ''),
-                s.adet,
+                f"{q_eff:.3f}" if unit == 'KG' else f"{q_eff:.0f}",
                 unit,
                 s.fiyat,
                 s.toplam,

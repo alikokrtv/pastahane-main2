@@ -95,6 +95,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
                     'date': s.tarih,
                     'product': s.urun,
                     'quantity': float(s.adet or 0),
+                    'price': float(getattr(s, 'fiyat', 0) or 0),
                     'unit': detect_unit(getattr(s, 'urun', None), getattr(s, 'grub', None)),
                     'cashier': s.satisiyapan,
                     'payment': s.odemesi,
@@ -108,7 +109,19 @@ class DashboardView(LoginRequiredMixin, TemplateView):
             # quantity_display ekle (KG -> 3 ondalık, ADET -> tam sayı)
             for item in recent_sales:
                 q = float(item.get('quantity') or 0)
-                item['quantity_display'] = f"{q:.3f}" if item.get('unit') == 'KG' else f"{q:.0f}"
+                unit = item.get('unit')
+                q_eff = q
+                if unit == 'KG':
+                    price = float(item.get('price') or 0)
+                    amount = float(item.get('amount') or 0)
+                    if q <= 0.0 or abs(q - 1.0) < 1e-6:
+                        if price > 0:
+                            q_eff = amount / price
+                    if abs(q_eff) < 1e-9:
+                        q_eff = 0.0
+                    item['quantity_display'] = f"{q_eff:.3f}"
+                else:
+                    item['quantity_display'] = f"{q_eff:.0f}"
 
             # Bugün ürün bazında satış (miktar ve ciro)
             by_product_today = list(
