@@ -128,7 +128,8 @@ class ViaposSalesListView(LoginRequiredMixin, TemplateView):
         qs = Satislar.objects.using('viapos').all().order_by('-tarih')
 
         # Filters
-        q = self.request.GET.get('q')
+        # Support new 'query' param (to avoid browser autofill on 'q'), fallback to legacy 'q'
+        q = self.request.GET.get('query') or self.request.GET.get('q')
         payment = self.request.GET.get('payment')
         group = self.request.GET.get('group')
         branch = self.request.GET.get('branch')
@@ -222,7 +223,7 @@ class ViaposSalesListView(LoginRequiredMixin, TemplateView):
 
         context.update({
             'filters': {
-                'q': q or '',
+                'query': q or '',
                 'payment': payment or '',
                 'group': group or '',
                 'branch': branch or '',
@@ -260,7 +261,8 @@ class ViaposSalesExportView(LoginRequiredMixin, View):
 
     def get(self, request):
         qs = Satislar.objects.using('viapos').all().order_by('-tarih')
-        q = request.GET.get('q')
+        # Support 'query' param with fallback to legacy 'q'
+        q = request.GET.get('query') or request.GET.get('q')
         payment = request.GET.get('payment')
         group = request.GET.get('group')
         branch = request.GET.get('branch')

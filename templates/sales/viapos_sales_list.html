@@ -7,7 +7,7 @@
 
   <!-- Filters -->
   <form method="get" autocomplete="off" class="grid grid-cols-1 md:grid-cols-6 gap-3 bg-white p-4 rounded shadow">
-    <input type="text" name="q" value="{{ filters.q }}" placeholder="Ürün/Müşteri/Fiş/Barkod" class="border rounded px-3 py-2">
+    <input type="text" name="query" value="{{ filters.query }}" placeholder="Ürün/Müşteri/Fiş/Barkod" class="border rounded px-3 py-2" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" inputmode="search">
     <input type="text" name="group" value="{{ filters.group }}" placeholder="Grup" class="border rounded px-3 py-2">
     <input type="text" name="payment" value="{{ filters.payment }}" placeholder="Ödeme" class="border rounded px-3 py-2">
     <input type="text" name="branch" value="{{ filters.branch }}" placeholder="Şube (Çarşı/Vega/Genel)" class="border rounded px-3 py-2">
