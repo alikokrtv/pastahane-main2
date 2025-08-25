@@ -45,6 +45,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
             end = start + timedelta(days=1)
 
             qs_today = Satislar.objects.using('viapos').filter(tarih__gte=start, tarih__lt=end)
+            # Bugün toplam ciro
             ciro = qs_today.aggregate(ciro=Sum('toplam'))['ciro'] or 0
             fis_sayisi = qs_today.values('fisno').distinct().count()
             satir = qs_today.count()
@@ -59,6 +60,21 @@ class DashboardView(LoginRequiredMixin, TemplateView):
                    .annotate(ciro=Sum('toplam'))
                    .order_by('gun')
             )
+
+            # Haftalık toplam ciro
+            weekly_total = qs7.aggregate(total=Sum('toplam'))['total'] or 0
+
+            # Son satışlar (bugünden) – şablonun beklediği yapıya dönüştür
+            recent_qs = Satislar.objects.using('viapos').order_by('-tarih')[:10]
+            recent_sales = [
+                {
+                    'customer': s.musteriad,
+                    'type': s.odemesi or 'Satış',
+                    'amount': float(s.toplam or 0),
+                    'date': s.tarih,
+                }
+                for s in recent_qs
+            ]
 
             # Bugün saatlik ciro
             saatlik = list(
@@ -75,6 +91,10 @@ class DashboardView(LoginRequiredMixin, TemplateView):
                 'ortalama_fis': ortalama_fis,
                 'ciro_son_7_gun': ciro_son_7_gun,
                 'saatlik_satis_bugun': saatlik,
+                # Template expectations
+                'daily_total': ciro,
+                'weekly_total': weekly_total,
+                'recent_sales': recent_sales,
             }
             context['viapos_available'] = True
         except Exception as e:
