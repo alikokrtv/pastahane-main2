@@ -65,6 +65,23 @@ class ViaposSalesListView(LoginRequiredMixin, TemplateView):
     def _norm(self, s: str | None) -> str:
         return (s or '').strip().upper()
 
+    def _to_float(self, v) -> float:
+        if v is None:
+            return 0.0
+        try:
+            if isinstance(v, (int, float)):
+                return float(v)
+            s = str(v).strip()
+            # Remove currency symbols and spaces
+            for ch in ['₺', '$', '€']:
+                s = s.replace(ch, '')
+            s = s.replace(' ', '')
+            # Turkish decimal comma to dot
+            s = s.replace(',', '.')
+            return float(s) if s else 0.0
+        except Exception:
+            return 0.0
+
     def _detect_unit(self, product: str | None, group: str | None) -> str:
         """Önce ürün/grup sözlükleri; sonra heuristik. Çıktı: 'KG' | 'ADET'"""
         p = self._norm(product)
@@ -159,36 +176,31 @@ class ViaposSalesListView(LoginRequiredMixin, TemplateView):
         # Prepare rows
         rows = []
         for s in page_obj.object_list:
-            unit = self._detect_unit(getattr(s, 'urun', None), getattr(s, 'grub', None))
-            try:
-                q = float(s.adet or 0)
-            except Exception:
-                q = 0.0
-            # Infer from price and amount if adet is 0 or ~1
-            try:
-                price = float(s.fiyat or 0)
-                amount = float(s.toplam or 0)
-            except Exception:
-                price = 0.0
-                amount = 0.0
+            detected_unit = self._detect_unit(getattr(s, 'urun', None), getattr(s, 'grub', None))
+            q = self._to_float(getattr(s, 'adet', 0))
+            price = self._to_float(getattr(s, 'fiyat', 0))
+            amount = self._to_float(getattr(s, 'toplam', 0))
+            unit = detected_unit
             q_eff = q
-            if price > 0 and (q <= 0.0 or abs(q - 1.0) < 1e-6):
+            if price > 0 and amount > 0:
                 ratio = amount / price
-                # If ratio close to an integer, it's likely ADET sale
                 nearest = round(ratio)
-                if abs(ratio - nearest) < 1e-6:
+                if abs(ratio - nearest) < 0.02:  # near integer → ADET
                     unit = 'ADET'
                     q_eff = float(nearest)
                 else:
                     unit = 'KG'
                     q_eff = ratio
-            elif unit == 'KG' and price > 0 and q == 0:
-                # Fallback
-                q_eff = amount / price
             # Avoid -0.000
             if abs(q_eff) < 1e-9:
                 q_eff = 0.0
-            quantity_display = f"{q_eff:.3f}" if unit == 'KG' else f"{q_eff:.0f}"
+            # Display: KG as grams, ADET as integer
+            if unit == 'KG':
+                quantity_display = f"{q_eff * 1000:.0f}"
+                unit_display = 'GR'
+            else:
+                quantity_display = f"{q_eff:.0f}"
+                unit_display = 'ADET'
             rows.append({
                 'id': s.id,
                 'fisno': s.fisno,
@@ -198,7 +210,7 @@ class ViaposSalesListView(LoginRequiredMixin, TemplateView):
                 'group': getattr(s, 'grub', None),
                 'quantity': q_eff,
                 'quantity_display': quantity_display,
-                'unit': unit,
+                'unit': unit_display,
                 'price': s.fiyat,
                 'amount': s.toplam,
                 'profit': s.kar,
@@ -282,23 +294,16 @@ class ViaposSalesExportView(LoginRequiredMixin, View):
         writer = csv.writer(response)
         writer.writerow(['ID','Fis No','Tarih','Müşteri','Ürün','Grup','Miktar','Birim','Fiyat','Tutar','Kar','Ödeme','Kasiyer','Şube','Barkod'])
         for s in qs:
-            unit = self._detect_unit(getattr(s, 'urun', None), getattr(s, 'grub', None))
-            # Infer quantity and possibly unit from price/amount
-            try:
-                q = float(s.adet or 0)
-            except Exception:
-                q = 0.0
-            try:
-                price = float(s.fiyat or 0)
-                amount = float(s.toplam or 0)
-            except Exception:
-                price = 0.0
-                amount = 0.0
+            detected_unit = self._detect_unit(getattr(s, 'urun', None), getattr(s, 'grub', None))
+            q = self._to_float(getattr(s, 'adet', 0))
+            price = self._to_float(getattr(s, 'fiyat', 0))
+            amount = self._to_float(getattr(s, 'toplam', 0))
+            unit = detected_unit
             q_eff = q
-            if price > 0 and (q <= 0.0 or abs(q - 1.0) < 1e-6):
+            if price > 0 and amount > 0:
                 ratio = amount / price
                 nearest = round(ratio)
-                if abs(ratio - nearest) < 1e-6:
+                if abs(ratio - nearest) < 0.02:
                     unit = 'ADET'
                     q_eff = float(nearest)
                 else:
